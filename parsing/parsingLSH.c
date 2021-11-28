@@ -18,36 +18,7 @@
 extern int d;
 
 // returns number of words in str
-int countWords(char *str){
-    int state = OUT;
-    int wc = 0;  // word count
-
-    // Scan all characters one by one
-    while (*str)
-    {
-        // If next character is a separator, set the
-        // state as OUT
-        if (*str == ' ' || *str == '\n' || *str == '\t' || *str == '\0')
-            state = OUT;
-
-        // If next character is not a word separator and
-        // state is OUT, then set the state as IN and
-        // increment word count
-        else if (state == OUT)
-        {
-            state = IN;
-            ++wc;
-        }
-
-        // Move to next character
-        ++str;
-    }
-
-    return wc;
-}
-
-// returns number of words in str
-int countWords2(char *str){
+static int countWords(char *str){
     char * token = strtok(str, " ");
     token = strtok(NULL, " ");
      // loop through the string to extract all other tokens
@@ -60,22 +31,7 @@ int countWords2(char *str){
     return counter;
 }
 
-int countLines(FILE *fp){
-  // count the lines of the given file
-  int count=0;
-  if(fp==NULL){ // error checking
-    perror("Error");
-    exit(-1);
-  }
-  while(!feof(fp)){
-    if(fgetc(fp)=='\n'){
-      count++;
-    }
-  }
-  return count;
-}
-
-int findDim(char* fileName){
+int findDimLSH(char* fileName){
   FILE *file = fopen(fileName, "r"); // read mode
 
   if (file == NULL){
@@ -92,13 +48,13 @@ int findDim(char* fileName){
    perror("Error while reading the file.\n");
    exit(-1);
  }
- int dims = countWords2(buffer);
+ int dims = countWords(buffer);
  fclose(file);
  return dims-1;
 }
 
 
-void readFile(char* fileName,List *inputs,int *vectorCount){
+void readFileLSH(char* fileName,List *inputs,int *vectorCount){
 
    FILE *file = fopen(fileName, "r"); // read mode
 
@@ -141,7 +97,7 @@ void readFile(char* fileName,List *inputs,int *vectorCount){
 }
 
 
-void readQueryFile(char* queryFile,char* outputFile,LSH lsh,List inputs,int n,double radius){
+void readQueryFileLSH(char* queryFile,char* outputFile,LSH lsh,List inputs){
 
    FILE *file = fopen(queryFile, "r"); // read mode
 
@@ -161,7 +117,7 @@ void readQueryFile(char* queryFile,char* outputFile,LSH lsh,List inputs,int n,do
     exit(EXIT_FAILURE);
   }
 
-
+  int n =1 ; // 1 nearest neighbor
   char buffer[MAX_INPUT_LENGTH];
   Vector nNearest[n]; // here store the true k nearest neighbors
   double knearestDists[n]; // here store the true distances from the k nearest neighbors
@@ -174,10 +130,6 @@ void readQueryFile(char* queryFile,char* outputFile,LSH lsh,List inputs,int n,do
       continue;
     }
 
-    for (int i = 0; i < n; i++){
-      nNearest[i]=NULL;
-      knearestDists[i]=-1;
-    }
 
     int id;
     char * token = strtok(buffer, " ");
@@ -194,35 +146,28 @@ void readQueryFile(char* queryFile,char* outputFile,LSH lsh,List inputs,int n,do
 
     fprintf(fptr, "Query %d:\n",id);
 
+    for (int i = 0; i < n; i++){
+      nNearest[i]=NULL;
+      knearestDists[i]=-1;
+    }
+
     clock_t begin_true = clock(); // time calculation for the k nearest neighbors with brute force method
     // find with the brute force method the k nearest neighbors for the corresponding query vector
-    if(n==1)
-      listFindNearestNeighbor(inputs,vecTmp,nNearest,knearestDists,d,-1);
-    else
-      listFindKNearestNeighbors(inputs,vecTmp,nNearest,knearestDists,d,n,-1);
+
+    listFindNearestNeighbor(inputs,vecTmp,nNearest,knearestDists,d,-1);
 
     clock_t end_true = clock();
     double time_spent_true = (double)(end_true - begin_true) / CLOCKS_PER_SEC;
 
     clock_t begin_lsh = clock(); // time calculation for the k nearest neighbors with LSH
     // find with the help of LSH the k nearest neighbor for the corresponding query vector
-    if(n==1)
-      nearestNeigborLSH(lsh,vecTmp,knearestDists,fptr);
-    else
-      kNearestNeighborsLSH(lsh,vecTmp,n,knearestDists,fptr);
+    nearestNeigborLSH(lsh,vecTmp,knearestDists,fptr);
 
     clock_t end_lsh = clock();
     double time_spent_lsh = (double)(end_lsh - begin_lsh) / CLOCKS_PER_SEC;
     fprintf(fptr, "tLSH: %f seconds\n",time_spent_lsh);
     fprintf(fptr, "tTrue: %f seconds\n",time_spent_true);
 
-
-    clock_t begin_radius = clock(); // time calculation for the range search with LSH
-    // neighbors range search of LSH for the corresponding query vector
-    radiusNeigborsLSH(lsh,vecTmp,radius,fptr);
-    clock_t end_radius = clock();
-    double time_spent_radius = (double)(end_radius - begin_radius) / CLOCKS_PER_SEC;
-    fprintf(fptr, "tRadiusSearch: %f seconds\n\n\n",time_spent_radius);
     deleteVector(vecTmp);
   }
   fclose(fptr);
