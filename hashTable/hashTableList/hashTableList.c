@@ -5,6 +5,7 @@
 #include <float.h>
 #include "../../Vector/vector.h"
 #include "../hashTable.h"
+#include "../../FrechetDistance/discreteFrechet.h"
 
 
 #define SQUARE(x) ((x)*(x))
@@ -21,7 +22,6 @@ double distance_metric(Vector v1,Vector v2,int d){
   }
   return sqrt(sum);
 }
-
 
 struct listNode {
   Vector v;

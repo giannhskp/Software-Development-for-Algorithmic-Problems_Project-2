@@ -37,7 +37,7 @@ static int wValueCalculation(List list,int numberOfVectorsInFile){
       if(count>stopBound){
         return floor(sumDist/count);
       }
-      sumDist += distance_metric(getVector(list),getVector(nested),d);
+      sumDist +=distance_metric(getVector(list),getVector(nested),d);
       count++;
       nested = getNext(nested);
     }
