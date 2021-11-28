@@ -2,8 +2,8 @@
 #define PARSINGCUBE_H
 
 
-void readFile(char*,List * ,int *);
-void readQueryFile(char* ,char* ,HyperCube,List,int,double,int,int );
-int findDim(char* );
+void readFileCube(char*,List * ,int *);
+void readQueryFileCube(char* ,char* ,HyperCube,List,int,int );
+int findDimCube(char* );
 
 #endif

@@ -18,7 +18,7 @@ int m;
 int probes;
 int w;
 
-int wValueCalculation(List list,int numberOfVectorsInFile){
+static int wValueCalculation(List list,int numberOfVectorsInFile){
   long double sumDist = 0.0;
   int count=0;
   double persentageToCheck;
@@ -49,118 +49,21 @@ int wValueCalculation(List list,int numberOfVectorsInFile){
 
 
 
-void printOptions(){
-  printf("_________________Options____________________\n\n");
-	printf("1. /repeat <new_query_file> <output file>\n\n");
-	printf("2. /exit\n\n");
-	printf("_____________________________________\n\n");
-}
-
-
-
-int main(int argc, char *argv[]) {
+void vectorTimeSeriesHypecube(char* arg_inputFile,char* arg_queryFile,int arg_new_dimension,int arg_M,int arg_probes,char* arg_outputFile) {
   srand(time(NULL));
-  int option;
   char str[200];
   char inputFile[100];
-  int inputflag=0;
+  strcpy(inputFile,arg_inputFile);
   char queryFile[100];
-  int queryflag=0;
+  strcpy(queryFile,arg_queryFile);
   char outputFile[100];
-  int outputflag=0;
-  new_dimension=14;
-  int m=10;
-  int n=1;
-  int r=10000;
-  int probes=2;
+  strcpy(outputFile,arg_outputFile);
 
-  while((option = getopt(argc, argv, "i:q:k:M:p:o:N:R:")) != -1){
-     switch(option){
-        case 'i':
-        inputflag++;
-        strcpy(inputFile,optarg);
-        printf("Given input File : %s\n", inputFile);
-        break;
-
-        case 'q':
-        queryflag++;
-        strcpy(queryFile,optarg);
-        printf("Given query File : %s\n", queryFile);
-        break;
-
-        case 'k':
-        new_dimension=atoi(optarg);
-        printf("k : %d\n", new_dimension);
-        break;
-
-        case 'M':
-        m=atoi(optarg);
-        printf("M : %d\n", m);
-        break;
-
-        case 'p':
-        if(strcmp(argv[optind-1],"-probes")==0){
-          probes=atoi(argv[optind]);
-          printf("probes : %d\n", probes);
-        }
-        break;
-
-        case 'o':
-        outputflag++;
-        strcpy(outputFile,optarg);
-        printf("Given output File : %s\n", outputFile);
-        break;
-
-        case 'N':
-        n=atoi(optarg);
-        printf("number of nearest neighbors: %d\n", n);
-        break;
-
-        case 'R':
-         r=atoi(optarg);
-         printf("Radius : %d\n", r);
-         break;
-
-        case ':':
-         printf("option needs a value\n");
-         break;
-        default: /* '?' */
-          fprintf(stderr, "Usage: %s –i <input file> –q <query file> –k <int> -M <int> -probes <int> -ο <output file> -Ν <number of nearest> -R <radius>\n",argv[0]);
-          exit(EXIT_FAILURE);
-     }
-  }
+  new_dimension=arg_new_dimension;
+  int m=arg_M;
+  int probes=arg_probes;
 
 
-  if(!inputflag){
-    printf(">Input file name: ");
-    fflush(stdin); // clear stdin buffer
-    if (fgets(str, sizeof(char)*200, stdin) == NULL) { // read a command
-      perror("Error reading string with fgets\n");
-      exit(1);
-    }
-    sscanf(str,"%s\n",inputFile);
-    printf("Given input File : %s\n", inputFile);
-  }
-  if(!queryflag){
-    printf(">Query file name: ");
-    fflush(stdin); // clear stdin buffer
-    if (fgets(str, sizeof(char)*200, stdin) == NULL) { // read a command
-      perror("Error reading string with fgets\n");
-      exit(1);
-    }
-    sscanf(str,"%s\n",queryFile);
-    printf("Given query File : %s\n", queryFile);
-  }
-  if(!outputflag){
-    printf(">Output file name: ");
-    fflush(stdin); // clear stdin buffer
-    if (fgets(str, sizeof(char)*200, stdin) == NULL) { // read a command
-      perror("Error reading string with fgets\n");
-      exit(1);
-    }
-    sscanf(str,"%s\n",outputFile);
-    printf("Given output File : %s\n", outputFile);
-  }
   if(new_dimension>25){
     printf("You chose a big value for k (d') and the system may not be capable of allocating all the memory needed by the hypecube\n");
     printf("Do you wish to continue with k=%d ? (Press \"y\" to continue or \"n\" to change the value of k)\n",new_dimension);
@@ -192,15 +95,13 @@ int main(int argc, char *argv[]) {
 
 
   List list;
-  int repeat=1;
-  char command[200];
   clock_t begin = clock();
-  d = findDim(inputFile);
+  d = findDimCube(inputFile);
   printf("DIMENSION = %d\n",d);
 
   list = initializeList();
   int numberOfVectorsInFile = 0;
-  readFile(inputFile,&list,&numberOfVectorsInFile);
+  readFileCube(inputFile,&list,&numberOfVectorsInFile);
   clock_t end = clock();
   double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Parsed input file in : %f seconds\n",time_spent);
@@ -222,40 +123,8 @@ int main(int argc, char *argv[]) {
   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Created HyperCube in : %f seconds\n",time_spent);
 
-  while(1){
-    if(repeat){
-      readQueryFile(queryFile,outputFile,hc,list,n,r,probes,m);
-    }
-
-    repeat=0;
-    printOptions(); // just printing the commands options for the user
-
-    printf("\n");
-    printf(">Enter a command: ");
-    fflush(stdin); // clear stdin buffer
-    if (fgets(str, sizeof(char)*200, stdin) == NULL) { // read a command
-      perror("Error reading string with fgets\n");
-      exit(1);
-    }
-    else if(strstr(str, "/repeat") != NULL) {
-      repeat=1;
-      sscanf(str,"%s %s %s\n",command,queryFile,outputFile);
-      printf("query File: %s\n",queryFile);
-      printf("output File: %s\n",outputFile);
-      continue;
-    }
-    else if(strcmp(str,"/exit\n")==0){
-      break;
-    }
-    else{
-      printf("\n\n  --- Wrong command ! Please, try again. ---  \n\n");
-      printOptions(); // just printing the commands options for the user
-      continue;
-    }
-
-  }
+  readQueryFileCube(queryFile,outputFile,hc,list,probes,m);
 
   deleteHyperCube(hc);
   listDelete(list,0);
-  return 0;
 }
