@@ -54,32 +54,27 @@ Vector timeSeriesSnapping(Vector v,Vector time,int d,double gridDelta){
     double temp=coordsVector[i];
     double tempTime=coordsTime[i];
     int found=0;
-    int keepX;
-    int keepY;
+    double keepX;
+    double keepY;
 
     // x
-    if(gridDelta>tempTime){
-      keepX=gridDelta;
-    }
-    else{
-      tempTime = tempTime + gridDelta/2;
-      tempTime = tempTime - fmod(tempTime,gridDelta);
-      keepX=tempTime;
-    }
+    tempTime = tempTime + gridDelta/2;
+    tempTime = tempTime - fmod(tempTime,gridDelta);
+    keepX=tempTime;
     // y
-    if(gridDelta>temp){
-      keepY=gridDelta;
-    }
-    else{
-      temp = temp + gridDelta/2;
-      temp = temp - fmod(temp,gridDelta);
-      // temp = temp - (temp % gridDelta);
-      keepY=temp;
-    }
+    temp = temp + gridDelta/2;
+    temp = temp - fmod(temp,gridDelta);
+    keepY=temp;
+
 
     for(int j=0;j<index;j++){
       if(snappedTime[j]==keepX && snappedVector[j]==keepY){
         found=1;
+        printf("i: %d\n",i);
+        printf("coordsVector: %f\n",coordsVector[i]);
+        printf("keepX: %f\n",keepX);
+        printf("keepY: %f\n",keepY);
+        break;
       }
     }
 
