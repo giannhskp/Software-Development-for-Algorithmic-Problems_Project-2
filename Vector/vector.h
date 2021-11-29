@@ -25,11 +25,14 @@ int getAssignedCluster(Vector );
 void setAssignedCluster(Vector ,int );
 
 double *getCoords(Vector);
+char* getID(Vector );
 
 void initializeClusterInfo(Vector );
 int getAssignedIteration(Vector );
 void setAssignedIteration(Vector ,int );
 double getAssignedAtRadius(Vector );
 void setAssignedAtRadius(Vector ,double );
+
+Vector shiftVector(Vector ,double );
 
 #endif

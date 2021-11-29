@@ -11,8 +11,10 @@
 #define SQUARE(x) ((x)*(x))
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 
+extern char *distanceMetric;
+extern Vector timeVector;
 
-double distance_metric(Vector v1,Vector v2,int d){
+double l2_distance(Vector v1,Vector v2,int d){
   // calculate the Euclidean distance (or L2) between the given vectors and return it
   double sum = 0.0;
   double *coords1 = getCoords(v1);
@@ -21,6 +23,18 @@ double distance_metric(Vector v1,Vector v2,int d){
     sum += SQUARE(coords1[i]-coords2[i]);
   }
   return sqrt(sum);
+}
+
+
+double distance_metric(Vector v1,Vector v2,int d){
+  if(strcmp(distanceMetric,"l2")==0){
+    return l2_distance(v1,v2,d);
+  }else if(strcmp(distanceMetric,"discreteFrechet")==0){
+    return discreteFrechet(v1,v2,timeVector,d);
+  }else{
+    printf("WRONG DISTANCE METRIC\n");
+    return -1.0;
+  }
 }
 
 struct listNode {

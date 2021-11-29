@@ -15,6 +15,8 @@ void printOptions(){
 	printf("_____________________________________\n\n");
 }
 
+char *distanceMetric;
+
 
 int main(int argc, char *argv[])  {
 
@@ -75,7 +77,7 @@ int main(int argc, char *argv[])  {
 
         case 'm':
         if(strcmp(argv[optind-1],"-metric")==0){
-          strcpy(metric,optarg);
+          strcpy(metric,argv[optind]);
           printf("Given metric: %s\n", metric);
         }
         break;
@@ -143,26 +145,40 @@ int main(int argc, char *argv[])  {
   srand(time(NULL));
   char command[200];
 
+  // TODO: REMOVE
+  strcpy(metric,"discrete");
+  delta=10;
+  printf("!!!!!!!!!!!! DELTA = %f\n",delta);
+
   if(strcmp(algorithm,"LSH")==0){
     // printf(fptr,"Algorithm: LSH\n");
+    distanceMetric=malloc(sizeof(char)*(strlen("l2")+1));
+    strcpy(distanceMetric,"l2");
     fprintf(stdout,"Algorithm: LSH\n");
     vectorTimeSeriesLSH(inputFile,queryFile,k_LSH,l,outputFile);
   }
   else if(strcmp(algorithm,"Hypercube")==0){
+    distanceMetric=malloc(sizeof(char)*(strlen("l2")+1));
+    strcpy(distanceMetric,"l2");
     // printf(fptr,"Algorithm: Hypercube\n");
     vectorTimeSeriesHypecube(inputFile,queryFile,new_dimension,m,probes,outputFile);
   }
   else if(strcmp(algorithm,"Frechet")==0){
     // printf(fptr,"Algorithm: Frechet\n");
     if(strcmp(metric,"discrete")==0){
+      distanceMetric=malloc(sizeof(char)*(strlen("discreteFrechet")+1));
+      strcpy(distanceMetric,"discreteFrechet");
+      printf("CALLED FUNCTION vectorTimeSeriesLSHFrechetDiscrete\n");
+      vectorTimeSeriesLSHFrechetDiscrete(inputFile,queryFile,k_LSH,l,outputFile,delta);
     // clusteringHypercube(vecList,numOfClusters,mHyper,probes,fptr);
     }
     else if(strcmp(metric,"continuous")==0){
     // clusteringHypercube(vecList,numOfClusters,mHyper,probes,fptr);
-  }
-  else{
-    // TODO: GIVE METRIC
-  }
+    }
+    else{
+      // TODO: GIVE METRIC
+      printf("WRONG METRIC, %s\n",metric);
+    }
   }
   else{
     printf("%s\n",algorithm);
@@ -209,5 +225,6 @@ int main(int argc, char *argv[])  {
   //
   // }
 
+  free(distanceMetric);
   return 0;
 }

@@ -24,6 +24,10 @@ double* getCoords(Vector v){
   return v->coords;
 }
 
+char* getID(Vector v){
+  return v->vec_id;
+}
+
 int assignedToCluster(Vector v){
   return (v->clusterInfo->assignedCluster==-1) ? FALSE : TRUE;
 }
@@ -140,4 +144,11 @@ int compareVectors(Vector v1,Vector v2){
       return 0;
   }
   return 1;
+}
+
+Vector shiftVector(Vector v,double displacement){
+  for(int i=0;i<d;i++){
+    v->coords[i] += displacement;
+  }
+  return v;
 }
