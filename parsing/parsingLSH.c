@@ -13,21 +13,20 @@
 #define FALSE    0
 #define TRUE    1
 
-#define MAX_INPUT_LENGTH 1024
+#define MAX_INPUT_LENGTH 10240
 
 extern int d;
 
 // returns number of words in str
 static int countWords(char *str){
-    char * token = strtok(str, " ");
-    token = strtok(NULL, " ");
+    char * token = strtok(str, "	");
+    token = strtok(NULL, "	");
      // loop through the string to extract all other tokens
      int counter = 0;
      while( token != NULL ) {
         counter++;
-        token = strtok(NULL, " ");
+        token = strtok(NULL, "	");
      }
-
     return counter;
 }
 
@@ -42,7 +41,7 @@ int findDimLSH(char* fileName){
  if (feof(file)){ // empty file, return
    return -1;
  }
-  char buffer[MAX_INPUT_LENGTH];
+ char buffer[MAX_INPUT_LENGTH];
  fflush(stdin);  // clear stdin buffer
  if(fscanf(file,"%[^\n]\n",buffer)<0){ // read a line from the file
    perror("Error while reading the file.\n");
@@ -76,15 +75,15 @@ void readFileLSH(char* fileName,List *inputs,int *vectorCount){
     }
 
     double vec[d];
-    char * token = strtok(buffer, " ");
+    char * token = strtok(buffer, "	 ");
     char name[MAX_INPUT_LENGTH];
     strcpy(name,token);
-    token = strtok(NULL, " ");
+    token = strtok(NULL, "	");
      // loop through the string to extract all other tokens
      int counter = 0;
      while( token != NULL ) {
         vec[counter++]=atof(token);
-        token = strtok(NULL, " ");
+        token = strtok(NULL, "	");
      }
      Vector vecTmp=initVector(vec,name);
      (*inputs) = listInsert((*inputs),vecTmp,-1);
@@ -130,19 +129,18 @@ void readQueryFileLSH(char* queryFile,char* outputFile,LSH lsh,List inputs){
 
 
     int id;
-    char * token = strtok(buffer, " ");
+    char * token = strtok(buffer, "	 ");
     char name[MAX_INPUT_LENGTH];
     strcpy(name,token);
-    id=atoi(token);
-    token = strtok(NULL, " ");
+    token = strtok(NULL, "	");
     int counter = 0;
     while( token != NULL ) {
       vec[counter++]=atof(token);
-      token = strtok(NULL, " ");
+      token = strtok(NULL, "	");
     }
     Vector vecTmp=initVector(vec,name);
 
-    fprintf(fptr, "Query %d:\n",id);
+    fprintf(fptr, "Query %s:\n",name);
 
     for (int i = 0; i < n; i++){
       nNearest[i]=NULL;
@@ -159,7 +157,7 @@ void readQueryFileLSH(char* queryFile,char* outputFile,LSH lsh,List inputs){
 
     clock_t begin_lsh = clock(); // time calculation for the k nearest neighbors with LSH
     // find with the help of LSH the k nearest neighbor for the corresponding query vector
-    nearestNeigborLSH(lsh,vecTmp,knearestDists,fptr);
+    nearestNeigborLSH(lsh,vecTmp,nNearest,knearestDists,fptr);
 
     clock_t end_lsh = clock();
     double time_spent_lsh = (double)(end_lsh - begin_lsh) / CLOCKS_PER_SEC;
@@ -207,19 +205,18 @@ void readQueryFileLSH_DiscreteFrechet(char* queryFile,char* outputFile,LSH lsh,L
 
 
     int id;
-    char * token = strtok(buffer, " ");
+    char * token = strtok(buffer, "	 ");
     char name[MAX_INPUT_LENGTH];
     strcpy(name,token);
-    id=atoi(token);
-    token = strtok(NULL, " ");
+    token = strtok(NULL, "	");
     int counter = 0;
     while( token != NULL ) {
       vec[counter++]=atof(token);
-      token = strtok(NULL, " ");
+      token = strtok(NULL, "	");
     }
     Vector vecTmp=initVector(vec,name);
 
-    fprintf(fptr, "Query %d:\n",id);
+    fprintf(fptr, "Query %s:\n",name);
 
     for (int i = 0; i < n; i++){
       nNearest[i]=NULL;
@@ -236,12 +233,12 @@ void readQueryFileLSH_DiscreteFrechet(char* queryFile,char* outputFile,LSH lsh,L
 
     clock_t begin_lsh = clock(); // time calculation for the k nearest neighbors with LSH
     // find with the help of LSH the k nearest neighbor for the corresponding query vector
-    nearestNeigborLSH_DiscreteFrechet(lsh,vecTmp,knearestDists,fptr,grids,timeVector,delta);
+    nearestNeigborLSH_DiscreteFrechet(lsh,vecTmp,nNearest,knearestDists,fptr,grids,timeVector,delta);
 
     clock_t end_lsh = clock();
     double time_spent_lsh = (double)(end_lsh - begin_lsh) / CLOCKS_PER_SEC;
-    fprintf(fptr, "tLSH: %f seconds\n",time_spent_lsh);
-    fprintf(fptr, "tTrue: %f seconds\n",time_spent_true);
+    fprintf(fptr, "tApproximateAverage: %f seconds\n",time_spent_lsh);
+    fprintf(fptr, "tTrueAverage: %f seconds\n",time_spent_true);
     fflush(fptr);
     deleteVector(vecTmp);
   }

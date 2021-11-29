@@ -84,7 +84,7 @@ int main(int argc, char *argv[])  {
 
         case 'd':
         if(strcmp(argv[optind-1],"-delta")==0){
-          delta=atof(optarg);
+          delta=atof(argv[optind]);
           printf("Delta: %f\n", delta);
         }
         break;
@@ -146,9 +146,9 @@ int main(int argc, char *argv[])  {
   char command[200];
 
   // TODO: REMOVE
-  strcpy(metric,"discrete");
-  delta=10;
-  printf("!!!!!!!!!!!! DELTA = %f\n",delta);
+  // strcpy(metric,"discrete");
+  // delta=10;
+  // printf("!!!!!!!!!!!! DELTA = %f\n",delta);
 
   if(strcmp(algorithm,"LSH")==0){
     // printf(fptr,"Algorithm: LSH\n");

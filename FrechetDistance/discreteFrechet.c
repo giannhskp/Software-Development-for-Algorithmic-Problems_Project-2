@@ -28,7 +28,6 @@ double discreteFrechet(Vector v1,Vector v2,Vector time,int d){
   }
 
   dynamicArray[0][0] = l2_metric(coords1[0],coordsTime[0],coords2[0],coordsTime[0]);
-
   for(int i=1;i<d;i++){
     double p1qj = l2_metric(coords1[0],coordsTime[0],coords2[i],coordsTime[i]);
     dynamicArray[0][i] = MAX( dynamicArray[0][i-1], p1qj);

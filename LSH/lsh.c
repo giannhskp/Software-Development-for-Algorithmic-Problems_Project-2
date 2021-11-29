@@ -95,10 +95,6 @@ Vector timeSeriesSnapping(Vector v,Vector time,int d,double gridDelta,double t){
     for(int j=0;j<index;j++){
       if(snappedTime[j]==keepX && snappedVector[j]==keepY){
         found=1;
-        // printf("i: %d\n",i);
-        // printf("coordsVector: %f\n",coordsVector[i]+t);
-        // printf("keepX: %f\n",keepX);
-        // printf("keepY: %f\n",keepY);
         break;
       }
     }
@@ -246,6 +242,7 @@ void insertTimeSeriesToLSH(LSH lsh,Grids grids,Vector timeVector,double delta,Ve
     int index = computeG(lsh->g_fun[i],snappedToGrid,&id); // compute the value of the g function for the given vector that will be inserted
     // finally insert the vector at the corresponding bucket of the current hash table
     htInsert(lsh->hts[i],v,index,id);
+    deleteVector(snappedToGrid);
   }
   // getchar();
 }
@@ -291,7 +288,7 @@ void destroyLSH(LSH lsh){
 }
 
 
-void nearestNeigborLSH(LSH lsh,Vector q,double *trueDist,FILE *fptr){
+void nearestNeigborLSH(LSH lsh,Vector q,Vector *nNearest,double *trueDist,FILE *fptr){
   // find the nearest neighbor of the given vector q with the help of LSH
   Vector nearest=NULL;
   double nearestDist=-1;
@@ -307,16 +304,18 @@ void nearestNeigborLSH(LSH lsh,Vector q,double *trueDist,FILE *fptr){
   }
   // check if nearest neighbor of the given vector q found or not
   if(nearestDist>=0 && nearest!=NULL){
-    fprintf(fptr,"Nearest neighbor-1: ");
+    fprintf(fptr,"Approximate Nearest neighbor: ");
     printVectorIdInFile(nearest,fptr);
-    fprintf(fptr,"distanceLSH: %f\n",nearestDist);
+    fprintf(fptr,"True Nearest neighbor: ");
+    printVectorIdInFile(*nNearest,fptr);
+    fprintf(fptr,"distanceApproximate: %f\n",nearestDist);
     fprintf(fptr,"distanceTrue: %f\n", *trueDist);
   }else{
     fprintf(fptr,"- DID NOT FIND NEAREST NEIGHBOR\n");
   }
 }
 
-void nearestNeigborLSH_DiscreteFrechet(LSH lsh,Vector q,double *trueDist,FILE *fptr,Grids grids,Vector timeVector,double delta){
+void nearestNeigborLSH_DiscreteFrechet(LSH lsh,Vector q,Vector *nNearest,double *trueDist,FILE *fptr,Grids grids,Vector timeVector,double delta){
   // find the nearest neighbor of the given vector q with the help of LSH
   Vector nearest=NULL;
   double nearestDist=-1;
@@ -331,12 +330,15 @@ void nearestNeigborLSH_DiscreteFrechet(LSH lsh,Vector q,double *trueDist,FILE *f
     int q_index = computeG(gfuns[i],snappedToGrid,&q_ID); // compute the value of the g function for the given vector
     // and go to the corresponding bucket of the current hash table to find the  nearest neighbor for the given query vector
     htFindNearestNeighbor(hts[i],q_index,q,&nearest,&nearestDist,d,q_ID);
+    deleteVector(snappedToGrid);
   }
   // check if nearest neighbor of the given vector q found or not
   if(nearestDist>=0 && nearest!=NULL){
-    fprintf(fptr,"Nearest neighbor: ");
+    fprintf(fptr,"Approximate Nearest neighbor: ");
     printVectorIdInFile(nearest,fptr);
-    fprintf(fptr,"distanceLSH: %f\n",nearestDist);
+    fprintf(fptr,"True Nearest neighbor: ");
+    printVectorIdInFile(*nNearest,fptr);
+    fprintf(fptr,"distanceApproximate: %f\n",nearestDist);
     fprintf(fptr,"distanceTrue: %f\n", *trueDist);
   }else{
     fprintf(fptr,"- DID NOT FIND NEAREST NEIGHBOR\n");

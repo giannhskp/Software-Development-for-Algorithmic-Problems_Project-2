@@ -119,6 +119,12 @@ void vectorTimeSeriesLSHFrechetDiscrete(char* arg_inputFile,char* arg_queryFile,
 
   srand(time(NULL));
 
+
+
+  LSH lsh;
+  List list;
+  clock_t begin = clock();
+  d = findDimLSH(inputFile);
   double sum=0.0;
   double time[d];
   for(int i=0;i<d;i++){
@@ -126,12 +132,6 @@ void vectorTimeSeriesLSHFrechetDiscrete(char* arg_inputFile,char* arg_queryFile,
     sum+=1.0;
   }
   timeVector=initVector(time,"time");
-
-
-  LSH lsh;
-  List list;
-  clock_t begin = clock();
-  d = findDimLSH(inputFile);
   printf("DIMENSION = %d\n",d);
   list = initializeList();
   int numberOfVectorsInFile = 0;
@@ -160,7 +160,8 @@ void vectorTimeSeriesLSHFrechetDiscrete(char* arg_inputFile,char* arg_queryFile,
   printf("Created LSH in : %f seconds\n",time_spent);
 
   readQueryFileLSH_DiscreteFrechet(queryFile,outputFile,lsh,list,grids,timeVector,delta);
-
+  deleteVector(timeVector);
+  deleteGrids(grids);
   destroyLSH(lsh);
   listDelete(list,0);
 }
