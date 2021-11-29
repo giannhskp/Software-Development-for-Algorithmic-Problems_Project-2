@@ -33,4 +33,6 @@ void setAssignedIteration(Vector ,int );
 double getAssignedAtRadius(Vector );
 void setAssignedAtRadius(Vector ,double );
 
+Vector shiftVector(Vector ,double );
+
 #endif

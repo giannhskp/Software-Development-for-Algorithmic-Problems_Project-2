@@ -145,3 +145,10 @@ int compareVectors(Vector v1,Vector v2){
   }
   return 1;
 }
+
+Vector shiftVector(Vector v,double displacement){
+  for(int i=0;i<d;i++){
+    v->coords[i] += displacement;
+  }
+  return v;
+}

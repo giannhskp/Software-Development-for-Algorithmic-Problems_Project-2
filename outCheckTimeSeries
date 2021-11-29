@@ -1,0 +1,84 @@
+Query 1:
+Nearest neighbor: 9861
+distanceLSH: 44.000000
+distanceTrue: 39.000000
+tLSH: 0.029701 seconds
+tTrue: 5.131159 seconds
+Query 2:
+Nearest neighbor: 2644
+distanceLSH: 42.000000
+distanceTrue: 34.000000
+tLSH: 0.017589 seconds
+tTrue: 4.442467 seconds
+Query 3:
+Nearest neighbor: 585
+distanceLSH: 47.000000
+distanceTrue: 40.000000
+tLSH: 0.028300 seconds
+tTrue: 4.402963 seconds
+Query 4:
+Nearest neighbor: 7577
+distanceLSH: 44.000000
+distanceTrue: 38.000000
+tLSH: 0.025783 seconds
+tTrue: 4.839777 seconds
+Query 5:
+Nearest neighbor: 9753
+distanceLSH: 43.000000
+distanceTrue: 40.000000
+tLSH: 0.028433 seconds
+tTrue: 4.810538 seconds
+Query 6:
+Nearest neighbor: 6343
+distanceLSH: 42.000000
+distanceTrue: 34.000000
+tLSH: 0.042807 seconds
+tTrue: 4.877374 seconds
+Query 7:
+Nearest neighbor: 3313
+distanceLSH: 38.000000
+distanceTrue: 38.000000
+tLSH: 0.025835 seconds
+tTrue: 4.968443 seconds
+Query 8:
+Nearest neighbor: 810
+distanceLSH: 50.000000
+distanceTrue: 40.000000
+tLSH: 0.033872 seconds
+tTrue: 4.954668 seconds
+Query 9:
+Nearest neighbor: 1427
+distanceLSH: 40.000000
+distanceTrue: 37.000000
+tLSH: 0.026772 seconds
+tTrue: 4.765635 seconds
+Query 10:
+Nearest neighbor: 3808
+distanceLSH: 46.000000
+distanceTrue: 41.000000
+tLSH: 0.025844 seconds
+tTrue: 4.660861 seconds
+Query 11:
+Nearest neighbor: 3450
+distanceLSH: 41.000000
+distanceTrue: 38.000000
+tLSH: 0.029281 seconds
+tTrue: 4.787501 seconds
+Query 12:
+Nearest neighbor: 8684
+distanceLSH: 43.000000
+distanceTrue: 38.000000
+tLSH: 0.025951 seconds
+tTrue: 4.595600 seconds
+Query 13:
+Nearest neighbor: 4356
+distanceLSH: 44.000000
+distanceTrue: 38.000000
+tLSH: 0.017124 seconds
+tTrue: 4.609231 seconds
+Query 14:
+Nearest neighbor: 2282
+distanceLSH: 42.000000
+distanceTrue: 36.000000
+tLSH: 0.018372 seconds
+tTrue: 4.759686 seconds
