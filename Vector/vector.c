@@ -24,6 +24,10 @@ double* getCoords(Vector v){
   return v->coords;
 }
 
+char* getID(Vector v){
+  return v->vec_id;
+}
+
 int assignedToCluster(Vector v){
   return (v->clusterInfo->assignedCluster==-1) ? FALSE : TRUE;
 }

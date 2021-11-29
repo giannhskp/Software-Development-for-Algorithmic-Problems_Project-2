@@ -89,8 +89,17 @@ void readFileLSH(char* fileName,List *inputs,int *vectorCount){
      Vector vecTmp=initVector(vec,name);
      (*inputs) = listInsert((*inputs),vecTmp,-1);
      (*vectorCount)++;
-
-
+     printVector(vecTmp);
+     double time[d];
+     double sum=0.0;
+     for(int i=0;i<d;i++){
+       time[i]=sum;
+       sum+=1.0;
+     }
+     Vector timeV=initVector(time,"time");
+     vecTmp=timeSeriesSnapping(vecTmp,timeV,d,2.5); 
+     printVector(vecTmp);
+     getchar();
   }
 
   fclose(file);

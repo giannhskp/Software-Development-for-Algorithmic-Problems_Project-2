@@ -43,6 +43,63 @@ g_function *getGfuns(LSH lsh){
   return lsh->g_fun;
 }
 
+Vector timeSeriesSnapping(Vector v,Vector time,int d,double gridDelta){
+  double *coordsVector = getCoords(v);
+  double *coordsTime = getCoords(time);
+  double snappedVector[d];
+  double snappedTime[d];
+
+  int index=0;
+  for(int i=0;i<d;i++){
+    double temp=coordsVector[i];
+    double tempTime=coordsTime[i];
+    int found=0;
+    int keepX;
+    int keepY;
+
+    // x
+    if(gridDelta>tempTime){
+      keepX=gridDelta;
+    }
+    else{
+      tempTime = tempTime + gridDelta/2;
+      tempTime = tempTime - fmod(tempTime,gridDelta);
+      keepX=tempTime;
+    }
+    // y
+    if(gridDelta>temp){
+      keepY=gridDelta;
+    }
+    else{
+      temp = temp + gridDelta/2;
+      temp = temp - fmod(temp,gridDelta);
+      // temp = temp - (temp % gridDelta);
+      keepY=temp;
+    }
+
+    for(int j=0;j<index;j++){
+      if(snappedTime[j]==keepX && snappedVector[j]==keepY){
+        found=1;
+      }
+    }
+
+    if(!found){
+      snappedVector[index]=keepY;
+      snappedTime[index++]=keepX;
+    }
+  }
+  // TODO: padding
+  ////////////////////////////
+  for(int i=index;i<d;i++){
+    snappedVector[i]=0;
+    snappedTime[i]=0;
+  }
+  ////////////////////////////
+  Vector vecTmp=initVector(snappedVector,getID(v));
+  return vecTmp;
+}
+
+
 /* H FUNCTIONS*/
 
 void generateH_LSH(h_function *hfun){
