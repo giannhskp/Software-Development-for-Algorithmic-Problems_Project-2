@@ -7,6 +7,8 @@
 #include "mainLSH.h"
 #include "mainCube.h"
 
+#define FILTERING_E 0.1
+
 
 void printOptions(){
   printf("_________________Options____________________\n\n");
@@ -146,8 +148,8 @@ int main(int argc, char *argv[])  {
   char command[200];
 
   // TODO: REMOVE
-  strcpy(metric,"discrete");
-  delta=10;
+  strcpy(metric,"continuous");
+  delta=2.25;
   printf("!!!!!!!!!!!! DELTA = %f\n",delta);
   printf("!!!!!!!!!!!! METRIC = %s\n",metric);
 
@@ -174,7 +176,10 @@ int main(int argc, char *argv[])  {
     // clusteringHypercube(vecList,numOfClusters,mHyper,probes,fptr);
     }
     else if(strcmp(metric,"continuous")==0){
-    // clusteringHypercube(vecList,numOfClusters,mHyper,probes,fptr);
+      distanceMetric=malloc(sizeof(char)*(strlen("discreteFrechet")+1));
+      strcpy(distanceMetric,"discreteFrechet");
+      printf("CALLED FUNCTION vectorTimeSeriesLSHFrechetContinuous\n");
+      vectorTimeSeriesLSHFrechetContinuous(inputFile,queryFile,k_LSH,outputFile,delta,FILTERING_E);
     }
     else{
       // TODO: GIVE METRIC

@@ -8,11 +8,15 @@
 #include "../hashTable/hashTableList/hashTableList.h"
 #include "./helperFunctions.h"
 
+#define MAX(a, b) (((a) > (b)) ? (a) : (b))
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
 extern int w;
 extern int d;
 extern int k_LSH;
 extern int hashTableSize;
+
+#define PADDING_M 300
 
 
 typedef struct hfunc{
@@ -107,12 +111,91 @@ Vector timeSeriesSnapping(Vector v,Vector time,int d,double gridDelta,double t){
   // TODO: padding
   ////////////////////////////
   for(int i=index;i<d;i++){
-    snappedVector[i]=0;
-    snappedTime[i]=0;
+    snappedVector[i]=PADDING_M;
+    snappedTime[i]=PADDING_M;
   }
   ////////////////////////////
   Vector vecTmp=initVector(snappedVector,getID(v));
   return vecTmp;
+}
+
+Vector continuousTimeSeriesSnapping(Vector v,int d,double gridDelta){
+  double *coordsVector = getCoords(v);
+  double snappedVector[d];
+
+  int index=0;
+  for(int i=0;i<d;i++){
+    double temp=coordsVector[i];  // displacement
+    if(temp==-1){
+      continue;
+    }
+    double keepY;
+    // y
+    // temp = temp + gridDelta/2;
+    // temp = temp - fmod(temp,gridDelta);
+    // keepY=temp;
+
+    temp = temp+(0.5);
+    temp = temp/gridDelta;
+    temp = floor(temp);
+    temp = temp * gridDelta;
+    keepY = temp;
+
+
+    snappedVector[index++]=keepY;
+  }
+  // TODO: padding
+  ////////////////////////////
+  for(int i=index;i<d;i++){
+    snappedVector[i]=PADDING_M;
+  }
+  ////////////////////////////
+  Vector vecTmp=initVector(snappedVector,getID(v));
+  return vecTmp;
+}
+
+Vector minima_maxima(Vector v,int d){
+  double *coordsVector = getCoords(v);
+  double keyVector[d];
+  int newIndex = 0;
+  int prev = 0;
+  for(int i=1;i<(d-1);i++){
+    if(coordsVector[i+1]==PADDING_M){
+      break;
+    }
+    double minimum = MIN(coordsVector[prev],coordsVector[i+1]);
+    double maximum = MAX(coordsVector[prev],coordsVector[i+1]);
+    if(coordsVector[i]>=minimum && coordsVector[i]<=maximum){
+      continue;
+    }else{
+      keyVector[newIndex++] = coordsVector[i];
+      prev=i;
+    }
+  }
+  for(int i=newIndex;i<d;i++){
+    keyVector[i] = PADDING_M;
+  }
+  Vector tempVec = initVector(keyVector,"keyVector");
+  return tempVec;
+}
+
+Vector filtering(Vector v,double epsilon){
+  double *filteredCoords = malloc(d*(sizeof(double)));
+  double *originalCoords = getCoords(v);
+  filteredCoords[0]=originalCoords[0];
+  double previous = originalCoords[0];
+  for(int i=1;i<(d-1);i++){
+    if((fabs(previous-originalCoords[i])<epsilon) && (fabs(originalCoords[i]-originalCoords[i+1])<epsilon)){
+      filteredCoords[i]=-1;
+    }else{
+      filteredCoords[i]=originalCoords[i];
+      previous = originalCoords[i];
+    }
+  }
+  filteredCoords[d-1]=originalCoords[d-1];
+  Vector tempVec = initVector(filteredCoords,getID(v));
+  free(filteredCoords);
+  return tempVec;
 }
 
 
@@ -247,6 +330,40 @@ void insertTimeSeriesToLSH(LSH lsh,Grids grids,Vector timeVector,double delta,Ve
   // getchar();
 }
 
+
+void insertContinuousTimeSeriesToLSH(LSH lsh,Grids grids,Vector timeVector,double delta,Vector v,double epsilon){
+  // insert the given vector in all LSΗ hash tables
+  // the bucket of the hash table that the vector will be inserted depends from the corresponding g function of the specific hash Table (hash function)
+  // at the new node tha will be inserted at the hash Tables save the id (Querying trick)
+  // printf("*** FOR VECTOR WITH ID ");
+  // printVectorId(v);
+  // printf("ORIGINAL = ");
+  // printVector(v);
+  Vector v2 = filtering(v,epsilon);
+  // printf("FILTERED = ");
+  // printVector(v2);
+  // printf("DELTA = %f\n",delta);
+  Vector v3 = continuousTimeSeriesSnapping(v2,d,delta);
+  // printf("SNAPPED = ");
+  // printVector(v3);
+  Vector v4 = minima_maxima(v3,d);
+  // printf("KEY_VECTOR = ");
+  // printVector(v4);
+
+
+  int l = lsh->l;
+  if(l!=1){ // TODO: REMOVE
+    printf("L!=1 ON CONTINUOUS LSH\n");
+
+  }
+  unsigned int id;
+  int index = computeG(lsh->g_fun[0],v4,&id); // compute the value of the g function for the given vector that will be inserted
+  // finally insert the vector at the corresponding bucket of the current hash table
+  htInsert(lsh->hts[0],v,index,id);
+
+  // TODO: FREE VECTORS
+}
+
 void insertFromListToLSH(List list,LSH lsh){
   // insert every vector of the list at the corresponding LSH
   if(list==NULL){ return;}
@@ -263,6 +380,16 @@ void insertTimeSeriesFromListToLSH(List list,LSH lsh,Grids grids,Vector timeVect
   List temp=list;
   while(temp!=NULL){
       insertTimeSeriesToLSH(lsh,grids,timeVector,delta,getVector(temp));
+      temp=getNext(temp);
+  }
+}
+
+void insertContinuousTimeSeriesFromListToLSH(List list,LSH lsh,Grids grids,Vector timeVector,double delta,double epsilon){
+  // insert every vector of the list at the corresponding LSH
+  if(list==NULL){ return;}
+  List temp=list;
+  while(temp!=NULL){
+      insertContinuousTimeSeriesToLSH(lsh,grids,timeVector,delta,getVector(temp),epsilon);
       temp=getNext(temp);
   }
 }
@@ -286,7 +413,6 @@ void destroyLSH(LSH lsh){
   free(lsh->hts);
   free(lsh);
 }
-
 
 void nearestNeigborLSH(LSH lsh,Vector q,Vector *nNearest,double *trueDist,FILE *fptr){
   // find the nearest neighbor of the given vector q with the help of LSH
@@ -332,6 +458,36 @@ void nearestNeigborLSH_DiscreteFrechet(LSH lsh,Vector q,Vector *nNearest,double 
     htFindNearestNeighbor(hts[i],q_index,q,&nearest,&nearestDist,d,q_ID);
     deleteVector(snappedToGrid);
   }
+  // check if nearest neighbor of the given vector q found or not
+  if(nearestDist>=0 && nearest!=NULL){
+    fprintf(fptr,"Approximate Nearest neighbor: ");
+    printVectorIdInFile(nearest,fptr);
+    fprintf(fptr,"True Nearest neighbor: ");
+    printVectorIdInFile(*nNearest,fptr);
+    fprintf(fptr,"distanceApproximate: %f\n",nearestDist);
+    fprintf(fptr,"distanceTrue: %f\n", *trueDist);
+  }else{
+    fprintf(fptr,"- DID NOT FIND NEAREST NEIGHBOR\n");
+  }
+}
+
+void nearestNeigborLSH_ContinuousFrechet(LSH lsh,Vector q,Vector *nNearest,double *trueDist,FILE *fptr,Vector timeVector,double delta,double epsilon){
+  // find the nearest neighbor of the given vector q with the help of LSH
+  Vector nearest=NULL;
+  double nearestDist=-1;
+  int l = getL(lsh);
+  if(l!=1){printf("L!=1 ON CONTINUOUS LSH\n");} // TODO: REMOVE
+  HashTable *hts = getHts(lsh);
+
+  Vector v2 = filtering(q,epsilon);
+  Vector v3 = continuousTimeSeriesSnapping(v2,d,delta);
+  Vector v4 = minima_maxima(v3,d);
+
+  unsigned int q_id;
+  int q_index = computeG(lsh->g_fun[0],v4,&q_id); // compute the value of the g function for the given vector that will be inserted
+
+  htFindNearestNeighbor(hts[0],q_index,q,&nearest,&nearestDist,d,q_id);
+
   // check if nearest neighbor of the given vector q found or not
   if(nearestDist>=0 && nearest!=NULL){
     fprintf(fptr,"Approximate Nearest neighbor: ");

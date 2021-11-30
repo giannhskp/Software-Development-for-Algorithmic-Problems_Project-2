@@ -9,6 +9,7 @@ LSH initializeLSH(int );
 void insertToLSH(LSH ,Vector );
 void insertFromListToLSH(List ,LSH );
 void insertTimeSeriesFromListToLSH(List ,LSH ,Grids ,Vector ,double );
+void insertContinuousTimeSeriesFromListToLSH(List ,LSH ,Grids ,Vector ,double ,double );
 void printLSH(LSH );
 void destroyLSH(LSH );
 
@@ -24,4 +25,5 @@ Grids initializeGrids(double ,int );
 void deleteGrids(Grids );
 double getTofGrid(Grids ,int );
 void nearestNeigborLSH_DiscreteFrechet(LSH ,Vector ,Vector *,double *,FILE *,Grids ,Vector ,double );
+void nearestNeigborLSH_ContinuousFrechet(LSH ,Vector ,Vector *,double *,FILE *,Vector ,double ,double );
 #endif
