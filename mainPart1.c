@@ -146,9 +146,10 @@ int main(int argc, char *argv[])  {
   char command[200];
 
   // TODO: REMOVE
-  // strcpy(metric,"discrete");
-  // delta=10;
-  // printf("!!!!!!!!!!!! DELTA = %f\n",delta);
+  strcpy(metric,"discrete");
+  delta=10;
+  printf("!!!!!!!!!!!! DELTA = %f\n",delta);
+  printf("!!!!!!!!!!!! METRIC = %s\n",metric);
 
   if(strcmp(algorithm,"LSH")==0){
     // printf(fptr,"Algorithm: LSH\n");
