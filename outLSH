@@ -1,35 +1,208 @@
 Query nnn_e:
-Approximate Nearest neighbor: mh_a
-True Nearest neighbor: mh_a
-distanceApproximate: 0.700000
-distanceTrue: 0.700000
-tApproximateAverage: 0.015064 seconds
-tTrueAverage: 0.152378 seconds
+Approximate Nearest neighbor: isf
+True Nearest neighbor: isf
+distanceApproximate: 0.660000
+distanceTrue: 0.660000
+tApproximateAverage: 0.139773 seconds
+tTrueAverage: 1.193476 seconds
 Query nnn_f:
-Approximate Nearest neighbor: lmhb
-True Nearest neighbor: lmhb
-distanceApproximate: 0.550000
-distanceTrue: 0.550000
-tApproximateAverage: 0.017228 seconds
-tTrueAverage: 0.154927 seconds
+Approximate Nearest neighbor: cof_g
+True Nearest neighbor: cof_g
+distanceApproximate: 0.500000
+distanceTrue: 0.500000
+tApproximateAverage: 0.023126 seconds
+tTrueAverage: 1.219582 seconds
 Query nnvc:
-Approximate Nearest neighbor: mbii
-True Nearest neighbor: mlss
-distanceApproximate: 0.460000
-distanceTrue: 0.460000
-tApproximateAverage: 0.037429 seconds
-tTrueAverage: 0.146561 seconds
+Approximate Nearest neighbor: bioc
+True Nearest neighbor: bioc
+distanceApproximate: 0.270000
+distanceTrue: 0.270000
+tApproximateAverage: 0.404343 seconds
+tTrueAverage: 1.396437 seconds
 Query nny:
-Approximate Nearest neighbor: mpacu
-True Nearest neighbor: mpacu
-distanceApproximate: 0.350000
-distanceTrue: 0.350000
-tApproximateAverage: 0.018116 seconds
-tTrueAverage: 0.149035 seconds
+Approximate Nearest neighbor: gdl
+True Nearest neighbor: gdl
+distanceApproximate: 0.310000
+distanceTrue: 0.310000
+tApproximateAverage: 0.150614 seconds
+tTrueAverage: 1.215343 seconds
 Query noa:
-Approximate Nearest neighbor: min
-True Nearest neighbor: min
-distanceApproximate: 0.626000
-distanceTrue: 0.626000
-tApproximateAverage: 0.016799 seconds
-tTrueAverage: 0.168881 seconds
+Approximate Nearest neighbor: jva
+True Nearest neighbor: jva
+distanceApproximate: 0.470000
+distanceTrue: 0.470000
+tApproximateAverage: 0.209650 seconds
+tTrueAverage: 1.185126 seconds
+Query noah:
+Approximate Nearest neighbor: mini
+True Nearest neighbor: fbc
+distanceApproximate: 6.350000
+distanceTrue: 5.069606
+tApproximateAverage: 0.001945 seconds
+tTrueAverage: 1.208198 seconds
+Query noc:
+Approximate Nearest neighbor: aa
+True Nearest neighbor: csgp
+distanceApproximate: 255.810000
+distanceTrue: 15.549280
+tApproximateAverage: 0.003686 seconds
+tTrueAverage: 1.318600 seconds
+Query nodk:
+Approximate Nearest neighbor: fccy
+True Nearest neighbor: fccy
+distanceApproximate: 1.509000
+distanceTrue: 1.509000
+tApproximateAverage: 0.014116 seconds
+tTrueAverage: 1.181094 seconds
+Query nog:
+Approximate Nearest neighbor: mcep
+True Nearest neighbor: mcep
+distanceApproximate: 0.425000
+distanceTrue: 0.425000
+tApproximateAverage: 0.390619 seconds
+tTrueAverage: 1.190895 seconds
+Query nok:
+Approximate Nearest neighbor: gogl
+True Nearest neighbor: kfs
+distanceApproximate: 3.650000
+distanceTrue: 0.761500
+tApproximateAverage: 0.001999 seconds
+tTrueAverage: 1.190309 seconds
+Query nom:
+Approximate Nearest neighbor: bfy
+True Nearest neighbor: ardc
+distanceApproximate: 2.085314
+distanceTrue: 1.320000
+tApproximateAverage: 0.004394 seconds
+tTrueAverage: 1.218513 seconds
+Query nomd:
+Approximate Nearest neighbor: nev
+True Nearest neighbor: nev
+distanceApproximate: 0.870000
+distanceTrue: 0.870000
+tApproximateAverage: 0.074324 seconds
+tTrueAverage: 1.233475 seconds
+Query nov:
+Approximate Nearest neighbor: ghdx
+True Nearest neighbor: acm
+distanceApproximate: 5.359000
+distanceTrue: 2.875000
+tApproximateAverage: 0.001497 seconds
+tTrueAverage: 1.254099 seconds
+Query novn:
+Approximate Nearest neighbor: hwcc
+True Nearest neighbor: gcv
+distanceApproximate: 2.300000
+distanceTrue: 1.277900
+tApproximateAverage: 0.002807 seconds
+tTrueAverage: 1.198079 seconds
+Query novt:
+Approximate Nearest neighbor: fnd
+True Nearest neighbor: ecpg
+distanceApproximate: 11.810000
+distanceTrue: 4.756312
+tApproximateAverage: 0.000423 seconds
+tTrueAverage: 1.299798 seconds
+Query now:
+Approximate Nearest neighbor: njr
+True Nearest neighbor: iac
+distanceApproximate: 83.326001
+distanceTrue: 6.050752
+tApproximateAverage: 0.000399 seconds
+tTrueAverage: 1.335140 seconds
+Query np:
+- DID NOT FIND NEAREST NEIGHBOR
+tApproximateAverage: 0.000084 seconds
+tTrueAverage: 1.277510 seconds
+Query npk:
+- DID NOT FIND NEAREST NEIGHBOR
+tApproximateAverage: 0.000086 seconds
+tTrueAverage: 1.259616 seconds
+Query npn:
+Approximate Nearest neighbor: alty
+True Nearest neighbor: alty
+distanceApproximate: 0.454000
+distanceTrue: 0.454000
+tApproximateAverage: 0.042879 seconds
+tTrueAverage: 1.251909 seconds
+Query npo:
+- DID NOT FIND NEAREST NEIGHBOR
+tApproximateAverage: 0.000089 seconds
+tTrueAverage: 1.268070 seconds
+Query nptn:
+Approximate Nearest neighbor: ftk
+True Nearest neighbor: ngvc
+distanceApproximate: 2.200000
+distanceTrue: 1.410000
+tApproximateAverage: 0.004949 seconds
+tTrueAverage: 1.194611 seconds
+Query npv:
+Approximate Nearest neighbor: erc
+True Nearest neighbor: erc
+distanceApproximate: 0.228000
+distanceTrue: 0.228000
+tApproximateAverage: 0.179086 seconds
+tTrueAverage: 1.188082 seconds
+Query nq:
+Approximate Nearest neighbor: gec
+True Nearest neighbor: mfg
+distanceApproximate: 0.560000
+distanceTrue: 0.560000
+tApproximateAverage: 0.207123 seconds
+tTrueAverage: 1.174208 seconds
+Query nqp:
+Approximate Nearest neighbor: nmz
+True Nearest neighbor: nmz
+distanceApproximate: 0.187000
+distanceTrue: 0.187000
+tApproximateAverage: 0.178532 seconds
+tTrueAverage: 1.173700 seconds
+Query nr:
+Approximate Nearest neighbor: ihd
+True Nearest neighbor: mgic
+distanceApproximate: 1.913800
+distanceTrue: 1.300000
+tApproximateAverage: 0.002856 seconds
+tTrueAverage: 1.186347 seconds
+Query nrcia:
+Approximate Nearest neighbor: arkq
+True Nearest neighbor: acad
+distanceApproximate: 6.349244
+distanceTrue: 4.033000
+tApproximateAverage: 0.002296 seconds
+tTrueAverage: 1.210541 seconds
+Query nrcib:
+Approximate Nearest neighbor: abt
+True Nearest neighbor: ava
+distanceApproximate: 6.941000
+distanceTrue: 5.170476
+tApproximateAverage: 0.000664 seconds
+tTrueAverage: 1.204930 seconds
+Query nre:
+Approximate Nearest neighbor: nfj
+True Nearest neighbor: nfj
+distanceApproximate: 0.760000
+distanceTrue: 0.760000
+tApproximateAverage: 0.035479 seconds
+tTrueAverage: 1.173012 seconds
+Query nrg:
+Approximate Nearest neighbor: cee
+True Nearest neighbor: hvt-a
+distanceApproximate: 5.659000
+distanceTrue: 4.338491
+tApproximateAverage: 0.003127 seconds
+tTrueAverage: 1.182981 seconds
+Query nrim:
+Approximate Nearest neighbor: bxs
+True Nearest neighbor: mli
+distanceApproximate: 4.026164
+distanceTrue: 3.312000
+tApproximateAverage: 0.002211 seconds
+tTrueAverage: 1.205597 seconds
+Query nrk:
+Approximate Nearest neighbor: myn
+True Nearest neighbor: myn
+distanceApproximate: 0.180000
+distanceTrue: 0.180000
+tApproximateAverage: 0.178211 seconds
+tTrueAverage: 1.178012 seconds
