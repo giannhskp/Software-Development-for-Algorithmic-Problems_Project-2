@@ -31,8 +31,9 @@ static int wValueCalculation(List list,int numberOfVectorsInFile){
   }else{
     persentageToCheck = 0.000001;
   }
-  persentageToCheck = 0.0001;
+  persentageToCheck = 0.0001; // TODO: CHANGE
   int stopBound = persentageToCheck*numberOfVectorsInFile*numberOfVectorsInFile;
+
   while(list!=NULL){
     List nested = list;
     while(nested!=NULL){
@@ -170,3 +171,67 @@ void vectorTimeSeriesLSHFrechetDiscrete(char* arg_inputFile,char* arg_queryFile,
 //
 //   // TO DO
 // }
+void vectorTimeSeriesLSHFrechetContinuous(char* arg_inputFile,char* arg_queryFile,int arg_k_LSH,char* arg_outputFile,double arg_delta,double epsilon){
+  char str[200];
+  char inputFile[100];
+  strcpy(inputFile,arg_inputFile);
+  char queryFile[100];
+  strcpy(queryFile,arg_queryFile);
+  char outputFile[100];
+  strcpy(outputFile,arg_outputFile);
+  int l=1;
+  double delta=arg_delta;
+  k_LSH = arg_k_LSH;
+  hashTableSize = 1000;
+
+
+
+  srand(time(NULL));
+
+
+
+  LSH lsh;
+  List list;
+  clock_t begin = clock();
+  d = findDimLSH(inputFile);
+  double sum=0.0;
+  double time[d];
+  for(int i=0;i<d;i++){
+    time[i]=sum;
+    sum+=1.0;
+  }
+  timeVector=initVector(time,"time");
+  printf("DIMENSION = %d\n",d);
+  list = initializeList();
+  int numberOfVectorsInFile = 0;
+  readFileLSH(inputFile,&list,&numberOfVectorsInFile);
+  clock_t end = clock();
+  double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+  printf("Parsed input file in : %f seconds\n",time_spent);
+  printf("Number of vectors in input file: %d\n",numberOfVectorsInFile);
+  hashTableSize=numberOfVectorsInFile/16;
+
+  printf("Finding optimal value of w based on the input file\n");
+  begin = clock();
+  w = wValueCalculation(list,numberOfVectorsInFile);
+  // w /= W_DIVIDER;
+  w = w/10;
+  end = clock();
+  time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+  printf("Found value of w in %f seconds, w = %d\n",time_spent,w );
+
+  begin = clock();
+  lsh = initializeLSH(l);
+  Grids grids = initializeGrids(delta,l);
+  insertContinuousTimeSeriesFromListToLSH(list,lsh,grids,timeVector,delta,epsilon);
+  end = clock();
+  time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+  printf("Created LSH in : %f seconds22\n",time_spent);
+  printLSH(lsh);
+
+  readQueryFileLSH_ContinuousFrechet(queryFile,outputFile,lsh,list,timeVector,delta,epsilon);
+  deleteVector(timeVector);
+  deleteGrids(grids);
+  destroyLSH(lsh);
+  listDelete(list,0);
+}
