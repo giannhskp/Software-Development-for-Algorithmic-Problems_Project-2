@@ -87,13 +87,17 @@ Vector timeSeriesSnapping(Vector v,Vector time,int d,double gridDelta,double t){
     double keepY;
 
     // x
-    tempTime = tempTime + gridDelta/2;
-    tempTime = tempTime - fmod(tempTime,gridDelta);
-    keepX=tempTime;
+    tempTime = tempTime+(0.5);
+    tempTime = tempTime/gridDelta;
+    tempTime = floor(tempTime);
+    tempTime = tempTime * gridDelta;
+    keepX = tempTime;
     // y
-    temp = temp + gridDelta/2;
-    temp = temp - fmod(temp,gridDelta);
-    keepY=temp;
+    temp = temp+(0.5);
+    temp = temp/gridDelta;
+    temp = floor(temp);
+    temp = temp * gridDelta;
+    keepY = temp;
 
 
     for(int j=0;j<index;j++){
