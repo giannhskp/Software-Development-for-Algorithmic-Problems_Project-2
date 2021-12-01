@@ -26,6 +26,8 @@ extern int d;
 extern int hashTableSize;
 extern int complete;
 extern int w;
+char *distanceMetric;
+Vector timeVector;
 
 
 int wValueCalculation(List list,int numberOfVectorsInFile){
@@ -41,6 +43,7 @@ int wValueCalculation(List list,int numberOfVectorsInFile){
   }else{
     persentageToCheck = 0.000001;
   }
+  persentageToCheck = 0.0001; // TODO: REMOVE
   int stopBound = persentageToCheck*numberOfVectorsInFile*numberOfVectorsInFile;
   while(list!=NULL){
     List nested = list;
@@ -253,7 +256,6 @@ void reverseAssignmentLSH(LSH lsh,Vector *vectors,Vector *clusters,Vector *oldCl
   *firstTime=1;
 }
 
-
 double *silhouetteLSH_Hypercube(HashTable *clustersHt,Vector *clusters,int numOfClusters,double *stotal){
     // used to find the silhouettes of each cluster in reverseAssignmentHypercube
   double *silhouettes = calloc(sizeof(double),numOfClusters);
@@ -448,7 +450,6 @@ void reverseAssignmentHypercube(HyperCube cube,Vector *vectors,Vector *clusters,
   *firstTime=1;
 }
 
-
 void clusteringHypercube(List vecList,int numOfClusters,int m,int probes,FILE* fptr){
   Vector *vectors;
   Vector *clusters;
@@ -566,22 +567,39 @@ void clusteringHypercube(List vecList,int numOfClusters,int m,int probes,FILE* f
   deleteHyperCube(cube);
 }
 
-void clustering(List vecList,FILE* fptr,char* method,int numOfClusters,int l,int mHyper,int probes){
-  if(strcmp(method,"Classic")==0){
+void clustering(List vecList,FILE* fptr,char* assignment,char *update,int numOfClusters,int l,int mHyper,int probes){
+  if(strcmp(assignment,"Classic")==0){
+    if(strcmp(update,"Mean Vector")==0){
+      distanceMetric=malloc(sizeof(char)*(strlen("l2")+1));
+      strcpy(distanceMetric,"l2");
+    }else if(strcmp(update,"Mean Frechet")==0){
+      double sum=0.0;
+      double time[d];
+      for(int i=0;i<d;i++){
+        time[i]=sum;
+        sum+=1.0;
+      }
+      timeVector=initVector(time,"time");
+      distanceMetric=malloc(sizeof(char)*(strlen("discreteFrechet")+1));
+      strcpy(distanceMetric,"discreteFrechet");
+    }else{
+      printf("Wrong update method!\n");
+      exit(-1);
+    }
     fprintf(fptr,"Algorithm: Lloyds\n");
     clusteringLloyds(vecList,numOfClusters,fptr);
   }
-  else if(strcmp(method,"LSH")==0){
-    fprintf(fptr,"Algorithm: Range Search LSH\n");
-    clusteringLSH(vecList,numOfClusters,l,fptr);
-  }
-  else if(strcmp(method,"Hypercube")==0){
-    fprintf(fptr,"Algorithm: Range Search Hypercube\n");
-    clusteringHypercube(vecList,numOfClusters,mHyper,probes,fptr);
-  }
+  // else if(strcmp(method,"LSH")==0){
+  //   fprintf(fptr,"Algorithm: Range Search LSH\n");
+  //   clusteringLSH(vecList,numOfClusters,l,fptr);
+  // }
+  // else if(strcmp(method,"Hypercube")==0){
+  //   fprintf(fptr,"Algorithm: Range Search Hypercube\n");
+  //   clusteringHypercube(vecList,numOfClusters,mHyper,probes,fptr);
+  // }
   else{
-    printf("%s\n",method );
-    printf("INVALID METHOD NAME!\n");
+    printf("%s\n",assignment );
+    printf("INVALID assignment NAME!\n");
     exit(EXIT_FAILURE);
   }
 

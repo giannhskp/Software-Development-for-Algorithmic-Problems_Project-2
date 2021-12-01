@@ -11,24 +11,23 @@
 #define FALSE    0
 #define TRUE    1
 
-#define MAX_INPUT_LENGTH 1024
+#define MAX_INPUT_LENGTH 10240
 
 extern int d;
 extern int k_LSH;
 extern int new_dimension;
 
-// returns the number of words in string
-int countWords(char *str){
-  char * token = strtok(str, " ");
-  token = strtok(NULL, " ");
-   // loop through the string to extract all other tokens
-   int counter = 0;
-   while( token != NULL ) {
-      counter++;
-      token = strtok(NULL, " ");
-   }
-
-  return counter;
+// returns number of words in str
+static int countWords(char *str){
+    char * token = strtok(str, "	");
+    token = strtok(NULL, "	");
+     // loop through the string to extract all other tokens
+     int counter = 0;
+     while( token != NULL ) {
+        counter++;
+        token = strtok(NULL, "	");
+     }
+    return counter;
 }
 
 int countLines(FILE *fp){
@@ -153,16 +152,15 @@ void readFile(char* fileName,List *list,int *numOfVecs){
     if(fscanf(file,"%[^\n]\n",buffer)<0){ // read a line from the file
       continue;
     }
-
     double vec[d];
-    char * token = strtok(buffer," ");
+    char * token = strtok(buffer, "	 ");
     char name[MAX_INPUT_LENGTH];
     strcpy(name,token);
-    token = strtok(NULL," ");
+    token = strtok(NULL, "	");
      int counter = 0;
      while( token != NULL ) {
         vec[counter++]=atof(token);
-        token = strtok(NULL," ");
+        token = strtok(NULL, "	");
      }
      Vector vecTmp=initVector(vec,name);
      (*list) = listInsert((*list),vecTmp,-1);
@@ -170,8 +168,6 @@ void readFile(char* fileName,List *list,int *numOfVecs){
 
   }
 
-
   fclose(file);
-
 
 }

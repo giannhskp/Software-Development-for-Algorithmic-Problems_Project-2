@@ -44,8 +44,10 @@ int main(int argc, char *argv[]) {
   int confflag=0;
   char outputFile[200];
   int outputflag=0;
-  char method[200];
-  int methodflag=0;
+  char update[200];
+  strcpy(update,"Mean Frechet"); // default
+  char assignment[200];
+  strcpy(assignment,"Classic"); // default
 
 
   while((option = getopt(argc, argv, "i:c:o:m:")) != -1){
@@ -68,12 +70,6 @@ int main(int argc, char *argv[]) {
         }
         break;
 
-        case 'm':
-        methodflag++;
-        strcpy(method,optarg);
-        printf("Method: %s\n", method);
-        break;
-
         case 'o':
         outputflag++;
         strcpy(outputFile,optarg);
@@ -85,11 +81,10 @@ int main(int argc, char *argv[]) {
          break;
 
         default: /* '?' */
-          fprintf(stderr, "Usage: %s –i <input file> –c <configuration file> -o <output file> -complete <optional> -m <method: Classic OR LSH or Hypercube>\n",argv[0]);
+          fprintf(stderr, "Usage: %s –i <input file> –c <configuration file> -o <output file> -update <Mean Frechet or Mean Vector> –assignment <Classic or LSH or Hypercube or LSH_Frechet> -complete <optional> -silhouette <optional>\n",argv[0]);
           exit(EXIT_FAILURE);
      }
   }
-
 
   if(!inputflag){
     printf(">Input file name: ");
@@ -120,16 +115,6 @@ int main(int argc, char *argv[]) {
     }
     sscanf(str,"%s\n",outputFile);
     printf("Given output File : %s\n", outputFile);
-  }
-  if(!methodflag){
-    printf(">Method's name: ");
-    fflush(stdin); // clear stdin buffer
-    if (fgets(str, sizeof(char)*200, stdin) == NULL) { // read a command
-      perror("Error reading string with fgets\n");
-      exit(1);
-    }
-    sscanf(str,"%s\n",method);
-    printf("Given method's name: %s\n", method);
   }
 
   FILE* fptr;
@@ -163,7 +148,7 @@ int main(int argc, char *argv[]) {
       double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
       printf("Parsed input file in : %f seconds\n",time_spent);
       printf("Number of vectors in input file: %d\n",numOfVecs);
-
+      fflush(stdout);
       fptr = fopen(outputFile, "w");
       if(fptr == NULL){
         /* File not created hence exit */
@@ -171,7 +156,7 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
       }
 
-      clustering(list,fptr,method,numOfClusters,l,mHyper,probes);
+      clustering(list,fptr,assignment,update,numOfClusters,l,mHyper,probes);
     }
     repeat=0;
 
@@ -190,14 +175,15 @@ int main(int argc, char *argv[]) {
       }
       else if(strstr(str, "/repeat") != NULL) {
         repeat=1;
-        if(strcmp(method,"LSH")==0 || strcmp(method,"Hypercube")==0)
-          listDelete(list,0);
-        else
+        if(strcmp(assignment,"Classic")==0)
           listDelete(list,1);
-        sscanf(str,"%s %s %s %s %s\n",command,inputFile,confFile,method,outputFile);
+        else
+          listDelete(list,0);
+        sscanf(str,"%s %s %s %s %s %s\n",command,inputFile,confFile,update,assignment,outputFile);
         printf("FILE: %s\n",inputFile);
         printf("Given configuration File : %s\n", confFile);
-        printf("Given method : %s\n", method);
+        printf("Given update method : %s\n", update);
+        printf("Given assignment method : %s\n", assignment);
         printf("Given output File : %s\n", outputFile);
         fclose(fptr);
         continue;
@@ -213,10 +199,10 @@ int main(int argc, char *argv[]) {
 
   }
 
-  if(strcmp(method,"LSH")==0 || strcmp(method,"Hypercube")==0)
-    listDelete(list,0);
-  else
+  if(strcmp(assignment,"Classic")==0)
     listDelete(list,1);
+  else
+    listDelete(list,0);
 
   fclose(fptr);
   return 0;
