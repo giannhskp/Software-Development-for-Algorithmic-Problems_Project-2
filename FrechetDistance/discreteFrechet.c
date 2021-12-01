@@ -17,10 +17,49 @@ static double l2_metric(double x1,double y1,double x2,double y2){
 
 double discreteFrechet(Vector v1,Vector v2,Vector time,int d){
   double **dynamicArray=malloc(d*sizeof(double*));
+  double *coords1 = getCoords(v1);
+  double *coords2 = getCoords(v2);
+  double *coordsTime = getCoords(time);
+
+  for(int i=0;i<d;i++){
+    dynamicArray[i]=malloc(d*sizeof(double));
+  }
+
+  dynamicArray[0][0] = l2_metric(coords1[0],coordsTime[0],coords2[0],coordsTime[0]);
+  for(int i=1;i<d;i++){
+    double p1qj = l2_metric(coords1[0],coordsTime[0],coords2[i],coordsTime[i]);
+    dynamicArray[0][i] = MAX( dynamicArray[0][i-1], p1qj);
+  }
+
+  for(int j=1;j<d;j++){
+    double piq1 = l2_metric(coords1[j],coordsTime[j],coords2[0],coordsTime[0]);
+    dynamicArray[j][0] = MAX(dynamicArray[j-1][0],piq1);
+  }
+
+  for(int i=1;i<d;i++){
+    for(int j=1;j<d;j++){
+      double piqj = l2_metric(coords1[i],coordsTime[i],coords2[j],coordsTime[j]);
+      double minC = MIN3(dynamicArray[i-1][j], dynamicArray[i-1][j-1], dynamicArray[i][j-1]);
+      dynamicArray[i][j] = MAX(minC,piqj);
+    }
+  }
+
+  double finalDistance = dynamicArray[d-1][d-1];
+
+  for(int i=0;i<d;i++){
+    free(dynamicArray[i]);
+  }
+  free(dynamicArray);
+  return finalDistance;
+}
+
+int *discreteFrechet_optimalPath(Vector v1,Vector v2,Vector time,int d,int *pathLength){
+  double **dynamicArray=malloc(d*sizeof(double*));
   int **backtrackingPath=malloc(d*sizeof(int*));
   double *coords1 = getCoords(v1);
   double *coords2 = getCoords(v2);
   double *coordsTime = getCoords(time);
+  int *optimalPath = malloc(2*d*sizeof(int*));
 
   for(int i=0;i<d;i++){
     dynamicArray[i]=malloc(d*sizeof(double));
@@ -28,16 +67,17 @@ double discreteFrechet(Vector v1,Vector v2,Vector time,int d){
   }
 
   dynamicArray[0][0] = l2_metric(coords1[0],coordsTime[0],coords2[0],coordsTime[0]);
-  for(int i=1;i<d;i++){
-    double p1qj = l2_metric(coords1[0],coordsTime[0],coords2[i],coordsTime[i]);
-    dynamicArray[0][i] = MAX( dynamicArray[0][i-1], p1qj);
-    backtrackingPath[0][i] =  i-1;
+  backtrackingPath[0][0] = -1;
+  for(int j=1;j<d;j++){
+    double p1qj = l2_metric(coords1[0],coordsTime[0],coords2[j],coordsTime[j]);
+    dynamicArray[0][j] = MAX( dynamicArray[0][j-1], p1qj);
+    backtrackingPath[0][j] =  j-1;
   }
 
-  for(int j=1;j<d;j++){
-    double piq1 = l2_metric(coords1[j],coordsTime[j],coords2[0],coordsTime[0]);
-    dynamicArray[j][0] = MAX(dynamicArray[j-1][0],piq1);
-    backtrackingPath[j][0] =  (j-1)*d;
+  for(int i=1;i<d;i++){
+    double piq1 = l2_metric(coords1[i],coordsTime[i],coords2[0],coordsTime[0]);
+    dynamicArray[i][0] = MAX(dynamicArray[i-1][0],piq1);
+    backtrackingPath[i][0] =  (i-1)*d;
   }
 
   for(int i=1;i<d;i++){
@@ -54,11 +94,23 @@ double discreteFrechet(Vector v1,Vector v2,Vector time,int d){
       dynamicArray[i][j] = MAX(minC,piqj);
     }
   }
+  int optimalPathLenth = 0;
+  int backtrackIndex = backtrackingPath[d-1][d-1];
+  optimalPath[optimalPathLenth++] = backtrackIndex;
+
+  while(1){
+    if(backtrackIndex==-1){
+      optimalPath[optimalPathLenth++] = -1;
+      break;
+    }
+    int y = backtrackIndex / d;
+    int x = backtrackIndex % d;
+    backtrackIndex = backtrackingPath[x][y];
+    optimalPath[optimalPathLenth++] = backtrackIndex;
+  }
 
 
-  // y = index / width;
-  // x = index % width;
-  double finalDistance = dynamicArray[d-1][d-1];
+  (*pathLength) = optimalPathLenth;
 
   for(int i=0;i<d;i++){
     free(dynamicArray[i]);
@@ -66,5 +118,5 @@ double discreteFrechet(Vector v1,Vector v2,Vector time,int d){
   }
   free(dynamicArray);
   free(backtrackingPath);
-  return finalDistance;
+  return optimalPath;
 }
