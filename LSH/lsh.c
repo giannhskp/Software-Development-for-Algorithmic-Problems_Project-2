@@ -7,6 +7,10 @@
 #include "../hashTable/hashTable.h"
 #include "../hashTable/hashTableList/hashTableList.h"
 #include "./helperFunctions.h"
+#include "../Fred-master/include/frechet.hpp"
+#include "../Fred-master/include/point.hpp"
+#include "../Fred-master/include/types.hpp"
+
 
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))

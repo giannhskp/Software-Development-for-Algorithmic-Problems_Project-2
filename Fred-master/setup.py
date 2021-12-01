@@ -1,3 +1,4 @@
+# coding=utf-8
 import os
 import re
 import sys
@@ -15,7 +16,7 @@ this_dir = os.path.dirname(os.path.abspath(__file__))
 
 class CMakeExtension(Extension):
     def __init__(self, name, sourcedir=this_dir):
-        Extension.__init__(self, name, 
+        Extension.__init__(self, name,
                            include_dirs=[os.path.join(this_dir, 'include'), os.path.join(this_dir, 'pybind11')],
                            sources=sorted(glob("src/*.cpp")))
         self.sourcedir = os.path.abspath(sourcedir)
@@ -41,7 +42,7 @@ class CMakeBuild(build_ext):
     def build_extension(self, ext):
         extdir = os.path.abspath(
             os.path.dirname(self.get_ext_fullpath(ext.name)))
-            
+
         cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir]
 
         cfg = 'Debug' if self.debug else 'Release'
