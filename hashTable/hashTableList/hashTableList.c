@@ -12,7 +12,7 @@
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 
 extern char *distanceMetric;
-extern Vector timeVector;
+// extern Vector timeVector;
 
 double l2_distance(Vector v1,Vector v2,int d){
   // calculate the Euclidean distance (or L2) between the given vectors and return it
@@ -30,7 +30,7 @@ double distance_metric(Vector v1,Vector v2,int d){
   if(strcmp(distanceMetric,"l2")==0){
     return l2_distance(v1,v2,d);
   }else if(strcmp(distanceMetric,"discreteFrechet")==0){
-    return discreteFrechet(v1,v2,timeVector,d);
+    return discreteFrechet(v1,v2,d);
   }else{
     printf("WRONG DISTANCE METRIC\n");
     return -1.0;

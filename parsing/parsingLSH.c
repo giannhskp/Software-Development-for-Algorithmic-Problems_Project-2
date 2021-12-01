@@ -53,7 +53,7 @@ int findDimLSH(char* fileName){
 }
 
 
-void readFileLSH(char* fileName,List *inputs,int *vectorCount){
+void readFileLSH(char* fileName,List *inputs,int *vectorCount,int keepTimes,double *times){
 
    FILE *file = fopen(fileName, "r"); // read mode
 
@@ -85,7 +85,12 @@ void readFileLSH(char* fileName,List *inputs,int *vectorCount){
         vec[counter++]=atof(token);
         token = strtok(NULL, "	");
      }
-     Vector vecTmp=initVector(vec,name);
+     Vector vecTmp;
+     if(keepTimes){
+       vecTmp=initTimeSeries(vec,times,name);
+     }else{
+       vecTmp=initVector(vec,name);
+     }
      (*inputs) = listInsert((*inputs),vecTmp,-1);
      (*vectorCount)++;
   }
@@ -170,7 +175,7 @@ void readQueryFileLSH(char* queryFile,char* outputFile,LSH lsh,List inputs){
   fclose(file);
 }
 
-void readQueryFileLSH_DiscreteFrechet(char* queryFile,char* outputFile,LSH lsh,List inputs,Grids grids,Vector timeVector,double delta){
+void readQueryFileLSH_DiscreteFrechet(char* queryFile,char* outputFile,LSH lsh,List inputs,Grids grids,double delta,double *time){
 
    FILE *file = fopen(queryFile, "r"); // read mode
 
@@ -214,7 +219,7 @@ void readQueryFileLSH_DiscreteFrechet(char* queryFile,char* outputFile,LSH lsh,L
       vec[counter++]=atof(token);
       token = strtok(NULL, "	");
     }
-    Vector vecTmp=initVector(vec,name);
+    Vector vecTmp=initTimeSeries(vec,time,name);
 
     fprintf(fptr, "Query %s:\n",name);
 
@@ -233,7 +238,7 @@ void readQueryFileLSH_DiscreteFrechet(char* queryFile,char* outputFile,LSH lsh,L
 
     clock_t begin_lsh = clock(); // time calculation for the k nearest neighbors with LSH
     // find with the help of LSH the k nearest neighbor for the corresponding query vector
-    nearestNeigborLSH_DiscreteFrechet(lsh,vecTmp,nNearest,knearestDists,fptr,grids,timeVector,delta);
+    nearestNeigborLSH_DiscreteFrechet(lsh,vecTmp,nNearest,knearestDists,fptr,grids,delta);
 
     clock_t end_lsh = clock();
     double time_spent_lsh = (double)(end_lsh - begin_lsh) / CLOCKS_PER_SEC;
@@ -246,7 +251,7 @@ void readQueryFileLSH_DiscreteFrechet(char* queryFile,char* outputFile,LSH lsh,L
   fclose(file);
 }
 
-void readQueryFileLSH_ContinuousFrechet(char* queryFile,char* outputFile,LSH lsh,List inputs,Vector timeVector,double delta,double epsilon){
+void readQueryFileLSH_ContinuousFrechet(char* queryFile,char* outputFile,LSH lsh,List inputs,double delta,double epsilon,double *time){
 
    FILE *file = fopen(queryFile, "r"); // read mode
 
@@ -290,7 +295,7 @@ void readQueryFileLSH_ContinuousFrechet(char* queryFile,char* outputFile,LSH lsh
       vec[counter++]=atof(token);
       token = strtok(NULL, "	");
     }
-    Vector vecTmp=initVector(vec,name);
+    Vector vecTmp=initTimeSeries(vec,time,name);
 
     fprintf(fptr, "Query %s:\n",name);
 
@@ -309,7 +314,7 @@ void readQueryFileLSH_ContinuousFrechet(char* queryFile,char* outputFile,LSH lsh
 
     clock_t begin_lsh = clock(); // time calculation for the k nearest neighbors with LSH
     // find with the help of LSH the k nearest neighbor for the corresponding query vector
-    nearestNeigborLSH_ContinuousFrechet(lsh,vecTmp,nNearest,knearestDists,fptr,timeVector,delta,epsilon);
+    nearestNeigborLSH_ContinuousFrechet(lsh,vecTmp,nNearest,knearestDists,fptr,delta,epsilon);
 
     clock_t end_lsh = clock();
     double time_spent_lsh = (double)(end_lsh - begin_lsh) / CLOCKS_PER_SEC;
