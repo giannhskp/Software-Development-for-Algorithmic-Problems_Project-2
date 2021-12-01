@@ -153,7 +153,9 @@ void vectorTimeSeriesLSHFrechetDiscrete(char* arg_inputFile,char* arg_queryFile,
   printf("Found value of w in %f seconds, w = %d\n",time_spent,w );
 
   begin = clock();
+  d*=2;
   lsh = initializeLSH(l);
+  d/=2;
   Grids grids = initializeGrids(delta,l);
   insertTimeSeriesFromListToLSH(list,lsh,grids,timeVector,delta);
   end = clock();
@@ -227,7 +229,7 @@ void vectorTimeSeriesLSHFrechetContinuous(char* arg_inputFile,char* arg_queryFil
   end = clock();
   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Created LSH in : %f seconds22\n",time_spent);
-  printLSH(lsh);
+  // printLSH(lsh);
 
   readQueryFileLSH_ContinuousFrechet(queryFile,outputFile,lsh,list,timeVector,delta,epsilon);
   deleteVector(timeVector);

@@ -27,18 +27,18 @@ double getTofGrid(Grids ,int );
 void nearestNeigborLSH_DiscreteFrechet(LSH ,Vector ,Vector *,double *,FILE *,Grids ,Vector ,double );
 void nearestNeigborLSH_ContinuousFrechet(LSH ,Vector ,Vector *,double *,FILE *,Vector ,double ,double );
 
-#ifdef __cplusplus
-#define EXTERNC extern "C"
-#else
-#define EXTERNC
-#endif
-
-typedef void* string;
-
-EXTERNC string str();
-EXTERNC void mylibrary_mytype_destroy(mylibrary_mytype_t mytype);
-EXTERNC void mylibrary_mytype_doit(mylibrary_mytype_t self, int param);
-
-#undef EXTERNC
+// #ifdef __cplusplus
+// #define EXTERNC extern "C"
+// #else
+// #define EXTERNC
+// #endif
+//
+// typedef void* string;
+//
+// EXTERNC string str();
+// EXTERNC void mylibrary_mytype_destroy(mylibrary_mytype_t mytype);
+// EXTERNC void mylibrary_mytype_doit(mylibrary_mytype_t self, int param);
+//
+// #undef EXTERNC
 
 #endif

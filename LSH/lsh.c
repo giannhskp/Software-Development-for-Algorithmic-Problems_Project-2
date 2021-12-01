@@ -7,9 +7,9 @@
 #include "../hashTable/hashTable.h"
 #include "../hashTable/hashTableList/hashTableList.h"
 #include "./helperFunctions.h"
-#include "../Fred-master/include/frechet.hpp"
-#include "../Fred-master/include/point.hpp"
-#include "../Fred-master/include/types.hpp"
+// #include "../Fred-master/include/frechet.hpp"
+// #include "../Fred-master/include/point.hpp"
+// #include "../Fred-master/include/types.hpp"
 
 
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
@@ -81,8 +81,10 @@ Vector timeSeriesSnapping(Vector v,Vector time,int d,double gridDelta,double t){
   double *coordsTime = getCoords(time);
   double snappedVector[d];
   double snappedTime[d];
+  double snappedFinal[2*d];
 
   int index=0;
+  int indexFinal=0;
   for(int i=0;i<d;i++){
     double temp=coordsVector[i] + t;  // displacement
     double tempTime=coordsTime[i] + t;   // displacement
@@ -112,18 +114,33 @@ Vector timeSeriesSnapping(Vector v,Vector time,int d,double gridDelta,double t){
     }
 
     if(!found){
-      snappedVector[index]=keepY;
-      snappedTime[index++]=keepX;
+      snappedFinal[indexFinal++]=keepX;
+      snappedFinal[indexFinal++]=keepY;
+      snappedTime[index]=keepX;
+      snappedVector[index++]=keepY;
     }
   }
   // TODO: padding
   ////////////////////////////
-  for(int i=index;i<d;i++){
-    snappedVector[i]=PADDING_M;
-    snappedTime[i]=PADDING_M;
+  // for(int i=index;i<d;i++){
+  //   snappedVector[i]=PADDING_M;
+  //   snappedTime[i]=PADDING_M;
+  // }
+  for(int i=index;i<2*d;i++){
+    snappedFinal[i]=PADDING_M;
+    // snappedTime[i]=PADDING_M;
   }
   ////////////////////////////
-  Vector vecTmp=initVector(snappedVector,getID(v));
+  // printf("%d\n",d);
+  d*=2;
+  // printf("%d\n",d);
+  Vector vecTmp=initVector(snappedFinal,getID(v));
+  d/=2;
+  // getchar();
+  // printVector(vecTmp);
+  // getchar();
+  // printVector(snappedTime);
+  // printVector(snappedVector);
   return vecTmp;
 }
 
@@ -327,13 +344,17 @@ void insertTimeSeriesToLSH(LSH lsh,Grids grids,Vector timeVector,double delta,Ve
     // printf("ORIGINAL = ");
     // printVector(v);
     Vector snappedToGrid = timeSeriesSnapping(v,timeVector,d,delta,t_of_grid);
+    // d*=2;
     // printf("SNAPPED = ");
     // printVector(snappedToGrid);
     unsigned int id;
     int index = computeG(lsh->g_fun[i],snappedToGrid,&id); // compute the value of the g function for the given vector that will be inserted
     // finally insert the vector at the corresponding bucket of the current hash table
+    // d/=2;
     htInsert(lsh->hts[i],v,index,id);
+    d*=2;
     deleteVector(snappedToGrid);
+    d/=2;
   }
   // getchar();
 }
@@ -461,7 +482,9 @@ void nearestNeigborLSH_DiscreteFrechet(LSH lsh,Vector q,Vector *nNearest,double 
     double t_of_grid = getTofGrid(grids,i);
     Vector snappedToGrid = timeSeriesSnapping(q,timeVector,d,delta,t_of_grid);
     unsigned int q_ID;
+    // d*=2;
     int q_index = computeG(gfuns[i],snappedToGrid,&q_ID); // compute the value of the g function for the given vector
+    // d/=2;
     // and go to the corresponding bucket of the current hash table to find the  nearest neighbor for the given query vector
     htFindNearestNeighbor(hts[i],q_index,q,&nearest,&nearestDist,d,q_ID);
     deleteVector(snappedToGrid);
