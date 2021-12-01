@@ -9,6 +9,7 @@
 #include "Hypercube/hypercube.h"
 #include "./parsing/parsingCluster.h"
 #include "./Clustering/clustering.h"
+#include "./BinaryTree/binaryTree.h"
 
 #define W_VALUE 4
 
