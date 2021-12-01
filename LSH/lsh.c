@@ -76,9 +76,9 @@ g_function *getGfuns(LSH lsh){
   return lsh->g_fun;
 }
 
-Vector timeSeriesSnapping(Vector v,Vector time,int d,double gridDelta,double t){
+Vector timeSeriesSnapping(Vector v,int d,double gridDelta,double t){
   double *coordsVector = getCoords(v);
-  double *coordsTime = getCoords(time);
+  double *coordsTime = getTime(v);
   double snappedVector[d];
   double snappedTime[d];
   double snappedFinal[2*d];
@@ -131,9 +131,9 @@ Vector timeSeriesSnapping(Vector v,Vector time,int d,double gridDelta,double t){
     // snappedTime[i]=PADDING_M;
   }
   ////////////////////////////
-  // printf("%d\n",d);
+  printf("%d\n",d);
   d*=2;
-  // printf("%d\n",d);
+  printf("%d\n",d);
   Vector vecTmp=initVector(snappedFinal,getID(v));
   d/=2;
   // getchar();
@@ -330,7 +330,7 @@ void insertToLSH(LSH lsh,Vector v){
   }
 }
 
-void insertTimeSeriesToLSH(LSH lsh,Grids grids,Vector timeVector,double delta,Vector v){
+void insertTimeSeriesToLSH(LSH lsh,Grids grids,double delta,Vector v){
   // insert the given vector in all LSΗ hash tables
   // the bucket of the hash table that the vector will be inserted depends from the corresponding g function of the specific hash Table (hash function)
   // at the new node tha will be inserted at the hash Tables save the id (Querying trick)
@@ -343,7 +343,7 @@ void insertTimeSeriesToLSH(LSH lsh,Grids grids,Vector timeVector,double delta,Ve
     // printf("*-*  T = %f\n",t_of_grid);
     // printf("ORIGINAL = ");
     // printVector(v);
-    Vector snappedToGrid = timeSeriesSnapping(v,timeVector,d,delta,t_of_grid);
+    Vector snappedToGrid = timeSeriesSnapping(v,d,delta,t_of_grid);
     // d*=2;
     // printf("SNAPPED = ");
     // printVector(snappedToGrid);
@@ -360,7 +360,7 @@ void insertTimeSeriesToLSH(LSH lsh,Grids grids,Vector timeVector,double delta,Ve
 }
 
 
-void insertContinuousTimeSeriesToLSH(LSH lsh,Grids grids,Vector timeVector,double delta,Vector v,double epsilon){
+void insertContinuousTimeSeriesToLSH(LSH lsh,Grids grids,double delta,Vector v,double epsilon){
   // insert the given vector in all LSΗ hash tables
   // the bucket of the hash table that the vector will be inserted depends from the corresponding g function of the specific hash Table (hash function)
   // at the new node tha will be inserted at the hash Tables save the id (Querying trick)
@@ -403,22 +403,22 @@ void insertFromListToLSH(List list,LSH lsh){
   }
 }
 
-void insertTimeSeriesFromListToLSH(List list,LSH lsh,Grids grids,Vector timeVector,double delta){
+void insertTimeSeriesFromListToLSH(List list,LSH lsh,Grids grids,double delta){
   // insert every vector of the list at the corresponding LSH
   if(list==NULL){ return;}
   List temp=list;
   while(temp!=NULL){
-      insertTimeSeriesToLSH(lsh,grids,timeVector,delta,getVector(temp));
+      insertTimeSeriesToLSH(lsh,grids,delta,getVector(temp));
       temp=getNext(temp);
   }
 }
 
-void insertContinuousTimeSeriesFromListToLSH(List list,LSH lsh,Grids grids,Vector timeVector,double delta,double epsilon){
+void insertContinuousTimeSeriesFromListToLSH(List list,LSH lsh,Grids grids,double delta,double epsilon){
   // insert every vector of the list at the corresponding LSH
   if(list==NULL){ return;}
   List temp=list;
   while(temp!=NULL){
-      insertContinuousTimeSeriesToLSH(lsh,grids,timeVector,delta,getVector(temp),epsilon);
+      insertContinuousTimeSeriesToLSH(lsh,grids,delta,getVector(temp),epsilon);
       temp=getNext(temp);
   }
 }
@@ -470,7 +470,7 @@ void nearestNeigborLSH(LSH lsh,Vector q,Vector *nNearest,double *trueDist,FILE *
   }
 }
 
-void nearestNeigborLSH_DiscreteFrechet(LSH lsh,Vector q,Vector *nNearest,double *trueDist,FILE *fptr,Grids grids,Vector timeVector,double delta){
+void nearestNeigborLSH_DiscreteFrechet(LSH lsh,Vector q,Vector *nNearest,double *trueDist,FILE *fptr,Grids grids,double delta){
   // find the nearest neighbor of the given vector q with the help of LSH
   Vector nearest=NULL;
   double nearestDist=-1;
@@ -480,7 +480,7 @@ void nearestNeigborLSH_DiscreteFrechet(LSH lsh,Vector q,Vector *nNearest,double 
   // to find the nearest neighbor of the given vector q, euclidean distance must be applied between the vector q and the vectors of the corresponding bucket of every LSH hash table
   for(int i=0;i<l;i++){ // go at every hash table of lsh
     double t_of_grid = getTofGrid(grids,i);
-    Vector snappedToGrid = timeSeriesSnapping(q,timeVector,d,delta,t_of_grid);
+    Vector snappedToGrid = timeSeriesSnapping(q,d,delta,t_of_grid);
     unsigned int q_ID;
     // d*=2;
     int q_index = computeG(gfuns[i],snappedToGrid,&q_ID); // compute the value of the g function for the given vector
@@ -502,7 +502,7 @@ void nearestNeigborLSH_DiscreteFrechet(LSH lsh,Vector q,Vector *nNearest,double 
   }
 }
 
-void nearestNeigborLSH_ContinuousFrechet(LSH lsh,Vector q,Vector *nNearest,double *trueDist,FILE *fptr,Vector timeVector,double delta,double epsilon){
+void nearestNeigborLSH_ContinuousFrechet(LSH lsh,Vector q,Vector *nNearest,double *trueDist,FILE *fptr,double delta,double epsilon){
   // find the nearest neighbor of the given vector q with the help of LSH
   Vector nearest=NULL;
   double nearestDist=-1;

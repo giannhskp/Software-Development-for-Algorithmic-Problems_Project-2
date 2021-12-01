@@ -16,12 +16,17 @@ typedef extraInfoNode *extraInfo;
 typedef struct vec_node{
   char *vec_id; // to save the corresponding id from the given file
   double* coords; // an array to save the coordinates of the vector
+  double* times;
   extraInfo clusterInfo; // extra info for the vector tha used at clustering (reverseAssignment with LSH and reverseAssignment with Hypercube)
 }vec;
 typedef vec *Vector;
 
 double* getCoords(Vector v){
   return v->coords;
+}
+
+double* getTime(Vector v){
+  return v->times;
 }
 
 char* getID(Vector v){
@@ -59,8 +64,23 @@ void setAssignedAtRadius(Vector v,double radius){
 Vector initVector(double *vec, char id[]){
   Vector v=malloc(sizeof(struct vec_node));
   v->coords = malloc(d*sizeof(double));
+  v->times = NULL;
   for(int i=0;i<d;i++){
     (v->coords)[i] = vec[i];
+  }
+  v->vec_id = malloc((strlen(id)+1)*sizeof(char));
+  strcpy(v->vec_id,id);
+  v->clusterInfo = NULL;
+  return v;
+}
+
+Vector initTimeSeries(double *vec,double *time, char id[]){
+  Vector v=malloc(sizeof(struct vec_node));
+  v->coords = malloc(d*sizeof(double));
+  v->times = malloc(d*sizeof(double));
+  for(int i=0;i<d;i++){
+    (v->coords)[i] = vec[i];
+    (v->times)[i] = time[i];
   }
   v->vec_id = malloc((strlen(id)+1)*sizeof(char));
   strcpy(v->vec_id,id);

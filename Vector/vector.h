@@ -4,6 +4,7 @@
 typedef struct vec_node *Vector;
 
 Vector initVector(double *, char []);
+Vector initTimeSeries(double *,double *, char []);
 
 Vector copyVector(Vector );
 
@@ -25,6 +26,7 @@ int getAssignedCluster(Vector );
 void setAssignedCluster(Vector ,int );
 
 double *getCoords(Vector);
+double* getTime(Vector );
 char* getID(Vector );
 
 void initializeClusterInfo(Vector );
