@@ -12,13 +12,13 @@
 
 #define W_DIVIDER 80
 
-int d;
+// int d;
 int w;
 int k_LSH;
 int hashTableSize;
 // Vector timeVector;
 
-static int wValueCalculation(List list,int numberOfVectorsInFile){
+static int wValueCalculation(List list,int numberOfVectorsInFile,int dim){
   long double sumDist = 0.0;
   int count=0;
   double persentageToCheck;
@@ -40,7 +40,7 @@ static int wValueCalculation(List list,int numberOfVectorsInFile){
       if(count>stopBound){
         return floor(sumDist/count);
       }
-      sumDist +=distance_metric(getVector(list),getVector(nested),d);
+      sumDist +=distance_metric(getVector(list),getVector(nested),dim);
       count++;
       nested = getNext(nested);
     }
@@ -70,8 +70,8 @@ void vectorTimeSeriesLSH(char* arg_inputFile,char* arg_queryFile,int arg_k_LSH,i
   LSH lsh;
   List list;
   clock_t begin = clock();
-  d = findDimLSH(inputFile);
-  printf("DIMENSION = %d\n",d);
+  dim = findDimLSH(inputFile);
+  printf("DIMENSION = %d\n",dim);
   list = initializeList();
   int numberOfVectorsInFile = 0;
   readFileLSH(inputFile,&list,&numberOfVectorsInFile,0,NULL);
@@ -125,14 +125,14 @@ void vectorTimeSeriesLSHFrechetDiscrete(char* arg_inputFile,char* arg_queryFile,
   LSH lsh;
   List list;
   clock_t begin = clock();
-  d = findDimLSH(inputFile);
+  dim = findDimLSH(inputFile);
   double sum=0.0;
-  double time[d];
-  for(int i=0;i<d;i++){
+  double time[dim];
+  for(int i=0;i<dim;i++){
     time[i]=sum;
     sum+=1.0;
   }
-  printf("DIMENSION = %d\n",d);
+  printf("DIMENSION = %d\n",dim);
   list = initializeList();
   int numberOfVectorsInFile = 0;
   readFileLSH(inputFile,&list,&numberOfVectorsInFile,1,time);
@@ -152,9 +152,9 @@ void vectorTimeSeriesLSHFrechetDiscrete(char* arg_inputFile,char* arg_queryFile,
   printf("Found value of w in %f seconds, w = %d\n",time_spent,w );
 
   begin = clock();
-  d*=2;
+  // dim*=2;
   lsh = initializeLSH(l);
-  d/=2;
+  // dim/=2;
   Grids grids = initializeGrids(delta,l);
   insertTimeSeriesFromListToLSH(list,lsh,grids,delta);
   end = clock();
@@ -193,14 +193,14 @@ void vectorTimeSeriesLSHFrechetContinuous(char* arg_inputFile,char* arg_queryFil
   LSH lsh;
   List list;
   clock_t begin = clock();
-  d = findDimLSH(inputFile);
+  dim = findDimLSH(inputFile);
   double sum=0.0;
-  double time[d];
-  for(int i=0;i<d;i++){
+  double time[dim];
+  for(int i=0;i<dim;i++){
     time[i]=sum;
     sum+=1.0;
   }
-  printf("DIMENSION = %d\n",d);
+  printf("DIMENSION = %d\n",dim);
   list = initializeList();
   int numberOfVectorsInFile = 0;
   readFileLSH(inputFile,&list,&numberOfVectorsInFile,1,time);
