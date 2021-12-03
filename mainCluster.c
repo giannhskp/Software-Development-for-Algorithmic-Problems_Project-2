@@ -14,7 +14,7 @@
 #define W_VALUE 4
 
 
-int d;
+// int d;
 // int k;
 int new_dimension;
 int m;
@@ -124,8 +124,8 @@ int main(int argc, char *argv[]) {
   while(1){
     if(repeat){
       clock_t begin = clock();
-      d = findDim(inputFile);
-      printf("DIMENSION = %d\n",d);
+      int dim = findDim(inputFile);
+      printf("DIMENSION = %d\n",dim);
       int numOfClusters=-100,l=3,mHyper=10,probes=2;
       new_dimension=3;
       k_LSH=4;
@@ -144,7 +144,7 @@ int main(int argc, char *argv[]) {
         printf("numOfClusters : %d\n\n", numOfClusters);
       }
       list = initializeList();
-      readFile(inputFile,&list,&numOfVecs);
+      readFile(inputFile,&list,&numOfVecs,dim);
       clock_t end = clock();
       double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
       printf("Parsed input file in : %f seconds\n",time_spent);
@@ -157,7 +157,7 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
       }
 
-      clustering(list,fptr,assignment,update,numOfClusters,l,mHyper,probes);
+      clustering(list,fptr,assignment,update,numOfClusters,l,mHyper,probes,dim);
     }
     repeat=0;
 

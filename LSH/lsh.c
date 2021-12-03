@@ -16,7 +16,7 @@
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
 extern int w;
-extern int d;
+// extern int d;
 extern int k_LSH;
 extern int hashTableSize;
 
@@ -76,16 +76,17 @@ g_function *getGfuns(LSH lsh){
   return lsh->g_fun;
 }
 
-Vector timeSeriesSnapping(Vector v,int d,double gridDelta,double t){
+Vector timeSeriesSnapping(Vector v,double gridDelta,double t){
+  int dim=getDim(v);
   double *coordsVector = getCoords(v);
   double *coordsTime = getTime(v);
-  double snappedVector[d];
-  double snappedTime[d];
-  double snappedFinal[2*d];
+  double snappedVector[dim];
+  double snappedTime[dim];
+  double snappedFinal[2*dim];
 
   int index=0;
   int indexFinal=0;
-  for(int i=0;i<d;i++){
+  for(int i=0;i<dim;i++){
     double temp=coordsVector[i] + t;  // displacement
     double tempTime=coordsTime[i] + t;   // displacement
     int found=0;
@@ -126,30 +127,23 @@ Vector timeSeriesSnapping(Vector v,int d,double gridDelta,double t){
   //   snappedVector[i]=PADDING_M;
   //   snappedTime[i]=PADDING_M;
   // }
-  for(int i=index;i<2*d;i++){
+  for(int i=index;i<2*dim;i++){
     snappedFinal[i]=PADDING_M;
     // snappedTime[i]=PADDING_M;
   }
   ////////////////////////////
-  printf("%d\n",d);
-  d*=2;
-  printf("%d\n",d);
-  Vector vecTmp=initVector(snappedFinal,getID(v));
-  d/=2;
-  // getchar();
-  // printVector(vecTmp);
-  // getchar();
-  // printVector(snappedTime);
-  // printVector(snappedVector);
+  Vector vecTmp=initVector(snappedFinal,getID(v),2*dim);
+
   return vecTmp;
 }
 
-Vector continuousTimeSeriesSnapping(Vector v,int d,double gridDelta){
+Vector continuousTimeSeriesSnapping(Vector v,double gridDelta){
+  int dim=getDim(v);
   double *coordsVector = getCoords(v);
-  double snappedVector[d];
+  double snappedVector[dim];
 
   int index=0;
-  for(int i=0;i<d;i++){
+  for(int i=0;i<dim;i++){
     double temp=coordsVector[i];  // displacement
     if(temp==-1){
       continue;
@@ -171,20 +165,21 @@ Vector continuousTimeSeriesSnapping(Vector v,int d,double gridDelta){
   }
   // TODO: padding
   ////////////////////////////
-  for(int i=index;i<d;i++){
+  for(int i=index;i<dim;i++){
     snappedVector[i]=PADDING_M;
   }
   ////////////////////////////
-  Vector vecTmp=initVector(snappedVector,getID(v));
+  Vector vecTmp=initVector(snappedVector,getID(v),2*dim);
   return vecTmp;
 }
 
-Vector minima_maxima(Vector v,int d){
+Vector minima_maxima(Vector v){
+  int dim=getDim(v);
   double *coordsVector = getCoords(v);
-  double keyVector[d];
+  double keyVector[dim];
   int newIndex = 0;
   int prev = 0;
-  for(int i=1;i<(d-1);i++){
+  for(int i=1;i<(dim-1);i++){
     if(coordsVector[i+1]==PADDING_M){
       break;
     }
@@ -197,19 +192,20 @@ Vector minima_maxima(Vector v,int d){
       prev=i;
     }
   }
-  for(int i=newIndex;i<d;i++){
+  for(int i=newIndex;i<dim;i++){
     keyVector[i] = PADDING_M;
   }
-  Vector tempVec = initVector(keyVector,"keyVector");
+  Vector tempVec = initVector(keyVector,"keyVector",dim);
   return tempVec;
 }
 
 Vector filtering(Vector v,double epsilon){
-  double *filteredCoords = malloc(d*(sizeof(double)));
+  int dim = getDim(v);
+  double *filteredCoords = malloc(dim*(sizeof(double)));
   double *originalCoords = getCoords(v);
   filteredCoords[0]=originalCoords[0];
   double previous = originalCoords[0];
-  for(int i=1;i<(d-1);i++){
+  for(int i=1;i<(dim-1);i++){
     if((fabs(previous-originalCoords[i])<epsilon) && (fabs(originalCoords[i]-originalCoords[i+1])<epsilon)){
       filteredCoords[i]=-1;
     }else{
@@ -217,8 +213,8 @@ Vector filtering(Vector v,double epsilon){
       previous = originalCoords[i];
     }
   }
-  filteredCoords[d-1]=originalCoords[d-1];
-  Vector tempVec = initVector(filteredCoords,getID(v));
+  filteredCoords[dim-1]=originalCoords[dim-1];
+  Vector tempVec = initVector(filteredCoords,getID(v),dim);
   free(filteredCoords);
   return tempVec;
 }
@@ -226,10 +222,10 @@ Vector filtering(Vector v,double epsilon){
 
 /* H FUNCTIONS*/
 
-void generateH_LSH(h_function *hfun){
+void generateH_LSH(h_function *hfun,int dim){
   // generate v vector coordinates of h function, v ∼ N (0, 1)^d
-  hfun->v=malloc(d*sizeof(double));
-  for(int i=0;i<d;i++){
+  hfun->v=malloc(dim*sizeof(double));
+  for(int i=0;i<dim;i++){
     hfun->v[i] = normalRandom();
   }
   // pick t variable uniformly ∈ R [0, w)
@@ -243,7 +239,7 @@ void destroyH_LSH(h_function h){
 
 int computeH_LSH(h_function hfun,Vector vector){
   // compute the dot product of the given vector with the v vector of h function (p · v)
-  double pv = dot_product(hfun.v,getCoords(vector),d);
+  double pv = dot_product(hfun.v,getCoords(vector),getDim(vector));
   // finally calculate the value of h function
   double temp = (double) (pv+hfun.t)/(double)w;
   return floor(temp);
@@ -251,13 +247,13 @@ int computeH_LSH(h_function hfun,Vector vector){
 
 /* G FUNCTIONS*/
 
-void generateG(g_function *gfun){
+void generateG(g_function *gfun,int dim){
   // allocate and generate the h functions tha will be used at the calculation of G function, k_LSH (number of h functions) has been given from the command line
   // g function is a random combination of hi's, every g function has k_LSH h functions
   gfun->h_functions = malloc(k_LSH*sizeof(h_function));
 
   for(int i=0;i<k_LSH;i++){
-     generateH_LSH(&gfun->h_functions[i]);
+     generateH_LSH(&gfun->h_functions[i],dim);
   }
   // allocate and generate as many variables r (r[i] are a random int ≤ 32 bits) as the functions h
   gfun->r = malloc(k_LSH*sizeof(int));
@@ -299,7 +295,7 @@ int computeG(g_function gfun,Vector p,unsigned int *id){
 
 /* LSH IMPLEMENTATION*/
 
-LSH initializeLSH(int l){
+LSH initializeLSH(int l,int dim){
   LSH tempLSH = malloc(sizeof(lshNode));
   // allocate as many G functions as the number of hash tables (g functions used like hash functions at the corresponding  hash tables )
   tempLSH->g_fun = malloc(l*sizeof(g_function));
@@ -308,7 +304,7 @@ LSH initializeLSH(int l){
   printf("-HASHSIZE = %d\n",hashTableSize);
   // generate G functions and initialize the correspodings hash tables
   for(int i=0;i<l;i++){
-     generateG(&(tempLSH->g_fun[i]));
+     generateG(&(tempLSH->g_fun[i]),dim);
      tempLSH->hts[i] = htInitialize(hashTableSize);
   }
   // save l (the number of hash tables)
@@ -340,23 +336,17 @@ void insertTimeSeriesToLSH(LSH lsh,Grids grids,double delta,Vector v){
   for(int i=0;i<l;i++){ // go at every hash table of lsh
     // printf("----- L = %d -------\n",i);
     double t_of_grid = getTofGrid(grids,i);
-    // printf("*-*  T = %f\n",t_of_grid);
-    // printf("ORIGINAL = ");
-    // printVector(v);
-    Vector snappedToGrid = timeSeriesSnapping(v,d,delta,t_of_grid);
-    // d*=2;
-    // printf("SNAPPED = ");
-    // printVector(snappedToGrid);
+
+    Vector snappedToGrid = timeSeriesSnapping(v,delta,t_of_grid);
+
     unsigned int id;
     int index = computeG(lsh->g_fun[i],snappedToGrid,&id); // compute the value of the g function for the given vector that will be inserted
     // finally insert the vector at the corresponding bucket of the current hash table
-    // d/=2;
+
     htInsert(lsh->hts[i],v,index,id);
-    d*=2;
+
     deleteVector(snappedToGrid);
-    d/=2;
   }
-  // getchar();
 }
 
 
@@ -372,10 +362,10 @@ void insertContinuousTimeSeriesToLSH(LSH lsh,Grids grids,double delta,Vector v,d
   // printf("FILTERED = ");
   // printVector(v2);
   // printf("DELTA = %f\n",delta);
-  Vector v3 = continuousTimeSeriesSnapping(v2,d,delta);
+  Vector v3 = continuousTimeSeriesSnapping(v2,delta);
   // printf("SNAPPED = ");
   // printVector(v3);
-  Vector v4 = minima_maxima(v3,d);
+  Vector v4 = minima_maxima(v3);
   // printf("KEY_VECTOR = ");
   // printVector(v4);
 
@@ -455,7 +445,7 @@ void nearestNeigborLSH(LSH lsh,Vector q,Vector *nNearest,double *trueDist,FILE *
     unsigned int q_ID;
     int q_index = computeG(gfuns[i],q,&q_ID); // compute the value of the g function for the given vector
     // and go to the corresponding bucket of the current hash table to find the  nearest neighbor for the given query vector
-    htFindNearestNeighbor(hts[i],q_index,q,&nearest,&nearestDist,d,q_ID);
+    htFindNearestNeighbor(hts[i],q_index,q,&nearest,&nearestDist,getDim(q),q_ID);
   }
   // check if nearest neighbor of the given vector q found or not
   if(nearestDist>=0 && nearest!=NULL){
@@ -480,13 +470,13 @@ void nearestNeigborLSH_DiscreteFrechet(LSH lsh,Vector q,Vector *nNearest,double 
   // to find the nearest neighbor of the given vector q, euclidean distance must be applied between the vector q and the vectors of the corresponding bucket of every LSH hash table
   for(int i=0;i<l;i++){ // go at every hash table of lsh
     double t_of_grid = getTofGrid(grids,i);
-    Vector snappedToGrid = timeSeriesSnapping(q,d,delta,t_of_grid);
+    Vector snappedToGrid = timeSeriesSnapping(q,delta,t_of_grid);
     unsigned int q_ID;
-    // d*=2;
+
     int q_index = computeG(gfuns[i],snappedToGrid,&q_ID); // compute the value of the g function for the given vector
-    // d/=2;
+
     // and go to the corresponding bucket of the current hash table to find the  nearest neighbor for the given query vector
-    htFindNearestNeighbor(hts[i],q_index,q,&nearest,&nearestDist,d,q_ID);
+    htFindNearestNeighbor(hts[i],q_index,q,&nearest,&nearestDist,getDim(q),q_ID);
     deleteVector(snappedToGrid);
   }
   // check if nearest neighbor of the given vector q found or not
@@ -511,13 +501,13 @@ void nearestNeigborLSH_ContinuousFrechet(LSH lsh,Vector q,Vector *nNearest,doubl
   HashTable *hts = getHts(lsh);
 
   Vector v2 = filtering(q,epsilon);
-  Vector v3 = continuousTimeSeriesSnapping(v2,d,delta);
-  Vector v4 = minima_maxima(v3,d);
+  Vector v3 = continuousTimeSeriesSnapping(v2,delta);
+  Vector v4 = minima_maxima(v3);
 
   unsigned int q_id;
   int q_index = computeG(lsh->g_fun[0],v4,&q_id); // compute the value of the g function for the given vector that will be inserted
 
-  htFindNearestNeighbor(hts[0],q_index,q,&nearest,&nearestDist,d,q_id);
+  htFindNearestNeighbor(hts[0],q_index,q,&nearest,&nearestDist,getDim(q),q_id);
 
   // check if nearest neighbor of the given vector q found or not
   if(nearestDist>=0 && nearest!=NULL){
@@ -548,7 +538,7 @@ void kNearestNeighborsLSH(LSH lsh,Vector q,int knn,double *knearestTrueDists,FIL
     unsigned int q_ID;
     int q_index = computeG(gfuns[i],q,&q_ID); // compute the value of the g function for the given vector
     // and go to the corresponding bucket of the current hash table to find the k nearest neighbors for the given query vector
-    htKFindNearestNeighbors(hts[i], q_index, q, nearest, knearestDists, d,knn,q_ID);
+    htKFindNearestNeighbors(hts[i], q_index, q, nearest, knearestDists, getDim(q),knn,q_ID);
   }
   int flag=1;
   for (int i = knn-1; i >= 0; i--){
@@ -582,9 +572,9 @@ void radiusNeigborsLSH(LSH lsh,Vector q,double radius,FILE *fptr){
     unsigned int q_ID;
     int q_index = computeG(gfuns[i],q,&q_ID); // compute the value of the g function for the given vector
     // and go to the corresponding bucket of the current hash table to do the range search (to find the neighbors of the query vector inside the given radius)
-    htFindNeighborsInRadius(hts[i],q_index,vecsInRadius,q,d,q_ID,radius);
+    htFindNeighborsInRadius(hts[i],q_index,vecsInRadius,q,getDim(q),q_ID,radius);
   }
-  htRangePrint(vecsInRadius,q,d,fptr);
+  htRangePrint(vecsInRadius,q,getDim(q),fptr);
 
   htDelete(vecsInRadius,0);
 }
@@ -598,6 +588,6 @@ void radiusNeigborsClustering(LSH lsh,Vector q,double radius,HashTable vecsInRad
     unsigned int q_ID;
     int q_index = computeG(gfuns[i],q,&q_ID); // compute the value of the g function for the given vector
     // and go to the corresponding bucket of the current hash table to do the range search (to find the vectors that belong to the corresponding cluster)
-    htFindNeighborsInRadiusClustering(hts[i],q_index,centroidIndex,confList,vecsInRadius,q,d,q_ID,radius,assignCounter,iteration);
+    htFindNeighborsInRadiusClustering(hts[i],q_index,centroidIndex,confList,vecsInRadius,q,getDim(q),q_ID,radius,assignCounter,iteration);
   }
 }

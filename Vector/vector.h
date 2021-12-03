@@ -15,6 +15,7 @@ void deleteVector(Vector);
 void printVector(Vector );
 void printVectorId(Vector );
 
+int getDim(Vector );
 void printVectorInFile(Vector,FILE* );
 void printVectorIdInFile(Vector,FILE* );
 void printVectorIdInFileNoNewline(Vector,FILE* );

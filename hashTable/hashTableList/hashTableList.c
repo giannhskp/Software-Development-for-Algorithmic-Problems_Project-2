@@ -14,23 +14,23 @@
 extern char *distanceMetric;
 // extern Vector timeVector;
 
-double l2_distance(Vector v1,Vector v2,int d){
+double l2_distance(Vector v1,Vector v2,int dim){
   // calculate the Euclidean distance (or L2) between the given vectors and return it
   double sum = 0.0;
   double *coords1 = getCoords(v1);
   double *coords2 = getCoords(v2);
-  for(int i=0;i<d;i++){
+  for(int i=0;i<dim;i++){
     sum += SQUARE(coords1[i]-coords2[i]);
   }
   return sqrt(sum);
 }
 
 
-double distance_metric(Vector v1,Vector v2,int d){
+double distance_metric(Vector v1,Vector v2,int dim){
   if(strcmp(distanceMetric,"l2")==0){
-    return l2_distance(v1,v2,d);
+    return l2_distance(v1,v2,dim);
   }else if(strcmp(distanceMetric,"discreteFrechet")==0){
-    return discreteFrechet(v1,v2,d);
+    return discreteFrechet(v1,v2,dim);
   }else{
     printf("WRONG DISTANCE METRIC\n");
     return -1.0;
@@ -148,7 +148,7 @@ void listPrintClusteringInFile(List list,FILE* fptr){
 }
 
 
-void listRangePrint(List list,Vector q,int d,int *counter,FILE *fptr){
+void listRangePrint(List list,Vector q,int dim,int *counter,FILE *fptr){
     if(list==NULL){ return;}
     List temp=list;
     while(temp!=NULL){
@@ -196,13 +196,13 @@ List listDelete(List list,int freeVectors){
     return list;
 }
 
-void listFindNearestNeighbor(List list,Vector q,Vector *nearest,double *nearestDist,int d,int id){
+void listFindNearestNeighbor(List list,Vector q,Vector *nearest,double *nearestDist,int dim,int id){
   //  used to LSH to find the nearest neighbor and the corresponding distance for the given vector q at a list
   if(list==NULL){ return;}
   List temp=list;
   while(temp!=NULL){
     if(id==(temp->vector_ID)){ // (Querying trick, to avoid to compute Euclidean distance for all vectors in bucket)
-      double dist = distance_metric(temp->v,q,d);
+      double dist = distance_metric(temp->v,q,dim);
       if(dist<(*nearestDist) || (*nearestDist)<0){
         (*nearestDist) = dist;
         (*nearest) = temp->v;
@@ -212,7 +212,7 @@ void listFindNearestNeighbor(List list,Vector q,Vector *nearest,double *nearestD
   }
 }
 
-void listFindNearestNeighborCube(List list,Vector q,Vector *nearest,double *nearestDist,int d,int *numOfSearched,int maxToSearch){
+void listFindNearestNeighborCube(List list,Vector q,Vector *nearest,double *nearestDist,int dim,int *numOfSearched,int maxToSearch){
   // used to Hypercube to find the nearest neighbor and the corresponding distance for the given vector q at a list
   if(list==NULL){ return;}
   List temp=list;
@@ -220,7 +220,7 @@ void listFindNearestNeighborCube(List list,Vector q,Vector *nearest,double *near
     if((*numOfSearched)>=maxToSearch){
       return;
     }
-    double dist = distance_metric(temp->v,q,d);
+    double dist = distance_metric(temp->v,q,dim);
     if(dist<(*nearestDist) || (*nearestDist)<0){
       (*nearestDist) = dist;
       (*nearest) = temp->v;
@@ -289,7 +289,7 @@ int binarySearch(double arr[], int l, int r, double x){
   return -1;
 }
 
-void listFindKNearestNeighbors(List list,Vector q,Vector *nearest,double *nearestDist,int d,int k,int id){
+void listFindKNearestNeighbors(List list,Vector q,Vector *nearest,double *nearestDist,int dim,int k,int id){
   // used to LSH to find the k nearest neighbors and the corresponding distance for the given vector q at a list
   if(list==NULL){ return;}
   List temp=list;
@@ -302,7 +302,7 @@ void listFindKNearestNeighbors(List list,Vector q,Vector *nearest,double *neares
       }
       int flag = 1;   // this flag also used to be sure that these two array will be take/initialize by real distances and vectors (when this flag does not change value from 1 to 0, it means that the corresponding arrays are initialized)
       int added=0;  // used to check if a vector added at the corresponding arrays to do quickSort
-      double dist = distance_metric(temp->v,q,d);
+      double dist = distance_metric(temp->v,q,dim);
 
 
       // check if the vector is alreast exists at the array of k nearest neighbors
@@ -339,7 +339,7 @@ void listFindKNearestNeighbors(List list,Vector q,Vector *nearest,double *neares
   }
 }
 
-void listFindKNearestNeighborsCube(List list,Vector q,Vector *nearest,double *nearestDist,int d,int k,int *numOfSearched,int maxToSearch){
+void listFindKNearestNeighborsCube(List list,Vector q,Vector *nearest,double *nearestDist,int dim,int k,int *numOfSearched,int maxToSearch){
     // used to Hypercube to find the k nearest neighbors and the corresponding distance for the given vector q at a list
   if(list==NULL){ return;}
   List temp=list;
@@ -351,7 +351,7 @@ void listFindKNearestNeighborsCube(List list,Vector q,Vector *nearest,double *ne
       }
       int flag = 1; // this flag also used to be sure that these two array will be take/initialize by real distances and vectors (when this flag does not change value from 1 to 0, it means that the corresponding arrays are initialized)
       int added=0; // used to check if a vectoradded at the corresponding arrays to do quickSort
-      double dist = distance_metric(temp->v,q,d);
+      double dist = distance_metric(temp->v,q,dim);
       (*numOfSearched) += 1;
 
       // check if the vector is alreast exists at the array of k nearest neighbors
@@ -389,15 +389,15 @@ void listFindKNearestNeighborsCube(List list,Vector q,Vector *nearest,double *ne
 
 
 
-void listFindNeighborsInRadius(List list,HashTable storeNeighbors,Vector q,int d,int id,int radius){
+void listFindNeighborsInRadius(List list,HashTable storeNeighbors,Vector q,int dim,int id,int radius){
   // (LSH) used to find the neighbors of the given vector q inside at the given radius
   if(list==NULL){ return;}
   List temp=list;
   while(temp!=NULL){
     if(id==(temp->vector_ID)){ // (Querying trick, to avoid to compute Euclidean distance for all vectors in bucket)
-      double dist = distance_metric(temp->v,q,d);
+      double dist = distance_metric(temp->v,q,dim);
       if(dist<=radius){
-        htRangeInsert(storeNeighbors,temp->v,temp->vector_ID,d);
+        htRangeInsert(storeNeighbors,temp->v,temp->vector_ID,dim);
       }
     }
     temp=temp->next;
@@ -405,7 +405,7 @@ void listFindNeighborsInRadius(List list,HashTable storeNeighbors,Vector q,int d
 }
 
 
-void listFindNeighborsInRadiusClustering(List list,int centroidIndex,List* confList,HashTable storeNeighbors,Vector q,int d,int id,int radius,int *assignCounter,int iteration){
+void listFindNeighborsInRadiusClustering(List list,int centroidIndex,List* confList,HashTable storeNeighbors,Vector q,int dim,int id,int radius,int *assignCounter,int iteration){
   // used at reverseAssignmentLSH to assign the vectors in to the clusters (clusters represented with hash tables)
   if(list==NULL){ return;}
   List temp=list;
@@ -423,7 +423,7 @@ void listFindNeighborsInRadiusClustering(List list,int centroidIndex,List* confL
             continue;
           }
           else{
-            double dist = distance_metric(temp->v,q,d);
+            double dist = distance_metric(temp->v,q,dim);
             if(dist<=radius){ // check if for the given radius the current vector lies in ≥ 2 clusters, add it into the confList
               *confList=listInsert(*confList,temp->v,-1);
             }
@@ -432,10 +432,10 @@ void listFindNeighborsInRadiusClustering(List list,int centroidIndex,List* confL
           }
         }
         else{
-          double dist = distance_metric(temp->v,q,d);
+          double dist = distance_metric(temp->v,q,dim);
           if(dist<=radius){
             // insert the vector at the corresponding cluster (hash table)
-            htRangeInsert(storeNeighbors,temp->v,temp->vector_ID,d);
+            htRangeInsert(storeNeighbors,temp->v,temp->vector_ID,dim);
             setAssignedCluster(temp->v,centroidIndex);
             setAssignedIteration(temp->v,iteration);
             setAssignedAtRadius(temp->v,radius);
@@ -448,7 +448,7 @@ void listFindNeighborsInRadiusClustering(List list,int centroidIndex,List* confL
   }
 }
 
-void listFindNeighborsInRadiusClusteringCube(List list,int centroidIndex,List* confList,HashTable storeNeighbors,Vector q,int d,double radius,int *numOfSearched,int maxToSearch,int *assignCounter,int iteration){
+void listFindNeighborsInRadiusClusteringCube(List list,int centroidIndex,List* confList,HashTable storeNeighbors,Vector q,int dim,double radius,int *numOfSearched,int maxToSearch,int *assignCounter,int iteration){
   // used at reverseAssignmentHypercube to assign the vectors in to the clusters (clusters represented with hash tables)
   if(list==NULL){ return;}
   List temp=list;
@@ -469,7 +469,7 @@ void listFindNeighborsInRadiusClusteringCube(List list,int centroidIndex,List* c
           continue;
         }
         else{
-          double dist = distance_metric(temp->v,q,d);
+          double dist = distance_metric(temp->v,q,dim);
           if(dist<=radius){ // check if for the given radius the current vector lies in ≥ 2 clusters, add it into the confList
             *confList=listInsert(*confList,temp->v,-1);
           }
@@ -478,10 +478,10 @@ void listFindNeighborsInRadiusClusteringCube(List list,int centroidIndex,List* c
         }
       }
       else{
-        double dist = distance_metric(temp->v,q,d);
+        double dist = distance_metric(temp->v,q,dim);
         if(dist<=radius){
           // insert the vector at the corresponding cluster (hash table)
-          htRangeInsert(storeNeighbors,temp->v,temp->vector_ID,d);
+          htRangeInsert(storeNeighbors,temp->v,temp->vector_ID,dim);
           setAssignedCluster(temp->v,centroidIndex);
           setAssignedIteration(temp->v,iteration);
           setAssignedAtRadius(temp->v,radius);
@@ -492,7 +492,7 @@ void listFindNeighborsInRadiusClusteringCube(List list,int centroidIndex,List* c
     }
 }
 
-void listSolveRangeConflicts(List conflictList,HashTable *clustersHt,Vector *clusters,int numOfClusters,int d,int iteration){
+void listSolveRangeConflicts(List conflictList,HashTable *clustersHt,Vector *clusters,int numOfClusters,int dim,int iteration){
   // used to solve the conflicts for all vectors that has been inserted in the given list
   // more specifically these vectors has been assigned in more than one clusters previously at range search,
   // so let's find the cluster that really belongs these vectors with the help of Euclidean Distance
@@ -511,19 +511,19 @@ void listSolveRangeConflicts(List conflictList,HashTable *clustersHt,Vector *clu
     // let's solve the conflict and assign the vector at the "correct" cluster based on euclidean distance
     countReal++;
     // first delete it from the already assigned cluster
-    htRangeDelete(clustersHt[getAssignedCluster(temp->v)],temp->v,temp->vector_ID,d);
+    htRangeDelete(clustersHt[getAssignedCluster(temp->v)],temp->v,temp->vector_ID,dim);
     double minDist = DBL_MAX;
     int closestCentroid = -1;
     // and find the closest centroid based on euclidean distance
     for(int i=0;i<numOfClusters;i++){
-      double dist = distance_metric(temp->v,clusters[i],d);
+      double dist = distance_metric(temp->v,clusters[i],dim);
       if(dist<minDist){
         minDist = dist;
         closestCentroid = i;
       }
     }
     // closest centroid found, insert the vector at the corresponding cluster
-    htRangeInsert(clustersHt[closestCentroid],temp->v,temp->vector_ID,d);
+    htRangeInsert(clustersHt[closestCentroid],temp->v,temp->vector_ID,dim);
     setAssignedCluster(temp->v,closestCentroid);
     setAssignedAtRadius(temp->v,-3.0);
     setAssignedIteration(temp->v,iteration);
@@ -533,53 +533,59 @@ void listSolveRangeConflicts(List conflictList,HashTable *clustersHt,Vector *clu
 
 }
 
-void listFindNeighborsInRadiusCube(List list,HashTable storeNeighbors,Vector q,int d,int radius,int *numOfSearched,int maxToSearch){
+void listFindNeighborsInRadiusCube(List list,HashTable storeNeighbors,Vector q,int dim,int radius,int *numOfSearched,int maxToSearch){
   if(list==NULL){ return;}
   List temp=list;
   while(temp!=NULL){
     if((*numOfSearched)>=maxToSearch){
       return;
     }
-    double dist = distance_metric(temp->v,q,d);
+    double dist = distance_metric(temp->v,q,dim);
     (*numOfSearched) += 1;
     if(dist<=radius){
-      htRangeInsert(storeNeighbors,temp->v,temp->vector_ID,d);
+      htRangeInsert(storeNeighbors,temp->v,temp->vector_ID,dim);
     }
     temp=temp->next;
   }
 }
 
 
-Vector listMeanOfCluster(List list,int d){
+Vector listMeanOfCluster(List list,int dim){
   // used to find/calculate the centroid of the cluster (cluster is the given list)
   if(list==NULL) return NULL;
   List temp = list;
   int count=0;
-  double *sumDims=calloc(d,sizeof(double));
+  double *sumDims=calloc(dim,sizeof(double));
   while(temp!=NULL){
-    for(int i=0;i<d;i++){
+    for(int i=0;i<dim;i++){
       sumDims[i]+=getCoords(temp->v)[i]; // add up all the coordinates of the cluster vectors
     }
     count++;
     temp=temp->next;
   }
-  for(int i=0;i<d;i++){
+  for(int i=0;i<dim;i++){
     sumDims[i]/=(double)count; // divide the coordinates with their number
   }
   // finally create the centroid
-  Vector newCentroid  = initVector(sumDims,"tempCentroid");
+  double sum=0.0;
+  double time[dim];
+  for(int i=0;i<dim;i++){
+    time[i]=sum;
+    sum+=1.0;
+  }
+  Vector newCentroid  = initTimeSeries(sumDims,time,"tempCentroid",dim);
   free(sumDims);
   // and return it
   return newCentroid;
 }
 
-double *listSumOfVectors(List list,int d,int *count){
+double *listSumOfVectors(List list,int dim,int *count){
   // used to calculate the sum of vectors at one cluster (cluster is the given list)
   if(list==NULL) return NULL;
   List temp = list;
-  double *sumDims=calloc(d,sizeof(double));
+  double *sumDims=calloc(dim,sizeof(double));
   while(temp!=NULL){
-    for(int i=0;i<d;i++){
+    for(int i=0;i<dim;i++){
       sumDims[i]+=getCoords(temp->v)[i];
     }
     (*count)++;
@@ -589,13 +595,13 @@ double *listSumOfVectors(List list,int d,int *count){
 }
 
 
-int closestCentroid(Vector v,Vector *clusters,int numOfClusters,int d,int except){
+int closestCentroid(Vector v,Vector *clusters,int numOfClusters,int dim,int except){
   // used to find for the given vector the closest centroid based on euclidean distance
   int minDistIndex = -1;
   double minDist = DBL_MAX;
   for(int i=0;i<numOfClusters;i++){
     if(i==except) continue;
-    double tempDist = distance_metric(v,clusters[i],d);
+    double tempDist = distance_metric(v,clusters[i],dim);
     if(tempDist<minDist){
       minDistIndex = i;
       minDist = tempDist;
@@ -604,13 +610,13 @@ int closestCentroid(Vector v,Vector *clusters,int numOfClusters,int d,int except
   return minDistIndex;
 }
 
-double listFindSumOfDistancesOfVector(List list,Vector v,int *count,int d){
+double listFindSumOfDistancesOfVector(List list,Vector v,int *count,int dim){
   // used to find the sum of distances from the given vector to vectors of one cluster (cluster is the given list)
   if(list==NULL) return 0.0;
   List temp = list;
   double tempSum = 0.0;
   while(temp!=NULL){
-    double dist = distance_metric(temp->v,v,d);
+    double dist = distance_metric(temp->v,v,dim);
     tempSum += dist;
     (*count)++;
     temp=temp->next;
@@ -618,16 +624,16 @@ double listFindSumOfDistancesOfVector(List list,Vector v,int *count,int d){
   return tempSum;
 }
 
-void listComputeAverageDistOfEveryPointOfCluster(List *listArray,int arraySize,HashTable *clustersHt,int current_cluster,Vector *clusters,int numOfClusters,double *a,double *b,int *count,int d){
+void listComputeAverageDistOfEveryPointOfCluster(List *listArray,int arraySize,HashTable *clustersHt,int current_cluster,Vector *clusters,int numOfClusters,double *a,double *b,int *count,int dim){
   // used to compute a(i) and b(i) for the silhouette of each cluster at reverseAssignmentLSH and reverseAssignmentHypercube Algorithms
   for(int i=0;i<arraySize;i++){
     List temp = listArray[i];
     while(temp!=NULL){
       // a(i) = average distance of i to objects in same cluster
-      a[(*count)]=htFindAverageDistanceOfVectorInCluster(clustersHt[current_cluster],temp->v,d);
-      int second_closest_centroid = closestCentroid(temp->v,clusters,numOfClusters,d,current_cluster);
+      a[(*count)]=htFindAverageDistanceOfVectorInCluster(clustersHt[current_cluster],temp->v,dim);
+      int second_closest_centroid = closestCentroid(temp->v,clusters,numOfClusters,dim,current_cluster);
       // b(i) = average distance of i to objects in next best (neighbor) cluster
-      b[(*count)]=htFindAverageDistanceOfVectorInCluster(clustersHt[second_closest_centroid],temp->v,d);
+      b[(*count)]=htFindAverageDistanceOfVectorInCluster(clustersHt[second_closest_centroid],temp->v,dim);
       (*count)++;
       temp=temp->next;
     }
@@ -635,14 +641,14 @@ void listComputeAverageDistOfEveryPointOfCluster(List *listArray,int arraySize,H
 }
 
 
-double listFindAverageDistOfVector(List list,Vector v,int d){
+double listFindAverageDistOfVector(List list,Vector v,int dim){
   // used to compute average distance of given vector in the given cluster (list)
   if(list==NULL) return 0.0;
   List temp = list;
   double tempSum = 0.0;
   int count = 0;
   while(temp!=NULL){
-    double dist = distance_metric(temp->v,v,d);
+    double dist = distance_metric(temp->v,v,dim);
     tempSum += dist;
     (count)++;
     temp=temp->next;
@@ -651,29 +657,29 @@ double listFindAverageDistOfVector(List list,Vector v,int d){
   return tempSum/count;
 }
 
-void listComputeAverageDistOfEveryPointOfClusterLloyds(List list,List *clustersLists,int current_cluster,Vector *clusters,int numOfClusters,double *a,double *b,int *count,int d){
+void listComputeAverageDistOfEveryPointOfClusterLloyds(List list,List *clustersLists,int current_cluster,Vector *clusters,int numOfClusters,double *a,double *b,int *count,int dim){
   // used to compute compute a(i) and b(i) for the silhouette of each cluster at Lloyds Algorithm
     List temp = list;
     while(temp!=NULL){
       // a(i) = average distance of i to objects in same cluster
-      a[(*count)]=listFindAverageDistOfVector(clustersLists[current_cluster],temp->v,d);
-      int second_closest_centroid = closestCentroid(temp->v,clusters,numOfClusters,d,current_cluster);
+      a[(*count)]=listFindAverageDistOfVector(clustersLists[current_cluster],temp->v,dim);
+      int second_closest_centroid = closestCentroid(temp->v,clusters,numOfClusters,dim,current_cluster);
       // b(i) = average distance of i to objects in next best (neighbor) cluster
-      b[(*count)]=listFindAverageDistOfVector(clustersLists[second_closest_centroid],temp->v,d);
+      b[(*count)]=listFindAverageDistOfVector(clustersLists[second_closest_centroid],temp->v,dim);
       (*count)++;
       temp=temp->next;
     }
 }
 
 
-double silhouetteofClusterLloyds(List *clustersLists,Vector *clusters,int current_cluster,int numOfClusters,int numOfVectorsInCluster,int d,double *stotal){
+double silhouetteofClusterLloyds(List *clustersLists,Vector *clusters,int current_cluster,int numOfClusters,int numOfVectorsInCluster,int dim,double *stotal){
   // used to find the silhouettes of each clusters (clusters given in a array of lists)
   // a(i) = average distance of i to objects in same cluster
   // b(i) = average distance of i to objects in next best (neighbor) cluster
   double *a = calloc(sizeof(double),numOfVectorsInCluster);
   double *b = calloc(sizeof(double),numOfVectorsInCluster);
   int count = 0;
-  listComputeAverageDistOfEveryPointOfClusterLloyds(clustersLists[current_cluster],clustersLists,current_cluster,clusters,numOfClusters,a,b,&count,d);
+  listComputeAverageDistOfEveryPointOfClusterLloyds(clustersLists[current_cluster],clustersLists,current_cluster,clusters,numOfClusters,a,b,&count,dim);
   double sumOfS_i = 0.0;
   for(int i=0;i<numOfVectorsInCluster;i++){
     double s_i = (b[i]-a[i])/ MAX(b[i],a[i]);

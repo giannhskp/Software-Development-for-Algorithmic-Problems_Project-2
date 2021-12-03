@@ -30,6 +30,10 @@ double* getTime(Vector v){
   return v->times;
 }
 
+int getDim(Vector v){
+  return v->dim;
+}
+
 char* getID(Vector v){
   return v->vec_id;
 }
@@ -141,9 +145,16 @@ void initializeClusterInfo(Vector v){
 
 Vector copyVector(Vector vec){
   double *coords = getCoords(vec);
+
   Vector v=malloc(sizeof(struct vec_node));
-  v->coords = malloc(dim*sizeof(double));
-  for(int i=0;i<dim;i++){
+  if(vec->times!=NULL){
+    v->times = malloc(vec->dim*sizeof(double));
+    for(int i=0;i<vec->dim;i++){
+      v->times[i]=vec->times[i];
+    }
+  }
+  v->coords = malloc(vec->dim*sizeof(double));
+  for(int i=0;i<vec->dim;i++){
     (v->coords)[i] = coords[i];
   }
   v->vec_id = malloc((strlen(vec->vec_id)+1)*sizeof(char));

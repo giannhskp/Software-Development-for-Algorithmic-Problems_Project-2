@@ -22,7 +22,7 @@
 #define W_DIVIDER_CUBE 20
 
 extern int numOfVecs;
-extern int d;
+// extern int d;
 extern int hashTableSize;
 extern int complete;
 extern int w;
@@ -30,7 +30,7 @@ char *distanceMetric;
 Vector timeVector;
 
 
-int wValueCalculation(List list,int numberOfVectorsInFile){
+int wValueCalculation(List list,int numberOfVectorsInFile,int dim){
   long double sumDist = 0.0;
   int count=0;
   double persentageToCheck;
@@ -51,7 +51,7 @@ int wValueCalculation(List list,int numberOfVectorsInFile){
       if(count>stopBound){
         return floor(sumDist/count);
       }
-      sumDist += distance_metric(getVector(list),getVector(nested),d);
+      sumDist += distance_metric(getVector(list),getVector(nested),dim);
       count++;
       nested = getNext(nested);
     }
@@ -62,14 +62,14 @@ int wValueCalculation(List list,int numberOfVectorsInFile){
 
 
 
-void lloyds(Vector* clusters,Vector *oldClusters,Vector* vectors,List* clustersList,int numberOfVectors,int numOfClusters,int *vectorCount,int *firstTime) {
+void lloyds(Vector* clusters,Vector *oldClusters,Vector* vectors,List* clustersList,int numberOfVectors,int numOfClusters,int *vectorCount,int *firstTime,int dim) {
   // lloyds Algorithm
   if(*firstTime) // skip it for the first time (original centroids from the kmeansPlusPlus)
     for(int i=0;i<numOfClusters;i++){
       Vector newCenter;
       if(clustersList[i]!=NULL){ // check if each cluster has been formed (has vectors)
         // ok then find the new centroid for this cluster
-        newCenter=listMeanOfCluster(clustersList[i],d);
+        newCenter=listMeanOfCluster(clustersList[i],dim);
       }
       else{
         // this cluster hasn't been formed, let as centroid the previous one
@@ -84,24 +84,24 @@ void lloyds(Vector* clusters,Vector *oldClusters,Vector* vectors,List* clustersL
 
   for(int i=0;i<numberOfVectors;i++){ // for every vector
     // find the closest centroid with the euclidean distance
-    int closestCentroid = findClosestCentroid(vectors[i],clusters,numOfClusters);
+    int closestCentroid = findClosestCentroid(vectors[i],clusters,numOfClusters,dim);
     // and assign this vector to the corresponding cluster
     vectorCount[closestCentroid] += 1;
-    clustersList[closestCentroid] = listInsert(clustersList[closestCentroid],vectors[i],d);
+    clustersList[closestCentroid] = listInsert(clustersList[closestCentroid],vectors[i],dim);
   }
   *firstTime=1;
 }
 
-double *silhouetteLloyds(List *clustersList,Vector *clusters,int numOfClusters,int *vectorCount,double *stotal){
+double *silhouetteLloyds(List *clustersList,Vector *clusters,int numOfClusters,int *vectorCount,double *stotal,int dim){
   // used to find the silhouettes of each cluster in Lloyds Algorithm
   double *silhouettes = calloc(sizeof(double),numOfClusters);
   for(int i=0;i<numOfClusters;i++){
-    silhouettes[i] = silhouetteofClusterLloyds(clustersList,clusters,i,numOfClusters,vectorCount[i],d,stotal);
+    silhouettes[i] = silhouetteofClusterLloyds(clustersList,clusters,i,numOfClusters,vectorCount[i],dim,stotal);
   }
   return silhouettes;
 }
 
-void clusteringLloyds(List vecList,int numOfClusters,FILE* fptr){
+void clusteringLloyds(List vecList,int numOfClusters,FILE* fptr,int dim){
   Vector *vectors;
   Vector *clusters;
   Vector *oldClusters = NULL;
@@ -133,7 +133,7 @@ void clusteringLloyds(List vecList,int numOfClusters,FILE* fptr){
   int count=0;
   int firstTime=0;
   // lloyds Algorithm runs until convergence between the old cluster centroids and the new ones is achieved
-  while((count<2) || !centroidsConverge(clusters,oldClusters,numOfClusters,d)){ // check for convergence after the second one iteration
+  while((count<2) || !centroidsConverge(clusters,oldClusters,numOfClusters,dim)){ // check for convergence after the second one iteration
     count++;
     if(!firstIter){
       Vector *temp = oldClusters;
@@ -148,7 +148,7 @@ void clusteringLloyds(List vecList,int numOfClusters,FILE* fptr){
       }
     }
     // lloyds Algorithm
-    lloyds(clusters,oldClusters,vectors,clustersList,numOfVecs,numOfClusters,vectorCount,&firstTime);
+    lloyds(clusters,oldClusters,vectors,clustersList,numOfVecs,numOfClusters,vectorCount,&firstTime,dim);
 
     firstIter=FALSE;
   }
@@ -167,7 +167,7 @@ void clusteringLloyds(List vecList,int numOfClusters,FILE* fptr){
 
   printf("- COMPUTING SILHOUETTES FOR CLUSTERS\n");
   double stotal = 0.0;
-  double * silhouettes = silhouetteLloyds(clustersList,clusters,numOfClusters,vectorCount,&stotal);
+  double * silhouettes = silhouetteLloyds(clustersList,clusters,numOfClusters,vectorCount,&stotal,dim);
   printf("- FINISHED COMPUTING SILHOUETTES\n");
   fprintf(fptr, "Silhouette: [ ");
   for(int i=0;i<numOfClusters;i++){
@@ -200,11 +200,11 @@ void clusteringLloyds(List vecList,int numOfClusters,FILE* fptr){
   free(vectorCount);
 }
 
-void reverseAssignmentLSH(LSH lsh,Vector *vectors,Vector *clusters,Vector *oldClusters,HashTable *clustersHt,int numOfClusters,int iteration,int *firstTime){
+void reverseAssignmentLSH(LSH lsh,Vector *vectors,Vector *clusters,Vector *oldClusters,HashTable *clustersHt,int numOfClusters,int iteration,int *firstTime,int dim){
   if(*firstTime) // skip it for the first time (original centroids from the kmeansPlusPlus)
     for(int i=0;i<numOfClusters;i++){
 
-      Vector newCenter = htMeanOfCluster(clustersHt[i],d); // find the new centroid for every cluster
+      Vector newCenter = htMeanOfCluster(clustersHt[i],dim); // find the new centroid for every cluster
       if(newCenter==NULL){ // this cluster hasn't been formed, let as centroid the previous one
         newCenter=copyVector(oldClusters[i]);
       }
@@ -216,7 +216,7 @@ void reverseAssignmentLSH(LSH lsh,Vector *vectors,Vector *clusters,Vector *oldCl
     }
   double radius=DBL_MAX;
   // find the min distance between the centroids in order to initialize the radius for the range search
-  minDistbetweenCentroids(clusters,numOfClusters,&radius);
+  minDistbetweenCentroids(clusters,numOfClusters,&radius,dim);
   radius/=2;
   int assignCounter = 0;
   int previousAssigns = -1;
@@ -232,7 +232,7 @@ void reverseAssignmentLSH(LSH lsh,Vector *vectors,Vector *clusters,Vector *oldCl
       radiusNeigborsClustering(lsh,clusters[i],radius,clustersHt[i],i,&confList,&assignCounter,iteration);
     }
     // manage the vectors that presenting conflict
-    listSolveRangeConflicts(confList,clustersHt,clusters,numOfClusters,d,iteration);
+    listSolveRangeConflicts(confList,clustersHt,clusters,numOfClusters,dim,iteration);
     listDelete(confList,0);
     radius*=2; // doubled the radius for the next range search
     loopCounter++;
@@ -245,8 +245,8 @@ void reverseAssignmentLSH(LSH lsh,Vector *vectors,Vector *clusters,Vector *oldCl
       if(assignedToCluster(vectors[i]) && (getAssignedIteration(vectors[i])==iteration)){
         continue;
       }
-      int closestCentroid = findClosestCentroid(vectors[i],clusters,numOfClusters);
-      htRangeInsert(clustersHt[closestCentroid],vectors[i],-1,d);
+      int closestCentroid = findClosestCentroid(vectors[i],clusters,numOfClusters,dim);
+      htRangeInsert(clustersHt[closestCentroid],vectors[i],-1,dim);
       setAssignedCluster(vectors[i],closestCentroid);
       setAssignedIteration(vectors[i],iteration);
       setAssignedAtRadius(vectors[i],radius);
@@ -256,16 +256,16 @@ void reverseAssignmentLSH(LSH lsh,Vector *vectors,Vector *clusters,Vector *oldCl
   *firstTime=1;
 }
 
-double *silhouetteLSH_Hypercube(HashTable *clustersHt,Vector *clusters,int numOfClusters,double *stotal){
+double *silhouetteLSH_Hypercube(HashTable *clustersHt,Vector *clusters,int numOfClusters,double *stotal,int dim){
     // used to find the silhouettes of each cluster in reverseAssignmentHypercube
   double *silhouettes = calloc(sizeof(double),numOfClusters);
   for(int i=0;i<numOfClusters;i++){
-    silhouettes[i] = silhouetteofClusterLSH(clustersHt,clusters,i,numOfClusters,d,stotal);
+    silhouettes[i] = silhouetteofClusterLSH(clustersHt,clusters,i,numOfClusters,dim,stotal);
   }
   return silhouettes;
 }
 
-void clusteringLSH(List vecList,int numOfClusters,int l,FILE* fptr){
+void clusteringLSH(List vecList,int numOfClusters,int l,FILE* fptr,int dim){
   Vector *vectors;
   Vector *clusters;
   Vector *oldClusters = NULL;
@@ -291,7 +291,7 @@ void clusteringLSH(List vecList,int numOfClusters,int l,FILE* fptr){
   }
 
   clock_t begin = clock();
-  w = wValueCalculation(vecList,numOfVecs);
+  w = wValueCalculation(vecList,numOfVecs,dim);
   w /= W_DIVIDER_LSH;
   clock_t end = clock();
   double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
@@ -300,7 +300,7 @@ void clusteringLSH(List vecList,int numOfClusters,int l,FILE* fptr){
 
 
   begin = clock();
-  LSH lsh = initializeLSH(l);
+  LSH lsh = initializeLSH(l,dim);
   for(int i=0;i<numOfVecs;i++){
     initializeClusterInfo(vectors[i]);
     insertToLSH(lsh,vectors[i]);
@@ -320,7 +320,7 @@ void clusteringLSH(List vecList,int numOfClusters,int l,FILE* fptr){
   int countLSH=0;
   int firstTime=0;
   // reverseAssignmentLSH Algorithm runs until convergence between the old cluster centroids and the new ones is achieved
-  while((countLSH<2) || !centroidsConverge(clusters,oldClusters,numOfClusters,d)){ // check for convergence after the second one iteration
+  while((countLSH<2) || !centroidsConverge(clusters,oldClusters,numOfClusters,dim)){ // check for convergence after the second one iteration
     if(countLSH==MAX_RECENTER_ITERATIONS)
       break;
     countLSH++;
@@ -337,7 +337,7 @@ void clusteringLSH(List vecList,int numOfClusters,int l,FILE* fptr){
     }
 
     // reverseAssignmentLSH Algorithm
-    reverseAssignmentLSH(lsh,vectors,clusters,oldClusters,clustersHt,numOfClusters,countLSH,&firstTime);
+    reverseAssignmentLSH(lsh,vectors,clusters,oldClusters,clustersHt,numOfClusters,countLSH,&firstTime,dim);
 
     firstIterLSH=FALSE;
 
@@ -358,7 +358,7 @@ void clusteringLSH(List vecList,int numOfClusters,int l,FILE* fptr){
 
   printf("- COMPUTING SILHOUETTES FOR CLUSTERS\n");
   double stotal = 0.0;
-  double * silhouettes = silhouetteLSH_Hypercube(clustersHt,clusters,numOfClusters,&stotal);
+  double * silhouettes = silhouetteLSH_Hypercube(clustersHt,clusters,numOfClusters,&stotal,dim);
   printf("- FINISHED COMPUTING SILHOUETTES\n");
   fprintf(fptr, "Silhouette: [ ");
   for(int i=0;i<numOfClusters;i++){
@@ -393,11 +393,11 @@ void clusteringLSH(List vecList,int numOfClusters,int l,FILE* fptr){
   destroyLSH(lsh);
 }
 
-void reverseAssignmentHypercube(HyperCube cube,Vector *vectors,Vector *clusters,Vector *oldClusters,HashTable *clustersHt,int numOfClusters,int iteration,int m,int probes,int *firstTime){
+void reverseAssignmentHypercube(HyperCube cube,Vector *vectors,Vector *clusters,Vector *oldClusters,HashTable *clustersHt,int numOfClusters,int iteration,int m,int probes,int *firstTime,int dim){
   if(*firstTime) // skip it for the first time (original centroids from the kmeansPlusPlus)
     for(int i=0;i<numOfClusters;i++){
 
-      Vector newCenter = htMeanOfCluster(clustersHt[i],d); // find the new centroid for every cluster
+      Vector newCenter = htMeanOfCluster(clustersHt[i],dim); // find the new centroid for every cluster
       if(newCenter==NULL){ // this cluster hasn't been formed, let as centroid the previous one
         newCenter=copyVector(oldClusters[i]);
       }
@@ -409,7 +409,7 @@ void reverseAssignmentHypercube(HyperCube cube,Vector *vectors,Vector *clusters,
     }
   double radius=DBL_MAX;
   // find the min distance between the centroids in order to initialize the radius for the range search
-  minDistbetweenCentroids(clusters,numOfClusters,&radius);
+  minDistbetweenCentroids(clusters,numOfClusters,&radius,dim);
   radius/=2;
   int assignCounter = 0;
   int previousAssigns = -1;
@@ -426,7 +426,7 @@ void reverseAssignmentHypercube(HyperCube cube,Vector *vectors,Vector *clusters,
       radiusNeigborHypercubeClustering(cube,clusters[i],clustersHt[i],radius,probes,m,i,&confList,&assignCounter,iteration);
     }
     // manage the vectors that presenting conflict
-    listSolveRangeConflicts(confList,clustersHt,clusters,numOfClusters,d,iteration);
+    listSolveRangeConflicts(confList,clustersHt,clusters,numOfClusters,dim,iteration);
     listDelete(confList,0);
     radius*=2; // doubled the radius for the next range search
     loopCounter++;
@@ -439,8 +439,8 @@ void reverseAssignmentHypercube(HyperCube cube,Vector *vectors,Vector *clusters,
       if(assignedToCluster(vectors[i]) && (getAssignedIteration(vectors[i])==iteration)){
         continue;
       }
-      int closestCentroid = findClosestCentroid(vectors[i],clusters,numOfClusters);
-      htRangeInsert(clustersHt[closestCentroid],vectors[i],-1,d);
+      int closestCentroid = findClosestCentroid(vectors[i],clusters,numOfClusters,dim);
+      htRangeInsert(clustersHt[closestCentroid],vectors[i],-1,dim);
       setAssignedCluster(vectors[i],closestCentroid);
       setAssignedIteration(vectors[i],iteration);
       setAssignedAtRadius(vectors[i],radius);
@@ -450,7 +450,7 @@ void reverseAssignmentHypercube(HyperCube cube,Vector *vectors,Vector *clusters,
   *firstTime=1;
 }
 
-void clusteringHypercube(List vecList,int numOfClusters,int m,int probes,FILE* fptr){
+void clusteringHypercube(List vecList,int numOfClusters,int m,int probes,FILE* fptr,int dim){
   Vector *vectors;
   Vector *clusters;
   Vector *oldClusters = NULL;
@@ -469,7 +469,7 @@ void clusteringHypercube(List vecList,int numOfClusters,int m,int probes,FILE* f
   props = calloc(numOfVecs,sizeof(double));
 
   clock_t begin = clock();
-  w = wValueCalculation(vecList,numOfVecs);
+  w = wValueCalculation(vecList,numOfVecs,dim);
   w /= W_DIVIDER_CUBE;
   clock_t end = clock();
   double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
@@ -478,7 +478,7 @@ void clusteringHypercube(List vecList,int numOfClusters,int m,int probes,FILE* f
   // allocate and initialize the Hypercube with the vectors tha will be inserted into clusters
   hashTableSize=numOfVecs/16;
   begin = clock();
-  HyperCube cube = initializeHyperCube();
+  HyperCube cube = initializeHyperCube(dim);
   for(int i=0;i<numOfVecs;i++){
     initializeClusterInfo(vectors[i]);
     insertToHyperCube(cube,vectors[i]);
@@ -495,7 +495,7 @@ void clusteringHypercube(List vecList,int numOfClusters,int m,int probes,FILE* f
   int countLSH=0;
   int firstTime=0;
   // reverseAssignmentHypercube Algorithm runs until convergence between the old cluster centroids and the new ones is achieved
-  while((countLSH<2) || !centroidsConverge(clusters,oldClusters,numOfClusters,d)){
+  while((countLSH<2) || !centroidsConverge(clusters,oldClusters,numOfClusters,dim)){
     if(countLSH==MAX_RECENTER_ITERATIONS)
       break;
     countLSH++;
@@ -512,7 +512,7 @@ void clusteringHypercube(List vecList,int numOfClusters,int m,int probes,FILE* f
     }
 
     // reverseAssignmentHypercube Algorithm
-    reverseAssignmentHypercube(cube,vectors,clusters,oldClusters,clustersHt,numOfClusters,countLSH,m,probes,&firstTime);
+    reverseAssignmentHypercube(cube,vectors,clusters,oldClusters,clustersHt,numOfClusters,countLSH,m,probes,&firstTime,dim);
 
     firstIterLSH=FALSE;
 
@@ -533,7 +533,7 @@ void clusteringHypercube(List vecList,int numOfClusters,int m,int probes,FILE* f
 
   printf("- COMPUTING SILHOUETTES FOR CLUSTERS\n");
   double stotal = 0.0;
-  double * silhouettes = silhouetteLSH_Hypercube(clustersHt,clusters,numOfClusters,&stotal);
+  double * silhouettes = silhouetteLSH_Hypercube(clustersHt,clusters,numOfClusters,&stotal,dim);
   printf("- FINISHED COMPUTING SILHOUETTES\n");
   fprintf(fptr, "Silhouette: [ ");
   for(int i=0;i<numOfClusters;i++){
@@ -567,19 +567,19 @@ void clusteringHypercube(List vecList,int numOfClusters,int m,int probes,FILE* f
   deleteHyperCube(cube);
 }
 
-void clustering(List vecList,FILE* fptr,char* assignment,char *update,int numOfClusters,int l,int mHyper,int probes){
+void clustering(List vecList,FILE* fptr,char* assignment,char *update,int numOfClusters,int l,int mHyper,int probes,int dim){
   if(strcmp(assignment,"Classic")==0){
     if(strcmp(update,"Mean Vector")==0){
       distanceMetric=malloc(sizeof(char)*(strlen("l2")+1));
       strcpy(distanceMetric,"l2");
     }else if(strcmp(update,"Mean Frechet")==0){
       double sum=0.0;
-      double time[d];
-      for(int i=0;i<d;i++){
+      double time[dim];
+      for(int i=0;i<dim;i++){
         time[i]=sum;
         sum+=1.0;
       }
-      timeVector=initVector(time,"time");
+      timeVector=initVector(time,"time",dim);
       distanceMetric=malloc(sizeof(char)*(strlen("discreteFrechet")+1));
       strcpy(distanceMetric,"discreteFrechet");
     }else{
@@ -587,7 +587,7 @@ void clustering(List vecList,FILE* fptr,char* assignment,char *update,int numOfC
       exit(-1);
     }
     fprintf(fptr,"Algorithm: Lloyds\n");
-    clusteringLloyds(vecList,numOfClusters,fptr);
+    clusteringLloyds(vecList,numOfClusters,fptr,dim);
   }
   // else if(strcmp(method,"LSH")==0){
   //   fprintf(fptr,"Algorithm: Range Search LSH\n");

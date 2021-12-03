@@ -25,7 +25,6 @@ double discreteFrechet(Vector v1,Vector v2,int d){
   for(int i=0;i<d;i++){
     dynamicArray[i]=malloc(d*sizeof(double));
   }
-
   dynamicArray[0][0] = l2_metric(coords1[0],coordsTime1[0],coords2[0],coordsTime2[0]);
   for(int i=1;i<d;i++){
     double p1qj = l2_metric(coords1[0],coordsTime1[0],coords2[i],coordsTime2[i]);

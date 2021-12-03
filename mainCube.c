@@ -12,13 +12,13 @@
 
 #define W_DIVIDER 80
 
-int d;
+// int d;
 int new_dimension;
 int m;
 int probes;
 int w;
 
-static int wValueCalculation(List list,int numberOfVectorsInFile){
+static int wValueCalculation(List list,int numberOfVectorsInFile,int dim){
   long double sumDist = 0.0;
   int count=0;
   double persentageToCheck;
@@ -38,7 +38,7 @@ static int wValueCalculation(List list,int numberOfVectorsInFile){
       if(count>stopBound){
         return floor(sumDist/count);
       }
-      sumDist += distance_metric(getVector(list),getVector(nested),d);
+      sumDist += distance_metric(getVector(list),getVector(nested),dim);
       count++;
       nested = getNext(nested);
     }
@@ -96,12 +96,12 @@ void vectorTimeSeriesHypecube(char* arg_inputFile,char* arg_queryFile,int arg_ne
 
   List list;
   clock_t begin = clock();
-  d = findDimCube(inputFile);
-  printf("DIMENSION = %d\n",d);
+  int dim = findDimCube(inputFile);
+  printf("DIMENSION = %d\n",dim);
 
   list = initializeList();
   int numberOfVectorsInFile = 0;
-  readFileCube(inputFile,&list,&numberOfVectorsInFile);
+  readFileCube(inputFile,&list,&numberOfVectorsInFile,dim);
   clock_t end = clock();
   double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Parsed input file in : %f seconds\n",time_spent);
@@ -109,7 +109,7 @@ void vectorTimeSeriesHypecube(char* arg_inputFile,char* arg_queryFile,int arg_ne
 
   printf("Finding optimal value of w based on the input file\n");
   begin = clock();
-  w = wValueCalculation(list,numberOfVectorsInFile);
+  w = wValueCalculation(list,numberOfVectorsInFile,dim);
   w /= W_DIVIDER;
   end = clock();
   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
@@ -117,13 +117,13 @@ void vectorTimeSeriesHypecube(char* arg_inputFile,char* arg_queryFile,int arg_ne
 
   HyperCube hc;
   begin = clock();
-  hc = initializeHyperCube();
+  hc = initializeHyperCube(dim);
   insertFromListToHyperCube(list,hc);
   end = clock();
   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Created HyperCube in : %f seconds\n",time_spent);
 
-  readQueryFileCube(queryFile,outputFile,hc,list,probes,m);
+  readQueryFileCube(queryFile,outputFile,hc,list,probes,m,dim);
 
   deleteHyperCube(hc);
   listDelete(list,0);

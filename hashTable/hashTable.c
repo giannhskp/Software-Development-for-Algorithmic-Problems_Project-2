@@ -169,7 +169,15 @@ Vector htMeanOfCluster(HashTable ht,int d){
     sumDims[i]/=(double)count; // divide the coordinates with their number
   }
   // finally create the centroid
-  Vector newCentroid  = initVector(sumDims,"temp");
+
+  double sum=0.0;
+  double time[d];
+  for(int i=0;i<d;i++){
+    time[i]=sum;
+    sum+=1.0;
+  }
+
+  Vector newCentroid  = initTimeSeries(sumDims,time,"temp",d);
   free(sumDims);
   // and return it
   return newCentroid;
