@@ -19,7 +19,7 @@ EXEC1 = search
 EXEC2 = cluster
 
 all: $(EXEC1) $(EXEC2)
-# 
+#
 # search: $(EXEC1)
 #
 # cluster: $(EXEC2)
