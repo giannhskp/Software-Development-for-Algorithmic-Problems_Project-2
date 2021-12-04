@@ -5,6 +5,6 @@ typedef struct tree_head_node *Tree;
 
 Tree createTreeFromList(List ,int );
 void printTreeDFS(Tree );
-void destroyTree(Tree ,int );
-
+void destroyTree(Tree );
+Vector treeFindMeanCurve(Tree );
 #endif

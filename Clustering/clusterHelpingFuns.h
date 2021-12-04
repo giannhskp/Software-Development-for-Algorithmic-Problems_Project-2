@@ -7,7 +7,7 @@ void minDistToCentroids(Vector ,Vector* ,Vector *,int ,double *);
 
 void minDistbetweenCentroids(Vector *,int ,double *);
 
-int centroidsConverge(Vector *,Vector *,int ,int );
+int centroidsConverge(Vector *,Vector *,int );
 
 int findClosestCentroid(Vector ,Vector *,int );
 

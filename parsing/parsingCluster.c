@@ -13,7 +13,7 @@
 
 #define MAX_INPUT_LENGTH 10240
 
-extern int d;
+// extern int d;
 extern int k_LSH;
 extern int new_dimension;
 
@@ -129,7 +129,7 @@ void readConfFile(char* fileName,int * numOfClusters,int *l,int *mHyper,int *pro
 }
 
 
-void readFile(char* fileName,List *list,int *numOfVecs){
+void readFile(char* fileName,List *list,int *numOfVecs,int dim){
 
    FILE *file = fopen(fileName, "r"); // read mode
 
@@ -152,7 +152,7 @@ void readFile(char* fileName,List *list,int *numOfVecs){
     if(fscanf(file,"%[^\n]\n",buffer)<0){ // read a line from the file
       continue;
     }
-    double vec[d];
+    double vec[dim];
     char * token = strtok(buffer, "	 ");
     char name[MAX_INPUT_LENGTH];
     strcpy(name,token);
@@ -162,7 +162,13 @@ void readFile(char* fileName,List *list,int *numOfVecs){
         vec[counter++]=atof(token);
         token = strtok(NULL, "	");
      }
-     Vector vecTmp=initVector(vec,name);
+     double sum=0.0;
+     double time[dim];
+     for(int i=0;i<dim;i++){
+       time[i]=sum;
+       sum+=1.0;
+     }
+     Vector vecTmp=initTimeSeries(vec,time,name,dim);
      (*list) = listInsert((*list),vecTmp,-1);
      (*numOfVecs)++;
 

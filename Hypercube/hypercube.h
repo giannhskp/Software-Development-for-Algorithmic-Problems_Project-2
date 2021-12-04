@@ -3,7 +3,7 @@
 
 typedef struct hc_n *HyperCube;
 
-HyperCube initializeHyperCube();
+HyperCube initializeHyperCube(int);
 
 void insertToHyperCube(HyperCube ,Vector );
 void insertFromListToHyperCube(List ,HyperCube );

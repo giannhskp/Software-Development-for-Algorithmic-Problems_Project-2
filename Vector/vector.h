@@ -3,8 +3,10 @@
 
 typedef struct vec_node *Vector;
 
-Vector initVector(double *, char []);
-Vector initTimeSeries(double *,double *, char []);
+// Vector initVector(double *, char []);
+Vector initVector(double *, char [],int);
+// Vector initTimeSeries(double *,double *, char []);
+Vector initTimeSeries(double *,double *, char [],int);
 
 Vector copyVector(Vector );
 
@@ -13,6 +15,7 @@ void deleteVector(Vector);
 void printVector(Vector );
 void printVectorId(Vector );
 
+int getDim(Vector );
 void printVectorInFile(Vector,FILE* );
 void printVectorIdInFile(Vector,FILE* );
 void printVectorIdInFileNoNewline(Vector,FILE* );

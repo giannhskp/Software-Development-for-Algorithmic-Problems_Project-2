@@ -15,7 +15,7 @@
 
 #define MAX_INPUT_LENGTH 2048
 
-extern int d;
+// extern int d;
 
 // returns number of words in str
 int countWords(char *str){
@@ -55,7 +55,7 @@ int findDimCube(char* fileName){
 }
 
 
-void readFileCube(char* fileName,List *inputs,int *vectorCount){
+void readFileCube(char* fileName,List *inputs,int *vectorCount,int dim){
 
    FILE *file = fopen(fileName, "r"); // read mode
 
@@ -76,7 +76,7 @@ void readFileCube(char* fileName,List *inputs,int *vectorCount){
     if(read_result<0){ // read a line from the file
       continue;
     }
-    double vec[d];
+    double vec[dim];
     char * token = strtok(buffer, " ");
     char name[MAX_INPUT_LENGTH];
     strcpy(name,token);
@@ -87,7 +87,7 @@ void readFileCube(char* fileName,List *inputs,int *vectorCount){
       vec[counter++]=atof(token);
       token = strtok(NULL, " ");
      }
-     Vector vecTmp=initVector(vec,name);
+     Vector vecTmp=initVector(vec,name,dim);
      (*inputs) = listInsert((*inputs),vecTmp,-1);
      (*vectorCount)++;
   }
@@ -97,7 +97,7 @@ void readFileCube(char* fileName,List *inputs,int *vectorCount){
 
 
 
-void readQueryFileCube(char* queryFile,char* outputFile,HyperCube hc,List inputs,int hammingDist,int m){
+void readQueryFileCube(char* queryFile,char* outputFile,HyperCube hc,List inputs,int hammingDist,int m,int dim){
 
    FILE *file = fopen(queryFile, "r"); // read mode
 
@@ -121,7 +121,7 @@ void readQueryFileCube(char* queryFile,char* outputFile,HyperCube hc,List inputs
   int n = 1;  // 1 nearest neighbor
   Vector nNearest[n]; // here store the true k nearest neighbors
   double knearestDists[n]; // here store the true distances from the k nearest neighbors
-  double vec[d];
+  double vec[dim];
 
   while(!feof(file)){
     fflush(stdin);  // clear stdin buffer
@@ -142,7 +142,7 @@ void readQueryFileCube(char* queryFile,char* outputFile,HyperCube hc,List inputs
       vec[counter++]=atof(token);
       token = strtok(NULL, " ");
      }
-    Vector vecTmp=initVector(vec,name);
+    Vector vecTmp=initVector(vec,name,dim);
     fprintf(fptr, "Query %d:\n",id);
 
 
@@ -153,7 +153,7 @@ void readQueryFileCube(char* queryFile,char* outputFile,HyperCube hc,List inputs
 
     clock_t begin_true = clock(); // time calculation for the brute force method
     // find with the brute force method the k nearest neighbors for the corresponding query vector
-    listFindNearestNeighbor(inputs,vecTmp,nNearest,knearestDists,d,-1);
+    listFindNearestNeighbor(inputs,vecTmp,nNearest,knearestDists,dim,-1);
     clock_t end_true = clock();
     double time_spent_true = (double)(end_true - begin_true) / CLOCKS_PER_SEC;
 

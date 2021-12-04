@@ -12,13 +12,13 @@
 
 #define W_DIVIDER 80
 
-int d;
+// int d;
 int w;
 int k_LSH;
 int hashTableSize;
 // Vector timeVector;
 
-static int wValueCalculation(List list,int numberOfVectorsInFile){
+static int wValueCalculation(List list,int numberOfVectorsInFile,int dim){
   long double sumDist = 0.0;
   int count=0;
   double persentageToCheck;
@@ -40,7 +40,7 @@ static int wValueCalculation(List list,int numberOfVectorsInFile){
       if(count>stopBound){
         return floor(sumDist/count);
       }
-      sumDist +=distance_metric(getVector(list),getVector(nested),d);
+      sumDist +=distance_metric(getVector(list),getVector(nested));
       count++;
       nested = getNext(nested);
     }
@@ -52,7 +52,6 @@ static int wValueCalculation(List list,int numberOfVectorsInFile){
 
 void vectorTimeSeriesLSH(char* arg_inputFile,char* arg_queryFile,int arg_k_LSH,int arg_L,char* arg_outputFile)  {
 
-  char str[200];
   char inputFile[100];
   strcpy(inputFile,arg_inputFile);
   char queryFile[100];
@@ -70,11 +69,11 @@ void vectorTimeSeriesLSH(char* arg_inputFile,char* arg_queryFile,int arg_k_LSH,i
   LSH lsh;
   List list;
   clock_t begin = clock();
-  d = findDimLSH(inputFile);
-  printf("DIMENSION = %d\n",d);
+  int dim = findDimLSH(inputFile);
+  printf("DIMENSION = %d\n",dim);
   list = initializeList();
   int numberOfVectorsInFile = 0;
-  readFileLSH(inputFile,&list,&numberOfVectorsInFile,0,NULL);
+  readFileLSH(inputFile,&list,&numberOfVectorsInFile,0,NULL,dim);
   clock_t end = clock();
   double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Parsed input file in : %f seconds\n",time_spent);
@@ -83,20 +82,20 @@ void vectorTimeSeriesLSH(char* arg_inputFile,char* arg_queryFile,int arg_k_LSH,i
 
   printf("Finding optimal value of w based on the input file\n");
   begin = clock();
-  w = wValueCalculation(list,numberOfVectorsInFile);
+  w = wValueCalculation(list,numberOfVectorsInFile,dim);
   w /= W_DIVIDER;
   end = clock();
   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Found value of w in %f seconds, w = %d\n",time_spent,w );
 
   begin = clock();
-  lsh = initializeLSH(l);
+  lsh = initializeLSH(l,dim);
   insertFromListToLSH(list,lsh);
   end = clock();
   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Created LSH in : %f seconds\n",time_spent);
 
-  readQueryFileLSH(queryFile,outputFile,lsh,list);
+  readQueryFileLSH(queryFile,outputFile,lsh,list,dim);
 
   destroyLSH(lsh);
   listDelete(list,0);
@@ -104,7 +103,6 @@ void vectorTimeSeriesLSH(char* arg_inputFile,char* arg_queryFile,int arg_k_LSH,i
 
 
 void vectorTimeSeriesLSHFrechetDiscrete(char* arg_inputFile,char* arg_queryFile,int arg_k_LSH,int arg_L,char* arg_outputFile,double arg_delta){
-  char str[200];
   char inputFile[100];
   strcpy(inputFile,arg_inputFile);
   char queryFile[100];
@@ -125,17 +123,17 @@ void vectorTimeSeriesLSHFrechetDiscrete(char* arg_inputFile,char* arg_queryFile,
   LSH lsh;
   List list;
   clock_t begin = clock();
-  d = findDimLSH(inputFile);
+  int dim = findDimLSH(inputFile);
   double sum=0.0;
-  double time[d];
-  for(int i=0;i<d;i++){
+  double time[dim];
+  for(int i=0;i<dim;i++){
     time[i]=sum;
     sum+=1.0;
   }
-  printf("DIMENSION = %d\n",d);
+  printf("DIMENSION = %d\n",dim);
   list = initializeList();
   int numberOfVectorsInFile = 0;
-  readFileLSH(inputFile,&list,&numberOfVectorsInFile,1,time);
+  readFileLSH(inputFile,&list,&numberOfVectorsInFile,1,time,dim);
   clock_t end = clock();
   double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Parsed input file in : %f seconds\n",time_spent);
@@ -144,7 +142,7 @@ void vectorTimeSeriesLSHFrechetDiscrete(char* arg_inputFile,char* arg_queryFile,
 
   printf("Finding optimal value of w based on the input file\n");
   begin = clock();
-  w = wValueCalculation(list,numberOfVectorsInFile);
+  w = wValueCalculation(list,numberOfVectorsInFile,dim);
   // w /= W_DIVIDER;
   w = w/10;
   end = clock();
@@ -152,16 +150,16 @@ void vectorTimeSeriesLSHFrechetDiscrete(char* arg_inputFile,char* arg_queryFile,
   printf("Found value of w in %f seconds, w = %d\n",time_spent,w );
 
   begin = clock();
-  d*=2;
-  lsh = initializeLSH(l);
-  d/=2;
+  // dim*=2;
+  lsh = initializeLSH(l,2*dim);
+  // dim/=2;
   Grids grids = initializeGrids(delta,l);
   insertTimeSeriesFromListToLSH(list,lsh,grids,delta);
   end = clock();
   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Created LSH in : %f seconds\n",time_spent);
 
-  readQueryFileLSH_DiscreteFrechet(queryFile,outputFile,lsh,list,grids,delta,time);
+  readQueryFileLSH_DiscreteFrechet(queryFile,outputFile,lsh,list,grids,delta,time,dim);
   deleteGrids(grids);
   destroyLSH(lsh);
   listDelete(list,0);
@@ -172,7 +170,6 @@ void vectorTimeSeriesLSHFrechetDiscrete(char* arg_inputFile,char* arg_queryFile,
 //   // TO DO
 // }
 void vectorTimeSeriesLSHFrechetContinuous(char* arg_inputFile,char* arg_queryFile,int arg_k_LSH,char* arg_outputFile,double arg_delta,double epsilon){
-  char str[200];
   char inputFile[100];
   strcpy(inputFile,arg_inputFile);
   char queryFile[100];
@@ -193,17 +190,17 @@ void vectorTimeSeriesLSHFrechetContinuous(char* arg_inputFile,char* arg_queryFil
   LSH lsh;
   List list;
   clock_t begin = clock();
-  d = findDimLSH(inputFile);
+  int dim = findDimLSH(inputFile);
   double sum=0.0;
-  double time[d];
-  for(int i=0;i<d;i++){
+  double time[dim];
+  for(int i=0;i<dim;i++){
     time[i]=sum;
     sum+=1.0;
   }
-  printf("DIMENSION = %d\n",d);
+  printf("DIMENSION = %d\n",dim);
   list = initializeList();
   int numberOfVectorsInFile = 0;
-  readFileLSH(inputFile,&list,&numberOfVectorsInFile,1,time);
+  readFileLSH(inputFile,&list,&numberOfVectorsInFile,1,time,dim);
   clock_t end = clock();
   double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Parsed input file in : %f seconds\n",time_spent);
@@ -212,7 +209,7 @@ void vectorTimeSeriesLSHFrechetContinuous(char* arg_inputFile,char* arg_queryFil
 
   printf("Finding optimal value of w based on the input file\n");
   begin = clock();
-  w = wValueCalculation(list,numberOfVectorsInFile);
+  w = wValueCalculation(list,numberOfVectorsInFile,dim);
   // w /= W_DIVIDER;
   w = w/10;
   end = clock();
@@ -220,7 +217,7 @@ void vectorTimeSeriesLSHFrechetContinuous(char* arg_inputFile,char* arg_queryFil
   printf("Found value of w in %f seconds, w = %d\n",time_spent,w );
 
   begin = clock();
-  lsh = initializeLSH(l);
+  lsh = initializeLSH(l,2*dim);
   Grids grids = initializeGrids(delta,l);
   insertContinuousTimeSeriesFromListToLSH(list,lsh,grids,delta,epsilon);
   end = clock();
@@ -228,7 +225,7 @@ void vectorTimeSeriesLSHFrechetContinuous(char* arg_inputFile,char* arg_queryFil
   printf("Created LSH in : %f seconds22\n",time_spent);
   // printLSH(lsh);
 
-  readQueryFileLSH_ContinuousFrechet(queryFile,outputFile,lsh,list,delta,epsilon,time);
+  readQueryFileLSH_ContinuousFrechet(queryFile,outputFile,lsh,list,delta,epsilon,time,dim);
   deleteGrids(grids);
   destroyLSH(lsh);
   listDelete(list,0);

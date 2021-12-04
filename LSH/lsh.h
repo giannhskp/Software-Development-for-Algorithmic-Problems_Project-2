@@ -5,7 +5,7 @@ typedef struct lsh_n * LSH;
 typedef struct listNode *List;
 typedef struct grid_n *Grids;
 
-LSH initializeLSH(int );
+LSH initializeLSH(int,int );
 void insertToLSH(LSH ,Vector );
 void insertFromListToLSH(List ,LSH );
 void insertTimeSeriesFromListToLSH(List ,LSH ,Grids ,double );
