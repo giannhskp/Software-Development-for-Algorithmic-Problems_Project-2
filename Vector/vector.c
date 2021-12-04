@@ -144,6 +144,7 @@ void initializeClusterInfo(Vector v){
 // }
 
 Vector copyVector(Vector vec){
+  if(vec==NULL) return NULL;
   double *coords = getCoords(vec);
 
   Vector v=malloc(sizeof(struct vec_node));

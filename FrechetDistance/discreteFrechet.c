@@ -4,6 +4,8 @@
 #include <math.h>
 #include <limits.h>
 #include "../Vector/vector.h"
+#include "../hashTable/hashTableList/hashTableList.h"
+#include "../BinaryTree/binaryTree.h"
 
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 #define MAX3(a, b, c) MAX((MAX((a),(b))),(c))
@@ -64,7 +66,7 @@ int *discreteFrechet_optimalPath(Vector v1,Vector v2,int *pathLength){
   double *coords2 = getCoords(v2);
   double *coordsTime1 = getTime(v1);
   double *coordsTime2 = getTime(v2);
-  int *optimalPath = malloc((i_dim+j_dim)*sizeof(int*));
+  int *optimalPath = malloc((i_dim+j_dim)*sizeof(int));
 
   for(int i=0;i<i_dim;i++){
     dynamicArray[i]=malloc(j_dim*sizeof(double));
@@ -108,8 +110,8 @@ int *discreteFrechet_optimalPath(Vector v1,Vector v2,int *pathLength){
       optimalPath[optimalPathLenth++] = -1;
       break;
     }
-    int y = backtrackIndex / i_dim;
-    int x = backtrackIndex % i_dim;
+    int x = backtrackIndex / i_dim;
+    int y = backtrackIndex % i_dim;
     backtrackIndex = backtrackingPath[x][y];
     if(optimalPathLenth>=(i_dim+j_dim)){
       printf("!!! optimalPath OUT OF RANGE!\n");
@@ -128,4 +130,38 @@ int *discreteFrechet_optimalPath(Vector v1,Vector v2,int *pathLength){
   free(dynamicArray);
   free(backtrackingPath);
   return optimalPath;
+}
+
+Vector meanCurveBetween2Curves(Vector v1,Vector v2){
+  int pathLength = 0;
+  int i_dim = getDim(v1);
+  int *optimalPath = discreteFrechet_optimalPath(v1,v2,&pathLength);
+  double *meanCurveCoord = malloc(pathLength*sizeof(double));
+  double *meanCurveTime = malloc(pathLength*sizeof(double));
+  for(int i=0;i<pathLength;i++){
+    int index = optimalPath[i];
+    int x = index / i_dim;
+    int y = index % i_dim;
+    double meanCoord = (getCoords(v1)[x] + getCoords(v2)[y])/2;
+    double meanTime = (getTime(v1)[x] + getTime(v2)[y])/2;
+    meanCurveCoord[i] = meanCoord;
+    meanCurveTime[i] = meanTime;
+  }
+  Vector meanCurve = initTimeSeries(meanCurveCoord,meanCurveTime,"meanCurve",pathLength);
+  //free(optimalPath)
+  // free(meanCurveCoord)
+  // free(meanCurveTime)
+  return meanCurve;
+
+
+}
+
+Vector computeFrechetMeanCurve(List list,int count){
+  Tree tree = createTreeFromList(list,count);
+  printf("createTreeFromList OK!!!!!!!!\n");
+  Vector newCenter = treeFindMeanCurve(tree);
+  printf("treeFindMeanCurve OK!!!\n" );
+  fflush(stdout);
+  // destroyTree(tree);
+  return newCenter;
 }

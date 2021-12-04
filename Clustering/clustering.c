@@ -12,6 +12,7 @@
 #include "../Hypercube/hypercube.h"
 #include "./clusterHelpingFuns.h"
 #include "./kmeansPlusPlus.h"
+#include "../FrechetDistance/discreteFrechet.h"
 
 #define SQUARE(x) ((x)*(x))
 
@@ -69,7 +70,11 @@ void lloyds(Vector* clusters,Vector *oldClusters,Vector* vectors,List* clustersL
       Vector newCenter;
       if(clustersList[i]!=NULL){ // check if each cluster has been formed (has vectors)
         // ok then find the new centroid for this cluster
-        newCenter=listMeanOfCluster(clustersList[i],dim);
+        if(strcmp(distanceMetric,"discreteFrechet")==0){
+          newCenter = computeFrechetMeanCurve(clustersList[i],vectorCount[i]);
+        }else{
+          newCenter=listMeanOfCluster(clustersList[i],dim);
+        }
       }
       else{
         // this cluster hasn't been formed, let as centroid the previous one
@@ -80,6 +85,7 @@ void lloyds(Vector* clusters,Vector *oldClusters,Vector* vectors,List* clustersL
       clustersList[i] = NULL;
       // save the new centroid
       clusters[i]=newCenter;
+      vectorCount[i] = 0;
     }
 
   for(int i=0;i<numberOfVectors;i++){ // for every vector
@@ -88,6 +94,9 @@ void lloyds(Vector* clusters,Vector *oldClusters,Vector* vectors,List* clustersL
     // and assign this vector to the corresponding cluster
     vectorCount[closestCentroid] += 1;
     clustersList[closestCentroid] = listInsert(clustersList[closestCentroid],vectors[i],dim);
+  }
+  for(int i=0;i<numOfClusters;i++){ // for every vector
+    printf("COUNT[%d] = %d\n",i,vectorCount[i]);
   }
   *firstTime=1;
 }
@@ -144,7 +153,7 @@ void clusteringLloyds(List vecList,int numOfClusters,FILE* fptr,int dim){
           deleteVector(clusters[i]);
           clusters[i] = NULL;
         }
-        vectorCount[i] = 0;
+        // vectorCount[i] = 0;
       }
     }
     // lloyds Algorithm

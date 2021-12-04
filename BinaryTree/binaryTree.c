@@ -5,6 +5,8 @@
 #include <math.h>
 #include "../Vector/vector.h"
 #include "../hashTable/hashTableList/hashTableList.h"
+#include "../FrechetDistance/discreteFrechet.h"
+
 
 
 typedef struct tree_n{
@@ -40,7 +42,7 @@ Vector getTnVector(TreeNode tn){
 
 TreeNode createTreeNode(Vector v){
   TreeNode newNode = malloc(sizeof(tree_node));
-  newNode->v = v;
+  newNode->v = copyVector(v);
   newNode->left=NULL;
   newNode->right=NULL;
   return newNode;
@@ -109,16 +111,48 @@ void printTreeDFS(Tree tree){
   }
 }
 
-void destroyTreeRecursive(TreeNode tn,int freeLeafNodes){
+void destroyTreeRecursive(TreeNode tn){
   if(tn==NULL) return;
-  destroyTreeRecursive(getLeft(tn),freeLeafNodes);
-  destroyTreeRecursive(getRight(tn),freeLeafNodes);
-  if(freeLeafNodes && (getTnVector(tn)!=NULL))
+  destroyTreeRecursive(getLeft(tn));
+  destroyTreeRecursive(getRight(tn));
+  if((getTnVector(tn)!=NULL))
     deleteVector(getTnVector(tn));
   free(tn);
 }
 
-void destroyTree(Tree tree,int freeLeafNodes){
-  destroyTreeRecursive(getRoot(tree),freeLeafNodes);
+void destroyTree(Tree tree){
+  destroyTreeRecursive(getRoot(tree));
   free(tree);
+}
+
+void computeMeanCurvesRecursive(TreeNode tn){
+  if(tn==NULL) return;
+  computeMeanCurvesRecursive(getLeft(tn));
+  computeMeanCurvesRecursive(getRight(tn));
+
+  if(getLeft(tn)==NULL && getRight(tn)==NULL){
+    return;
+  }else if(getLeft(tn)==NULL){
+    tn->v = copyVector(getTnVector(getRight(tn)));
+  }else if(getRight(tn)==NULL){
+    tn->v = copyVector(getTnVector(getLeft(tn)));
+  }else{
+    if(getTnVector(getRight(tn))==NULL && getTnVector(getLeft(tn))==NULL){
+      return;
+    }else if(getTnVector(getLeft(tn))==NULL){
+      tn->v = copyVector(getTnVector(getRight(tn)));
+    }else if (getTnVector(getRight(tn))==NULL){
+      tn->v = copyVector(getTnVector(getLeft(tn)));
+    }else{
+      tn->v = meanCurveBetween2Curves(getTnVector(getLeft(tn)),getTnVector(getRight(tn)));
+    }
+  }
+  return;
+}
+
+Vector treeFindMeanCurve(Tree tree){
+  if(tree==NULL) {printf("TREE EMPTY!\n"); return NULL; }
+  computeMeanCurvesRecursive(getRoot(tree));
+  printf("computeMeanCurvesRecursive OK!!\n");
+  return copyVector(getTnVector(getRoot(tree)));
 }
