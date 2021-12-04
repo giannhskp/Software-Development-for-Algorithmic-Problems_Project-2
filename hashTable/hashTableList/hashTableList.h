@@ -9,7 +9,7 @@ typedef struct hashtable_head *HashTable;
 Vector getVector(List );
 List getNext(List );
 
-double distance_metric(Vector ,Vector ,int );
+double distance_metric(Vector ,Vector );
 
 List initializeList();
 List allocateListNode(Vector ,int );

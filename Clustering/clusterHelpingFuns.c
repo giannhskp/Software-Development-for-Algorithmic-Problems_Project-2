@@ -35,14 +35,14 @@ void minDistToCentroids(Vector v,Vector* vecs,Vector *clusters,int numOfClusters
     if(clusters[i]==NULL){
       break;
     }
-    double tempDist = distance_metric(clusters[i],v,getDim(v));
+    double tempDist = distance_metric(clusters[i],v);
     if(tempDist<(*minDistance)){
         (*minDistance) = tempDist;
     }
   }
 }
 
-void minDistbetweenCentroids(Vector *centroids,int numOfClusters,double *minDistance,int dim){
+void minDistbetweenCentroids(Vector *centroids,int numOfClusters,double *minDistance){
   for(int i=0;i<numOfClusters;i++){
     if(centroids[i]==NULL){
       break;
@@ -51,7 +51,7 @@ void minDistbetweenCentroids(Vector *centroids,int numOfClusters,double *minDist
         if(centroids[j]==NULL){
           break;
         }
-        double tempDist = distance_metric(centroids[i],centroids[j],dim);
+        double tempDist = distance_metric(centroids[i],centroids[j]);
         if(tempDist<(*minDistance)){
           (*minDistance) = tempDist;
         }
@@ -59,21 +59,21 @@ void minDistbetweenCentroids(Vector *centroids,int numOfClusters,double *minDist
   }
 }
 
-int centroidsConverge(Vector *new,Vector *old,int numOfClusters,int dim){
+int centroidsConverge(Vector *new,Vector *old,int numOfClusters){
   if(old==NULL) return FALSE;
   for(int i=0;i<numOfClusters;i++){
-    if(distance_metric(new[i],old[i],dim)>CONVERGENCE){
+    if(distance_metric(new[i],old[i])>CONVERGENCE){
       return FALSE;
     }
   }
   return TRUE;
 }
 
-int findClosestCentroid(Vector v,Vector *clusters,int numOfClusters,int dim){
+int findClosestCentroid(Vector v,Vector *clusters,int numOfClusters){
   int minDistIndex = -1;
   double minDist = DBL_MAX;
   for(int i=0;i<numOfClusters;i++){
-    double tempDist = distance_metric(v,clusters[i],dim);
+    double tempDist = distance_metric(v,clusters[i]);
     if(tempDist<minDist){
       minDistIndex = i;
       minDist = tempDist;
