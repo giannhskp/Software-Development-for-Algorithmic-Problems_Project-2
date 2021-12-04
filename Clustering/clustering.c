@@ -71,6 +71,7 @@ void lloyds(Vector* clusters,Vector *oldClusters,Vector* vectors,List* clustersL
       if(clustersList[i]!=NULL){ // check if each cluster has been formed (has vectors)
         // ok then find the new centroid for this cluster
         if(strcmp(distanceMetric,"discreteFrechet")==0){
+          printf(" FINDING MEAN CURVE FOR CLUSTER %d\n",i);
           newCenter = computeFrechetMeanCurve(clustersList[i],vectorCount[i]);
         }else{
           newCenter=listMeanOfCluster(clustersList[i],dim);
@@ -78,6 +79,7 @@ void lloyds(Vector* clusters,Vector *oldClusters,Vector* vectors,List* clustersL
       }
       else{
         // this cluster hasn't been formed, let as centroid the previous one
+        printf("Cluster %d is empty | No recenter\n",i);
         newCenter=copyVector(oldClusters[i]);
       }
       // finally delete each cluster in order to form a new one based to the new centroid
@@ -91,6 +93,7 @@ void lloyds(Vector* clusters,Vector *oldClusters,Vector* vectors,List* clustersL
   for(int i=0;i<numberOfVectors;i++){ // for every vector
     // find the closest centroid with the euclidean distance
     int closestCentroid = findClosestCentroid(vectors[i],clusters,numOfClusters);
+    // printf("Vector[%d] | closestCentroid= %d\n",i,closestCentroid);
     // and assign this vector to the corresponding cluster
     vectorCount[closestCentroid] += 1;
     clustersList[closestCentroid] = listInsert(clustersList[closestCentroid],vectors[i],dim);

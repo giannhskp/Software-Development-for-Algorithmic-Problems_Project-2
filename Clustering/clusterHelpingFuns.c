@@ -74,6 +74,15 @@ int findClosestCentroid(Vector v,Vector *clusters,int numOfClusters){
   double minDist = DBL_MAX;
   for(int i=0;i<numOfClusters;i++){
     double tempDist = distance_metric(v,clusters[i]);
+    if(isinf(tempDist)){
+      printf("FOUND INF\n");
+      printf("Vector:\n");
+      printVector(v);
+      printf("CLUSTER:\n");
+      printVector(clusters[i]);
+      exit(0);
+    }
+    // printf("tempDist[%d] = %f\n",i,tempDist);
     if(tempDist<minDist){
       minDistIndex = i;
       minDist = tempDist;

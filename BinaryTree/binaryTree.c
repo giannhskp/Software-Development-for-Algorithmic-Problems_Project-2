@@ -153,6 +153,5 @@ void computeMeanCurvesRecursive(TreeNode tn){
 Vector treeFindMeanCurve(Tree tree){
   if(tree==NULL) {printf("TREE EMPTY!\n"); return NULL; }
   computeMeanCurvesRecursive(getRoot(tree));
-  printf("computeMeanCurvesRecursive OK!!\n");
   return copyVector(getTnVector(getRoot(tree)));
 }
