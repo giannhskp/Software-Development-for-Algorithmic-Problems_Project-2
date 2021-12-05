@@ -8,7 +8,7 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include "point.hpp"
+#include "../include/point.hpp"
 
 std::string Point::str() const {
     std::stringstream ss;
@@ -37,11 +37,11 @@ std::string Points::repr() const {
 std::ostream& operator<<(std::ostream &out, const Point &p) {
     if (p.empty()) return out;
     out << "(";
-    
+
     for (dimensions_t i = 0; i < p.dimensions() - 1; ++i){
         out << p[i] << ",";
     }
-    
+
     out << p[p.dimensions() - 1] << ")";
 
     return out;
@@ -50,11 +50,11 @@ std::ostream& operator<<(std::ostream &out, const Point &p) {
 std::ostream& operator<<(std::ostream &out, const Points &p) {
     if (p.empty()) return out;
     out << "{";
-    
+
     for (curve_size_t i = 0; i < p.size() - 1; ++i){
         out << p[i] << ",";
     }
-    
+
     out << p[p.size() - 1] << "}";
 
     return out;
