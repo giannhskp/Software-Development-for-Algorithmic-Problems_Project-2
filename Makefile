@@ -29,12 +29,6 @@ all: $(EXEC1) $(EXEC2)
 
 $(EXEC1): $(OBJ1)
 	$(CCPLUSPLUS) -c $(FRECHERCONT)/simplification.cpp $(FRECHERCONT)/point.cpp $(FRECHERCONT)/interval.cpp $(FRECHERCONT)/frechet.cpp $(FRECHERCONT)/curve.cpp $(FRECHERCONT)/config.cpp
-	# $(CCPLUSPLUS) -o mainPart1.c
-	# gcc -c -o lib1.o lib1/lib1.c
-	# gcc -c -o lib2.o lib2/lib1.c
-	# gcc -c -o lib_main.o lib_main.c
-	# g++ -c -o main.o main.cpp
-	# g++ -o main lib1.o lib2.o lib_main.o main.o
 	$(CC) $(CFLAGS) $(OBJ1) -o $(EXEC1) -lm
 
 $(EXEC2): $(OBJ2)
