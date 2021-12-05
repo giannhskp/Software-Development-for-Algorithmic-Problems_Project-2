@@ -25,7 +25,7 @@
 extern int numOfVecs;
 // extern int d;
 extern int hashTableSize;
-extern int complete;
+extern int silhouette;
 extern int w;
 char *distanceMetric;
 // Vector timeVector;
@@ -187,7 +187,7 @@ void clusteringLloyds(List vecList,int numOfClusters,FILE* fptr,int dim){
   }
   fprintf(fptr,"stotal = %f ]\n\n",stotal/numOfVecs);
 
-  if(complete){
+  if(silhouette){
     for(int i=0;i<numOfClusters;i++){
       fprintf(fptr,"CLUSTER-%d {",i+1);
       printVectorInFile(clusters[i],fptr);
@@ -378,7 +378,7 @@ void clusteringLSH(List vecList,int numOfClusters,int l,FILE* fptr,int dim){
   }
   fprintf(fptr,"stotal = %f ]\n\n",stotal/numOfVecs);
 
-  if(complete){
+  if(silhouette){
     for(int i=0;i<numOfClusters;i++){
       fprintf(fptr,"CLUSTER-%d {",i+1);
       printVectorInFile(clusters[i],fptr);
@@ -553,7 +553,7 @@ void clusteringHypercube(List vecList,int numOfClusters,int m,int probes,FILE* f
   }
   fprintf(fptr,"stotal = %f ]\n\n",stotal/numOfVecs);
 
-  if(complete){
+  if(silhouette){
     for(int i=0;i<numOfClusters;i++){
       fprintf(fptr,"CLUSTER-%d {",i+1);
       printVectorInFile(clusters[i],fptr);

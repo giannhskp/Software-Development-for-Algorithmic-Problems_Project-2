@@ -22,7 +22,7 @@ int probes;
 int w;
 int numOfVecs;
 int hashTableSize;
-int complete;
+int silhouette;
 int k_LSH;
 
 void printOptions(){
@@ -37,7 +37,7 @@ void printOptions(){
 int main(int argc, char *argv[]) {
   srand(time(NULL));
   int option;
-  complete=0;
+  silhouette=0;
   char str[200];
   char inputFile[200];
   int inputflag=0;
@@ -51,41 +51,72 @@ int main(int argc, char *argv[]) {
   strcpy(assignment,"Classic"); // default
 
 
-  while((option = getopt(argc, argv, "i:c:o:m:")) != -1){
-     switch(option){
-        case 'i':
-        inputflag++;
-        strcpy(inputFile,optarg);
-        printf("Given input File : %s\n", inputFile);
-        break;
+  for(int i = 1 ; i < argc ; i++){
+    strcpy(str,argv[i]);
+    if(strcmp(str,"-i")==0 && (argc > i+1)){
+      inputflag++;
+      strcpy(inputFile,argv[i+1]);
+      printf("Given input File : %s\n", inputFile);
+    }
+    else if(strcmp(str,"–c")==0 && (argc > i+1)){
+      confflag++;
+      strcpy(confFile,argv[i+1]);
+      printf("Given configuration File : %s\n", confFile);
+    }
+    else if(strcmp(str,"-silhouette")==0 && (argc > i+1)){
+      printf("silhouette option ON.\n");
+      silhouette=1;
+    }
+    else if(strcmp(str,"-o")==0 && (argc > i+1)){
+      outputflag++;
+      strcpy(outputFile,argv[i+1]);
+      printf("Given output File : %s\n", outputFile);
+    }
+    else if(strcmp(str,"-update")==0 && (argc > i+1)){
+      strcpy(update,argv[i+1]); // default
+      printf("Given Update Method : %s\n", update);
+    }
+    else if(strcmp(str,"-assignment")==0 && (argc > i+1)){
+      strcpy(assignment,argv[i+1]); // default
+      printf("Given Assignment Method : %s\n", assignment);
+    }
 
-        case 'c':
-        if(strcmp(argv[optind-1],"-complete")==0){
-          printf("Complete option ON.\n");
-          complete=1;
-        }
-        else{
-          confflag++;
-          strcpy(confFile,optarg);
-          printf("Given configuration File : %s\n", confFile);
-        }
-        break;
-
-        case 'o':
-        outputflag++;
-        strcpy(outputFile,optarg);
-        printf("Given output File : %s\n", outputFile);
-        break;
-
-        case ':':
-         printf("option needs a value\n");
-         break;
-
-        default: /* '?' */
-          fprintf(stderr, "Usage: %s –i <input file> –c <configuration file> -o <output file> -update <Mean Frechet or Mean Vector> –assignment <Classic or LSH or Hypercube or LSH_Frechet> -complete <optional> -silhouette <optional>\n",argv[0]);
-          exit(EXIT_FAILURE);
-     }
   }
+  // while((option = getopt(argc, argv, "i:c:o:m:")) != -1){
+  //    switch(option){
+  //       case 'i':
+  //       inputflag++;
+  //       strcpy(inputFile,optarg);
+  //       printf("Given input File : %s\n", inputFile);
+  //       break;
+  //
+  //       case 'c':
+  //       if(strcmp(argv[optind-1],"-silhouette")==0){
+  //         printf("silhouette option ON.\n");
+  //         silhouette=1;
+  //       }
+  //       else{
+  //         confflag++;
+  //         strcpy(confFile,optarg);
+  //         printf("Given configuration File : %s\n", confFile);
+  //       }
+  //       break;
+  //
+  //       case 'o':
+  //       outputflag++;
+  //       strcpy(outputFile,optarg);
+  //       printf("Given output File : %s\n", outputFile);
+  //       break;
+  //
+  //       case ':':
+  //        printf("option needs a value\n");
+  //        break;
+  //
+  //       default: /* '?' */
+  //         fprintf(stderr, "Usage: %s –i <input file> –c <configuration file> -o <output file> -update <Mean Frechet or Mean Vector> –assignment <Classic or LSH or Hypercube or LSH_Frechet> -silhouette <optional> -silhouette <optional>\n",argv[0]);
+  //         exit(EXIT_FAILURE);
+  //    }
+  // }
 
   if(!inputflag){
     printf(">Input file name: ");

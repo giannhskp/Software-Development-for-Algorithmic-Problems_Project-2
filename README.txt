@@ -86,8 +86,8 @@ Github link: https://github.com/Sitaras/Software-Development-for-Algorithmic-Pro
 				► ./cube –i <input file> –q <query file> –k <int> -M <int> -probes <int> -ο <output file> -Ν <number of nearest> -R <radius>
 				  ( π.χ. ./cube -i input_small_id -q query_small_id -o outputCube -k 6 -M 8 -probes 3 -N 3 -R 300 )
 
-				► ./cluster –i <input file> –c <configuration file> -o <output file> -complete <optional> -m <method: Classic OR LSH or Hypercube>
-				  ( π.χ. ./cluster -i input_small_id -c cluster.conf -o outputCluster -m Classic -complete)
+				► ./cluster –i <input file> –c <configuration file> -o <output file> -silhouette <optional> -m <method: Classic OR LSH or Hypercube>
+				  ( π.χ. ./cluster -i input_small_id -c cluster.conf -o outputCluster -m Classic -silhouette)
 
 	(make clean, για την διαγραφή των παραγόμενων από την μεταγλώττιση αρχείων)
 ------------------------------------------------------------------------------------
