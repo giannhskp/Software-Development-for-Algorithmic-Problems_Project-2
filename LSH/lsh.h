@@ -9,7 +9,7 @@ LSH initializeLSH(int,int );
 void insertToLSH(LSH ,Vector );
 void insertFromListToLSH(List ,LSH );
 void insertTimeSeriesFromListToLSH(List ,LSH ,Grids ,double );
-void insertContinuousTimeSeriesFromListToLSH(List ,LSH ,Grids ,double ,double );
+void insertContinuousTimeSeriesFromListToLSH(List ,LSH ,double ,double );
 void printLSH(LSH );
 void destroyLSH(LSH );
 

@@ -13,6 +13,7 @@ Vector copyVector(Vector );
 void deleteVector(Vector);
 
 void printVector(Vector );
+void printTimes(Vector );
 void printVectorId(Vector );
 
 int getDim(Vector );

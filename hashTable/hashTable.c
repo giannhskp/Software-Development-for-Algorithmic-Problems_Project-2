@@ -61,7 +61,6 @@ int hashFunction(const HashTable ht,Vector v,int d){ /* Hash function used for h
 }
 
 int htInsert(HashTable ht, Vector v,int index,int id){
-  fflush(stdout);
   ht->table[index].head=listInsert(ht->table[index].head,v,id);
   ht->numberOfVectors++;
   return 1;

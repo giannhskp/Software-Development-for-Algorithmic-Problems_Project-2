@@ -6,6 +6,7 @@
 #include "../../Vector/vector.h"
 #include "../hashTable.h"
 #include "../../FrechetDistance/discreteFrechet.h"
+#include "../../Fred-master/src/my_interface.hpp"
 
 
 #define SQUARE(x) ((x)*(x))
@@ -37,6 +38,8 @@ double distance_metric(Vector v1,Vector v2){
     return l2_distance(v1,v2);
   }else if(strcmp(distanceMetric,"discreteFrechet")==0){
     return discreteFrechet(v1,v2);
+  }else if(strcmp(distanceMetric,"continuousFrechet")==0){
+    return compute_continuous_distance(getCoords(v1),getTime(v1),getCoords(v2),getTime(v2),getDim(v1),getDim(v2));
   }else{
     printf("WRONG DISTANCE METRIC\n");
     return -1.0;

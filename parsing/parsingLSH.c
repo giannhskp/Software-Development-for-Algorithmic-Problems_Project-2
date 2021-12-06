@@ -304,7 +304,7 @@ void readQueryFileLSH_ContinuousFrechet(char* queryFile,char* outputFile,LSH lsh
     clock_t begin_true = clock(); // time calculation for the k nearest neighbors with brute force method
     // find with the brute force method the k nearest neighbors for the corresponding query vector
 
-    listFindNearestNeighbor(inputs,vecTmp,nNearest,knearestDists,dim,-1);
+    // listFindNearestNeighbor(inputs,vecTmp,nNearest,knearestDists,dim,-1);
 
     clock_t end_true = clock();
     double time_spent_true = (double)(end_true - begin_true) / CLOCKS_PER_SEC;

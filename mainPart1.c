@@ -197,8 +197,8 @@ int main(int argc, char *argv[])  {
   char command[200];
 
   // TODO: REMOVE
-  strcpy(metric,"discrete");
-  delta=2.25;
+  // strcpy(metric,"discrete");
+  // delta=2.25;
   printf("!!!!!!!!!!!! DELTA = %f\n",delta);
   printf("!!!!!!!!!!!! METRIC = %s\n",metric);
 
@@ -225,8 +225,8 @@ int main(int argc, char *argv[])  {
     // clusteringHypercube(vecList,numOfClusters,mHyper,probes,fptr);
     }
     else if(strcmp(metric,"continuous")==0){
-      distanceMetric=malloc(sizeof(char)*(strlen("discreteFrechet")+1));
-      strcpy(distanceMetric,"discreteFrechet");
+      distanceMetric=malloc(sizeof(char)*(strlen("continuousFrechet")+1));
+      strcpy(distanceMetric,"continuousFrechet");
       printf("CALLED FUNCTION vectorTimeSeriesLSHFrechetContinuous\n");
       vectorTimeSeriesLSHFrechetContinuous(inputFile,queryFile,k_LSH,outputFile,delta,FILTERING_E);
     }
