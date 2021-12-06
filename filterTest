@@ -1,7 +1,0 @@
-Query a:
-Approximate Nearest neighbor: a
-True Nearest neighbor: a
-distanceApproximate: 0.000000
-distanceTrue: 0.000000
-tApproximateAverage: 0.002699 seconds
-tTrueAverage: 1.213961 seconds

@@ -39,79 +39,128 @@ int main(int argc, char *argv[])  {
   int new_dimension = 14;
   int probes=2;
 
-  while((option = getopt(argc, argv, "i:q:k:L:o:M:m:a:d:p:")) != -1){
-     switch(option){
-        case 'i':
-        inputflag++;
-        strcpy(inputFile,optarg);
-        printf("Given input File : %s\n", inputFile);
-        break;
+  for(int i = 1 ; i < argc ; i++){
+    strcpy(str,argv[i]);
+    if(strcmp(str,"-i")==0 && (argc > i+1)){
+      inputflag++;
+      strcpy(inputFile,argv[i+1]);
+      printf("Given input File : %s\n", inputFile);
+    }
+    else if(strcmp(str,"-q")==0 && (argc > i+1)){
+      queryflag++;
+      strcpy(queryFile,argv[i+1]);
+      printf("Given query File : %s\n", queryFile);
+    }
+    else if(strcmp(str,"-k")==0 && (argc > i+1)){
+      k_LSH=atoi(argv[i+1]);
+      new_dimension = k_LSH;
+      printf("k : %d\n", k_LSH);
+    }
+    else if(strcmp(str,"-L")==0 && (argc > i+1)){
+      l=atoi(argv[i+1]);
+      printf("L : %d\n", l);
+    }
+    else if(strcmp(str,"-o")==0 && (argc > i+1)){
+      outputflag++;
+      strcpy(outputFile,argv[i+1]);
+      printf("Given output File : %s\n", outputFile);
+    }
+    else if(strcmp(str,"-algorithm")==0 && (argc > i+1)){
+      strcpy(algorithm,argv[i+1]);
+      printf("Given algorithm : %s\n", algorithm);
+    }
+    else if(strcmp(str,"-metric")==0 && (argc > i+1)){
+      strcpy(metric,argv[i+1]);
+      printf("Given metric: %s\n", metric);
+    }
+    else if(strcmp(str,"-delta")==0 && (argc > i+1)){
+      delta=atof(argv[i+1]);
+      printf("Delta: %f\n", delta);
+    }
+    else if(strcmp(str,"-probes")==0 && (argc > i+1)){
+      probes=atoi(argv[i+1]);
+      printf("probes : %d\n", probes);
+    }
+    else if(strcmp(str,"-M")==0 && (argc > i+1)){
+      m=atoi(argv[i+1]);
+      printf("M : %d\n", m);
+    }
 
-        case 'q':
-        queryflag++;
-        strcpy(queryFile,optarg);
-        printf("Given query File : %s\n", queryFile);
-        break;
-
-        case 'k':
-        k_LSH=atoi(optarg);
-        new_dimension = k_LSH;
-        printf("k : %d\n", k_LSH);
-        break;
-
-        case 'L':
-        l=atoi(optarg);
-        printf("L : %d\n", l);
-        break;
-
-        case 'o':
-        outputflag++;
-        strcpy(outputFile,optarg);
-        printf("Given output File : %s\n", outputFile);
-        break;
-
-        case 'a':
-        if(strcmp(argv[optind-1],"-algorithm")==0){
-          strcpy(algorithm,argv[optind]);
-          printf("Given algorithm : %s\n", algorithm);
-        }
-        break;
-
-        case 'm':
-        if(strcmp(argv[optind-1],"-metric")==0){
-          strcpy(metric,argv[optind]);
-          printf("Given metric: %s\n", metric);
-        }
-        break;
-
-        case 'd':
-        if(strcmp(argv[optind-1],"-delta")==0){
-          delta=atof(argv[optind]);
-          printf("Delta: %f\n", delta);
-        }
-        break;
-
-        case 'p':
-        if(strcmp(argv[optind-1],"-probes")==0){
-          probes=atoi(argv[optind]);
-          printf("probes : %d\n", probes);
-        }
-        break;
-
-        case 'M':
-        m=atoi(optarg);
-        printf("M : %d\n", m);
-        break;
-
-        case ':':
-         printf("option needs a value\n");
-         break;
-
-        default:
-          fprintf(stderr, "Usage: %s –i <input file> –q <query file> –k <int> -L <int> -M <int> -probes <int> -ο <output file> -algorithm <LSH or Hypercube or Frechet> -metric <discreteor continuous | only for –algorithm Frechet> -delta <double>\n",argv[0]);
-          exit(EXIT_FAILURE);
-     }
   }
+
+  // while((option = getopt(argc, argv, "i:q:k:L:o:M:m:a:d:p:")) != -1){
+  //    switch(option){
+  //       case 'i':
+  //       inputflag++;
+  //       strcpy(inputFile,optarg);
+  //       printf("Given input File : %s\n", inputFile);
+  //       break;
+  //
+  //       case 'q':
+  //       queryflag++;
+  //       strcpy(queryFile,optarg);
+  //       printf("Given query File : %s\n", queryFile);
+  //       break;
+  //
+  //       case 'k':
+  //       k_LSH=atoi(optarg);
+  //       new_dimension = k_LSH;
+  //       printf("k : %d\n", k_LSH);
+  //       break;
+  //
+  //       case 'L':
+  //       l=atoi(optarg);
+  //       printf("L : %d\n", l);
+  //       break;
+  //
+  //       case 'o':
+  //       outputflag++;
+  //       strcpy(outputFile,optarg);
+  //       printf("Given output File : %s\n", outputFile);
+  //       break;
+  //
+  //       case 'a':
+  //       if(strcmp(argv[optind-1],"-algorithm")==0){
+  //         strcpy(algorithm,argv[optind]);
+  //         printf("Given algorithm : %s\n", algorithm);
+  //       }
+  //       break;
+  //
+  //       case 'm':
+  //       if(strcmp(argv[optind-1],"-metric")==0){
+  //         strcpy(metric,argv[optind]);
+  //         printf("Given metric: %s\n", metric);
+  //       }
+  //       break;
+  //
+  //       case 'd':
+  //       if(strcmp(argv[optind-1],"-delta")==0){
+  //         delta=atof(argv[optind]);
+  //         printf("Delta: %f\n", delta);
+  //       }
+  //       break;
+  //
+  //       case 'p':
+  //       if(strcmp(argv[optind-1],"-probes")==0){
+  //         probes=atoi(argv[optind]);
+  //         printf("probes : %d\n", probes);
+  //       }
+  //       break;
+  //
+  //       case 'M':
+  //       m=atoi(optarg);
+  //       printf("M : %d\n", m);
+  //       break;
+  //
+  //       case ':':
+  //        printf("option needs a value\n");
+  //        break;
+  //
+  //       default:
+  //         fprintf(stderr, "Usage: %s –i <input file> –q <query file> –k <int> -L <int> -M <int> -probes <int> -ο <output file> -algorithm <LSH or Hypercube or Frechet> -metric <discreteor continuous | only for –algorithm Frechet> -delta <double>\n",argv[0]);
+  //         exit(EXIT_FAILURE);
+  //    }
+  // }
 
   if(!inputflag){
     printf(">Input file name: ");
