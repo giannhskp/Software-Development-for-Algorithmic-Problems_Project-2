@@ -197,8 +197,8 @@ int main(int argc, char *argv[])  {
   char command[200];
 
   // TODO: REMOVE
-  strcpy(metric,"discrete");
-  delta=2.25;
+  // strcpy(metric,"discrete");
+  // delta=2.25;
   printf("!!!!!!!!!!!! DELTA = %f\n",delta);
   printf("!!!!!!!!!!!! METRIC = %s\n",metric);
 

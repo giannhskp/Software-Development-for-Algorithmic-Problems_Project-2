@@ -7,6 +7,7 @@
 #include "../hashTable/hashTable.h"
 #include "../hashTable/hashTableList/hashTableList.h"
 #include "./helperFunctions.h"
+#include "../Fred-master/src/my_interface.hpp"
 // #include "../Fred-master/include/frechet.hpp"
 // #include "../Fred-master/include/point.hpp"
 // #include "../Fred-master/include/types.hpp"
@@ -408,6 +409,9 @@ void insertContinuousTimeSeriesFromListToLSH(List list,LSH lsh,Grids grids,doubl
   if(list==NULL){ return;}
   List temp=list;
   while(temp!=NULL){
+      double x = compute_continuous_distance(getCoords(getVector(temp)),getTime(getVector(temp)),getCoords(getVector(getNext(temp))),getTime(getVector(getNext(temp))),getDim(getVector(temp)),getDim(getVector(getNext(temp))));
+      printf("---*------\n");
+      getchar();
       insertContinuousTimeSeriesToLSH(lsh,grids,delta,getVector(temp),epsilon);
       temp=getNext(temp);
   }
