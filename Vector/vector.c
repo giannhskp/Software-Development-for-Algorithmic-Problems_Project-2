@@ -186,6 +186,16 @@ void printVector(Vector v){
   printf(" ]\n");
 }
 
+void printTimes(Vector v){
+  if(v==NULL)
+    return;
+  printf("\n[");
+  for(int i=0;i<v->dim;i++){
+    printf(" %f",v->times[i]);
+  }
+  printf(" ]\n");
+}
+
 void printVectorId(Vector v){
   if(v==NULL)
     return;

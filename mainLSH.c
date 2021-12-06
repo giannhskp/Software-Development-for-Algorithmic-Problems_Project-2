@@ -31,7 +31,7 @@ static int wValueCalculation(List list,int numberOfVectorsInFile,int dim){
   }else{
     persentageToCheck = 0.000001;
   }
-  persentageToCheck = 0.0001; // TODO: CHANGE
+  persentageToCheck = 0.00001; // TODO: CHANGE
   int stopBound = persentageToCheck*numberOfVectorsInFile*numberOfVectorsInFile;
 
   while(list!=NULL){
@@ -40,7 +40,7 @@ static int wValueCalculation(List list,int numberOfVectorsInFile,int dim){
       if(count>stopBound){
         return floor(sumDist/count);
       }
-      sumDist +=distance_metric(getVector(list),getVector(nested));
+      sumDist += distance_metric(getVector(list),getVector(nested));
       count++;
       nested = getNext(nested);
     }
@@ -165,10 +165,7 @@ void vectorTimeSeriesLSHFrechetDiscrete(char* arg_inputFile,char* arg_queryFile,
   listDelete(list,0);
 }
 
-// void vectorTimeSeriesLSHFrechetContinuous(char* arg_inputFile,char* arg_queryFile,int arg_k_LSH,int arg_L,char* arg_outputFile,double arg_delta){
-//
-//   // TO DO
-// }
+
 void vectorTimeSeriesLSHFrechetContinuous(char* arg_inputFile,char* arg_queryFile,int arg_k_LSH,char* arg_outputFile,double arg_delta,double epsilon){
   char inputFile[100];
   strcpy(inputFile,arg_inputFile);
@@ -209,24 +206,24 @@ void vectorTimeSeriesLSHFrechetContinuous(char* arg_inputFile,char* arg_queryFil
 
   printf("Finding optimal value of w based on the input file\n");
   begin = clock();
-  w = wValueCalculation(list,numberOfVectorsInFile,dim);
+  // w = wValueCalculation(list,numberOfVectorsInFile,dim);
   // w /= W_DIVIDER;
-  w = w/10;
+  // w = w/10;
+  w=6; // TODO CHANGE
   end = clock();
   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Found value of w in %f seconds, w = %d\n",time_spent,w );
 
   begin = clock();
   lsh = initializeLSH(l,2*dim);
-  Grids grids = initializeGrids(delta,l);
-  insertContinuousTimeSeriesFromListToLSH(list,lsh,grids,delta,epsilon);
+  insertContinuousTimeSeriesFromListToLSH(list,lsh,delta,epsilon);
   end = clock();
   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Created LSH in : %f seconds22\n",time_spent);
   // printLSH(lsh);
+  // getchar();
 
   readQueryFileLSH_ContinuousFrechet(queryFile,outputFile,lsh,list,delta,epsilon,time,dim);
-  deleteGrids(grids);
   destroyLSH(lsh);
   listDelete(list,0);
 }

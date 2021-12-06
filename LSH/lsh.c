@@ -8,9 +8,6 @@
 #include "../hashTable/hashTableList/hashTableList.h"
 #include "./helperFunctions.h"
 #include "../Fred-master/src/my_interface.hpp"
-// #include "../Fred-master/include/frechet.hpp"
-// #include "../Fred-master/include/point.hpp"
-// #include "../Fred-master/include/types.hpp"
 
 
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
@@ -170,7 +167,7 @@ Vector continuousTimeSeriesSnapping(Vector v,double gridDelta){
     snappedVector[i]=PADDING_M;
   }
   ////////////////////////////
-  Vector vecTmp=initVector(snappedVector,getID(v),2*dim);
+  Vector vecTmp=initVector(snappedVector,getID(v),dim);
   return vecTmp;
 }
 
@@ -215,7 +212,7 @@ Vector filtering(Vector v,double epsilon){
     }
   }
   filteredCoords[dim-1]=originalCoords[dim-1];
-  Vector tempVec = initVector(filteredCoords,getID(v),dim);
+  Vector tempVec = initTimeSeries(filteredCoords,getTime(v),getID(v),dim);
   free(filteredCoords);
   return tempVec;
 }
@@ -351,7 +348,7 @@ void insertTimeSeriesToLSH(LSH lsh,Grids grids,double delta,Vector v){
 }
 
 
-void insertContinuousTimeSeriesToLSH(LSH lsh,Grids grids,double delta,Vector v,double epsilon){
+void insertContinuousTimeSeriesToLSH(LSH lsh,double delta,Vector v,double epsilon){
   // insert the given vector in all LSΗ hash tables
   // the bucket of the hash table that the vector will be inserted depends from the corresponding g function of the specific hash Table (hash function)
   // at the new node tha will be inserted at the hash Tables save the id (Querying trick)
@@ -379,9 +376,11 @@ void insertContinuousTimeSeriesToLSH(LSH lsh,Grids grids,double delta,Vector v,d
   unsigned int id;
   int index = computeG(lsh->g_fun[0],v4,&id); // compute the value of the g function for the given vector that will be inserted
   // finally insert the vector at the corresponding bucket of the current hash table
-  htInsert(lsh->hts[0],v,index,id);
+  htInsert(lsh->hts[0],v2,index,id);
 
   // TODO: FREE VECTORS
+  // free v3
+  // free v4
 }
 
 void insertFromListToLSH(List list,LSH lsh){
@@ -404,15 +403,12 @@ void insertTimeSeriesFromListToLSH(List list,LSH lsh,Grids grids,double delta){
   }
 }
 
-void insertContinuousTimeSeriesFromListToLSH(List list,LSH lsh,Grids grids,double delta,double epsilon){
+void insertContinuousTimeSeriesFromListToLSH(List list,LSH lsh,double delta,double epsilon){
   // insert every vector of the list at the corresponding LSH
   if(list==NULL){ return;}
   List temp=list;
   while(temp!=NULL){
-      double x = compute_continuous_distance(getCoords(getVector(temp)),getTime(getVector(temp)),getCoords(getVector(getNext(temp))),getTime(getVector(getNext(temp))),getDim(getVector(temp)),getDim(getVector(getNext(temp))));
-      printf("---*------\n");
-      getchar();
-      insertContinuousTimeSeriesToLSH(lsh,grids,delta,getVector(temp),epsilon);
+      insertContinuousTimeSeriesToLSH(lsh,delta,getVector(temp),epsilon);
       temp=getNext(temp);
   }
 }
@@ -511,7 +507,7 @@ void nearestNeigborLSH_ContinuousFrechet(LSH lsh,Vector q,Vector *nNearest,doubl
   unsigned int q_id;
   int q_index = computeG(lsh->g_fun[0],v4,&q_id); // compute the value of the g function for the given vector that will be inserted
 
-  htFindNearestNeighbor(hts[0],q_index,q,&nearest,&nearestDist,getDim(q),q_id);
+  htFindNearestNeighbor(hts[0],q_index,v2,&nearest,&nearestDist,getDim(v2),q_id);
 
   // check if nearest neighbor of the given vector q found or not
   if(nearestDist>=0 && nearest!=NULL){
@@ -524,6 +520,8 @@ void nearestNeigborLSH_ContinuousFrechet(LSH lsh,Vector q,Vector *nNearest,doubl
   }else{
     fprintf(fptr,"- DID NOT FIND NEAREST NEIGHBOR\n");
   }
+
+  // TODO: FREE VECTORS
 }
 
 void kNearestNeighborsLSH(LSH lsh,Vector q,int knn,double *knearestTrueDists,FILE* fptr){
