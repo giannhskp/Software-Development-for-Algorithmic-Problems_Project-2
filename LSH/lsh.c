@@ -376,9 +376,10 @@ void insertContinuousTimeSeriesToLSH(LSH lsh,double delta,Vector v,double epsilo
   unsigned int id;
   int index = computeG(lsh->g_fun[0],v4,&id); // compute the value of the g function for the given vector that will be inserted
   // finally insert the vector at the corresponding bucket of the current hash table
-  htInsert(lsh->hts[0],v2,index,id);
+  htInsert(lsh->hts[0],v,index,id);
 
   // TODO: FREE VECTORS
+  // free v2
   // free v3
   // free v4
 }
@@ -507,7 +508,7 @@ void nearestNeigborLSH_ContinuousFrechet(LSH lsh,Vector q,Vector *nNearest,doubl
   unsigned int q_id;
   int q_index = computeG(lsh->g_fun[0],v4,&q_id); // compute the value of the g function for the given vector that will be inserted
 
-  htFindNearestNeighbor(hts[0],q_index,v2,&nearest,&nearestDist,getDim(v2),q_id);
+  htFindNearestNeighbor(hts[0],q_index,q,&nearest,&nearestDist,getDim(v2),q_id);
 
   // check if nearest neighbor of the given vector q found or not
   if(nearestDist>=0 && nearest!=NULL){
