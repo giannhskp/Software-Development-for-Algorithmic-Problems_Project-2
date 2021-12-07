@@ -87,7 +87,6 @@ Vector timeSeriesSnapping(Vector v,double gridDelta,double t){
   for(int i=0;i<dim;i++){
     double y=coordsVector[i];
     double x=coordsTime[i];
-    int found=0;
     double keepX;
     double keepY;
 
@@ -104,30 +103,20 @@ Vector timeSeriesSnapping(Vector v,double gridDelta,double t){
     y = y * gridDelta;
     keepY = y + t;
 
-
-    for(int j=0;j<index;j++){
-      if(snappedTime[j]==keepX && snappedVector[j]==keepY){
-        found=1;
-        break;
+    if(index>0){
+      if(snappedTime[index-1]==keepX && snappedVector[index-1]==keepY){
+        continue;
       }
     }
 
-    if(!found){
-      snappedFinal[indexFinal++]=keepX;
-      snappedFinal[indexFinal++]=keepY;
-      snappedTime[index]=keepX;
-      snappedVector[index++]=keepY;
-    }
+    snappedFinal[indexFinal++]=keepX;
+    snappedFinal[indexFinal++]=keepY;
+    snappedTime[index]=keepX;
+    snappedVector[index++]=keepY;
   }
-  // TODO: padding
-  ////////////////////////////
-  // for(int i=index;i<d;i++){
-  //   snappedVector[i]=PADDING_M;
-  //   snappedTime[i]=PADDING_M;
-  // }
+
   for(int i=index;i<2*dim;i++){
     snappedFinal[i]=PADDING_M;
-    // snappedTime[i]=PADDING_M;
   }
   ////////////////////////////
   Vector vecTmp=initVector(snappedFinal,getID(v),2*dim);
@@ -161,7 +150,6 @@ Vector continuousTimeSeriesSnapping(Vector v,double gridDelta){
 
     snappedVector[index++]=keepY;
   }
-  // TODO: padding
   ////////////////////////////
   for(int i=index;i<dim;i++){
     snappedVector[i]=PADDING_M;
