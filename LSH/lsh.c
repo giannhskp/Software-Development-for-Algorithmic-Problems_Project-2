@@ -85,24 +85,24 @@ Vector timeSeriesSnapping(Vector v,double gridDelta,double t){
   int index=0;
   int indexFinal=0;
   for(int i=0;i<dim;i++){
-    double temp=coordsVector[i] + t;  // displacement
-    double tempTime=coordsTime[i] + t;   // displacement
+    double y=coordsVector[i];
+    double x=coordsTime[i];
     int found=0;
     double keepX;
     double keepY;
 
     // x
-    tempTime = tempTime+(0.5);
-    tempTime = tempTime/gridDelta;
-    tempTime = floor(tempTime);
-    tempTime = tempTime * gridDelta;
-    keepX = tempTime;
+    x = (x - t)/gridDelta;
+    x = x+(0.5);
+    x = floor(x);
+    x = x * gridDelta;
+    keepX = x + t;
     // y
-    temp = temp+(0.5);
-    temp = temp/gridDelta;
-    temp = floor(temp);
-    temp = temp * gridDelta;
-    keepY = temp;
+    y = (y - t)/gridDelta;
+    y = y+(0.5);
+    y = floor(y);
+    y = y * gridDelta;
+    keepY = y + t;
 
 
     for(int j=0;j<index;j++){
