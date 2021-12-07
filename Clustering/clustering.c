@@ -219,6 +219,7 @@ void reverseAssignmentLSH(LSH lsh,Vector *vectors,Vector *clusters,Vector *oldCl
       }else if(method == METHOD_VECTOR){
         newCenter = htMeanOfCluster(clustersHt[i],dim); // find the new centroid for every cluster
       }else if(method == METHOD_FRECHET){
+        printf("MEAN CURVE FOR CLUSTER [%d]\n",i);
         newCenter = computeFrechetMeanCurveLSH(clustersHt[i],getNumberOfVectors(clustersHt[i]));
       }
 

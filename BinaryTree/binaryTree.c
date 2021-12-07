@@ -87,16 +87,23 @@ Tree createTreeFromList(List list,int count){
   int leafCount = 0;
   tree->root = recursiveTreeCreateFromList(&tempList,height,&leafCount);
   tree->count=leafCount;
+  printf("CLUSTER COUNT = %d\n",count);
+  printf("LEAF COUNT = %d\n",leafCount);
   return tree;
 }
 
 TreeNode recursiveTreeCreateFromHt(List **listArray,int *arrayIndex,int height,int *leafCount){
   if(height==0){
+    if((*arrayIndex)<0 && ((*listArray)[0]==NULL))
+      return NULL;
+    // printf("ARRAY INDEX1 = %d\n",(*arrayIndex));
+    // fflush(stdout);
     while((*listArray)[(*arrayIndex)]==NULL){
-      if((*arrayIndex)<0)
-        return NULL;
       (*arrayIndex)--;
-
+      // printf("ARRAY INDEX2 = %d\n",(*arrayIndex));
+      // fflush(stdout);
+      if((*arrayIndex)<0 )
+        return NULL;
     }
     TreeNode tn = createTreeNode(getVector((*listArray)[(*arrayIndex)]));
     (*listArray)[(*arrayIndex)] = getNext((*listArray)[(*arrayIndex)]);
@@ -123,6 +130,8 @@ Tree createTreeFromHt(HashTable ht,int count){
   int starting_index = numOfBuckets-1;
   tree->root = recursiveTreeCreateFromHt(&listArray,&starting_index,height,&leafCount);
   tree->count=leafCount;
+  printf("CLUSTER COUNT = %d\n",count);
+  printf("LEAF COUNT = %d\n",leafCount);
   return tree;
 }
 

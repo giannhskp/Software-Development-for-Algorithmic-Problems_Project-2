@@ -73,7 +73,7 @@ int htInsert(HashTable ht, Vector v,int index,int id){
 }
 
 void htRangeInsert(HashTable ht, Vector v,int id,int d){
-  int index=hashFunction(ht,v,d);
+  int index=hashFunction(ht,v,getDim(v));
   ht->table[index].head=listUniqueInsert(ht->table[index].head,v,id);
   ht->numberOfVectors++;
 }
