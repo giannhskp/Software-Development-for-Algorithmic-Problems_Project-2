@@ -73,7 +73,6 @@ void lloyds(Vector* clusters,Vector *oldClusters,Vector* vectors,List* clustersL
       if(clustersList[i]!=NULL){ // check if each cluster has been formed (has vectors)
         // ok then find the new centroid for this cluster
         if(strcmp(distanceMetric,"discreteFrechet")==0){
-          printf(" FINDING MEAN CURVE FOR CLUSTER %d\n",i);
           newCenter = computeFrechetMeanCurve(clustersList[i],vectorCount[i]);
         }else{
           newCenter=listMeanOfCluster(clustersList[i],dim);
@@ -219,7 +218,6 @@ void reverseAssignmentLSH(LSH lsh,Vector *vectors,Vector *clusters,Vector *oldCl
       }else if(method == METHOD_VECTOR){
         newCenter = htMeanOfCluster(clustersHt[i],dim); // find the new centroid for every cluster
       }else if(method == METHOD_FRECHET){
-        printf("MEAN CURVE FOR CLUSTER [%d]\n",i);
         newCenter = computeFrechetMeanCurveLSH(clustersHt[i],getNumberOfVectors(clustersHt[i]));
       }
 
