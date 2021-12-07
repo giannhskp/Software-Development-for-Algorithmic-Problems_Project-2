@@ -7,6 +7,7 @@ typedef struct grid_n *Grids;
 
 LSH initializeLSH(int,int );
 void insertToLSH(LSH ,Vector );
+void insertTimeSeriesToLSH(LSH ,Grids ,double ,Vector );
 void insertFromListToLSH(List ,LSH );
 void insertTimeSeriesFromListToLSH(List ,LSH ,Grids ,double );
 void insertContinuousTimeSeriesFromListToLSH(List ,LSH ,double ,double );
@@ -17,6 +18,7 @@ void nearestNeigborLSH(LSH ,Vector,Vector *,double *,FILE* );
 void kNearestNeighborsLSH(LSH, Vector,int,double *,FILE*);
 void radiusNeigborsLSH(LSH ,Vector ,double,FILE* );
 void radiusNeigborsClustering(LSH ,Vector ,double ,HashTable ,int ,List* ,int *,int );
+void radiusNeigborsClusteringTimeSeries(LSH ,Vector ,double ,HashTable ,int ,List* ,int *,int ,Grids ,double );
 
 
 

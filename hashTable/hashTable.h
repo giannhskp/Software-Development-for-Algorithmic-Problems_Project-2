@@ -9,6 +9,8 @@ int hashFunction(const HashTable,int);
 HashTable htInitialize(int);
 int htInsert(HashTable ,Vector, int,int );
 int getNumberOfVectors(const HashTable );
+int getNumberOfBuckets(const HashTable );
+List getListOfBucket(const HashTable ,int );
 void htPrint(const HashTable);
 void htPrintClustering(const HashTable,FILE*);
 void htRangePrint(const HashTable ,Vector ,int,FILE* );

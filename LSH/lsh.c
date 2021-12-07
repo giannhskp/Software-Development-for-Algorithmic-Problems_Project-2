@@ -582,3 +582,19 @@ void radiusNeigborsClustering(LSH lsh,Vector q,double radius,HashTable vecsInRad
     htFindNeighborsInRadiusClustering(hts[i],q_index,centroidIndex,confList,vecsInRadius,q,getDim(q),q_ID,radius,assignCounter,iteration);
   }
 }
+
+void radiusNeigborsClusteringTimeSeries(LSH lsh,Vector q,double radius,HashTable vecsInRadius,int centroidIndex,List* confList,int *assignCounter,int iteration,Grids grids,double delta){
+  // based on the given centroids find the clusters that the given vectors belong with the help of LSH (this function used for the "reverseAssignmentLSH")
+  // the clusters are represented by hash tables
+  int l = getL(lsh);
+  HashTable *hts = getHts(lsh);
+  g_function *gfuns = getGfuns(lsh);
+  for(int i=0;i<l;i++){ // go at every hash table of lsh
+    double t_of_grid = getTofGrid(grids,i);
+    Vector snappedToGrid = timeSeriesSnapping(q,delta,t_of_grid);
+    unsigned int q_ID;
+    int q_index = computeG(gfuns[i],snappedToGrid,&q_ID); // compute the value of the g function for the given vector
+    // and go to the corresponding bucket of the current hash table to do the range search (to find the vectors that belong to the corresponding cluster)
+    htFindNeighborsInRadiusClustering(hts[i],q_index,centroidIndex,confList,vecsInRadius,q,getDim(q),q_ID,radius,assignCounter,iteration);
+  }
+}

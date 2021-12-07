@@ -21,6 +21,8 @@
 #define MAX_RECENTER_ITERATIONS 10
 #define W_DIVIDER_LSH 60
 #define W_DIVIDER_CUBE 20
+#define METHOD_VECTOR 2
+#define METHOD_FRECHET 3
 
 extern int numOfVecs;
 // extern int d;
@@ -79,7 +81,6 @@ void lloyds(Vector* clusters,Vector *oldClusters,Vector* vectors,List* clustersL
       }
       else{
         // this cluster hasn't been formed, let as centroid the previous one
-        printf("Cluster %d is empty | No recenter\n",i);
         newCenter=copyVector(oldClusters[i]);
       }
       // finally delete each cluster in order to form a new one based to the new centroid
@@ -97,9 +98,6 @@ void lloyds(Vector* clusters,Vector *oldClusters,Vector* vectors,List* clustersL
     // and assign this vector to the corresponding cluster
     vectorCount[closestCentroid] += 1;
     clustersList[closestCentroid] = listInsert(clustersList[closestCentroid],vectors[i],dim);
-  }
-  for(int i=0;i<numOfClusters;i++){ // for every vector
-    printf("COUNT[%d] = %d\n",i,vectorCount[i]);
   }
   *firstTime=1;
 }
@@ -212,14 +210,18 @@ void clusteringLloyds(List vecList,int numOfClusters,FILE* fptr,int dim){
   free(vectorCount);
 }
 
-void reverseAssignmentLSH(LSH lsh,Vector *vectors,Vector *clusters,Vector *oldClusters,HashTable *clustersHt,int numOfClusters,int iteration,int *firstTime,int dim){
+void reverseAssignmentLSH(LSH lsh,Vector *vectors,Vector *clusters,Vector *oldClusters,HashTable *clustersHt,int numOfClusters,int iteration,int *firstTime,int dim,int method,Grids grids,double delta){
   if(*firstTime) // skip it for the first time (original centroids from the kmeansPlusPlus)
     for(int i=0;i<numOfClusters;i++){
-
-      Vector newCenter = htMeanOfCluster(clustersHt[i],dim); // find the new centroid for every cluster
-      if(newCenter==NULL){ // this cluster hasn't been formed, let as centroid the previous one
+      Vector newCenter = NULL;
+      if(getNumberOfVectors(clustersHt[i])<=0){ // this cluster hasn't been formed, let as centroid the previous one
         newCenter=copyVector(oldClusters[i]);
+      }else if(method == METHOD_VECTOR){
+        newCenter = htMeanOfCluster(clustersHt[i],dim); // find the new centroid for every cluster
+      }else if(method == METHOD_FRECHET){
+        newCenter = computeFrechetMeanCurveLSH(clustersHt[i],getNumberOfVectors(clustersHt[i]));
       }
+
       // finally delete each cluster in order to form a new one based to the new centroid
       htDelete(clustersHt[i],0);
       clustersHt[i] = htInitialize(numOfVecs/(4*numOfClusters));
@@ -241,7 +243,11 @@ void reverseAssignmentLSH(LSH lsh,Vector *vectors,Vector *clusters,Vector *oldCl
     List confList=initializeList(); // list that used to store the vectors that in range search assigned at more than one cluster
     // assign each vector to the corresponding cluster with the help of range search
     for(int i=0;i<numOfClusters;i++){
-      radiusNeigborsClustering(lsh,clusters[i],radius,clustersHt[i],i,&confList,&assignCounter,iteration);
+      if(method == METHOD_VECTOR){
+        radiusNeigborsClustering(lsh,clusters[i],radius,clustersHt[i],i,&confList,&assignCounter,iteration);
+      }else if(method == METHOD_FRECHET){
+        radiusNeigborsClusteringTimeSeries(lsh,clusters[i],radius,clustersHt[i],i,&confList,&assignCounter,iteration,grids,delta);
+      }
     }
     // manage the vectors that presenting conflict
     listSolveRangeConflicts(confList,clustersHt,clusters,numOfClusters,dim,iteration);
@@ -277,7 +283,7 @@ double *silhouetteLSH_Hypercube(HashTable *clustersHt,Vector *clusters,int numOf
   return silhouettes;
 }
 
-void clusteringLSH(List vecList,int numOfClusters,int l,FILE* fptr,int dim){
+void clusteringLSH(List vecList,int numOfClusters,int l,FILE* fptr,int dim,int method,int delta){
   Vector *vectors;
   Vector *clusters;
   Vector *oldClusters = NULL;
@@ -305,6 +311,7 @@ void clusteringLSH(List vecList,int numOfClusters,int l,FILE* fptr,int dim){
   clock_t begin = clock();
   w = wValueCalculation(vecList,numOfVecs,dim);
   w /= W_DIVIDER_LSH;
+  w = 6;
   clock_t end = clock();
   double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Found value of w in %f seconds, w = %d\n",time_spent,w );
@@ -312,10 +319,26 @@ void clusteringLSH(List vecList,int numOfClusters,int l,FILE* fptr,int dim){
 
 
   begin = clock();
-  LSH lsh = initializeLSH(l,dim);
+  int vector_v_dim = -1;
+  if(method == METHOD_VECTOR){
+    vector_v_dim = dim;
+  }else if(method == METHOD_FRECHET){
+    vector_v_dim = 2*dim*numOfVecs; // TODO: ADD AN UPPER BOUND
+  }
+  LSH lsh = initializeLSH(l,vector_v_dim);
+  Grids grids;
+  if(method == METHOD_VECTOR){
+    grids = NULL;
+  }else if(method == METHOD_FRECHET){
+    grids = initializeGrids(delta,l);
+  }
   for(int i=0;i<numOfVecs;i++){
     initializeClusterInfo(vectors[i]);
-    insertToLSH(lsh,vectors[i]);
+    if(method == METHOD_VECTOR){
+      insertToLSH(lsh,vectors[i]);
+    }else if(method == METHOD_FRECHET){
+      insertTimeSeriesToLSH(lsh,grids,delta,vectors[i]);
+    }
   }
   end = clock();
   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
@@ -349,7 +372,7 @@ void clusteringLSH(List vecList,int numOfClusters,int l,FILE* fptr,int dim){
     }
 
     // reverseAssignmentLSH Algorithm
-    reverseAssignmentLSH(lsh,vectors,clusters,oldClusters,clustersHt,numOfClusters,countLSH,&firstTime,dim);
+    reverseAssignmentLSH(lsh,vectors,clusters,oldClusters,clustersHt,numOfClusters,countLSH,&firstTime,dim,method,grids,delta);
 
     firstIterLSH=FALSE;
 
@@ -579,7 +602,7 @@ void clusteringHypercube(List vecList,int numOfClusters,int m,int probes,FILE* f
   deleteHyperCube(cube);
 }
 
-void clustering(List vecList,FILE* fptr,char* assignment,char *update,int numOfClusters,int l,int mHyper,int probes,int dim){
+void clustering(List vecList,FILE* fptr,char* assignment,char *update,int numOfClusters,int l,int mHyper,int probes,int dim,int delta){
   if(strcmp(assignment,"Classic")==0){
     if(strcmp(update,"Mean Vector")==0){
       printf("METRIC USED: L2\n");
@@ -596,10 +619,26 @@ void clustering(List vecList,FILE* fptr,char* assignment,char *update,int numOfC
     fprintf(fptr,"Algorithm: Lloyds\n");
     clusteringLloyds(vecList,numOfClusters,fptr,dim);
   }
-  // else if(strcmp(method,"LSH")==0){
-  //   fprintf(fptr,"Algorithm: Range Search LSH\n");
-  //   clusteringLSH(vecList,numOfClusters,l,fptr);
-  // }
+  else if(strcmp(assignment,"LSH")==0){
+    int method;
+    if(strcmp(update,"Mean Vector")==0){
+      printf("METRIC USED: L2\n");
+      distanceMetric=malloc(sizeof(char)*(strlen("l2")+1));
+      strcpy(distanceMetric,"l2");
+      method = METHOD_VECTOR;
+    }else if(strcmp(update,"Mean Frechet")==0){
+      printf("METRIC USED: DISCRETE FRECHET\n");
+      distanceMetric=malloc(sizeof(char)*(strlen("discreteFrechet")+1));
+      strcpy(distanceMetric,"discreteFrechet");
+      method = METHOD_FRECHET;
+    }else{
+      printf("Wrong update method!\n");
+      exit(-1);
+    }
+    fprintf(fptr,"Algorithm: Lloyds\n");
+    fprintf(fptr,"Algorithm: Range Search LSH\n");
+    clusteringLSH(vecList,numOfClusters,l,fptr,dim,method,delta);
+  }
   // else if(strcmp(method,"Hypercube")==0){
   //   fprintf(fptr,"Algorithm: Range Search Hypercube\n");
   //   clusteringHypercube(vecList,numOfClusters,mHyper,probes,fptr);

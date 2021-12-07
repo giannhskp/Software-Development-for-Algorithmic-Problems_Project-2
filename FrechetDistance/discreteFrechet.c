@@ -240,3 +240,12 @@ Vector computeFrechetMeanCurve(List list,int count){
   return newCenter;
   // return NULL;
 }
+
+Vector computeFrechetMeanCurveLSH(HashTable ht,int count){
+  Tree tree = createTreeFromHt(ht,count);
+  Vector newCenter = treeFindMeanCurve(tree);
+  fflush(stdout);
+  // destroyTree(tree);
+  return newCenter;
+  // return NULL;
+}

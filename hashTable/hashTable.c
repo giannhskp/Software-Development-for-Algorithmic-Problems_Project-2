@@ -25,6 +25,12 @@ typedef struct hashtable_head *HashTable;
 int getNumberOfVectors(const HashTable ht){
   return ht->numberOfVectors;
 }
+int getNumberOfBuckets(const HashTable ht){
+  return ht->buckets;
+}
+List getListOfBucket(const HashTable ht,int bucket){
+  return ht->table[bucket].head;
+}
 
 
 

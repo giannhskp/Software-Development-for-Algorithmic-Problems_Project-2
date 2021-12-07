@@ -50,6 +50,8 @@ int main(int argc, char *argv[]) {
   char assignment[200];
   strcpy(assignment,"Classic"); // default
 
+  double delta = 0.1;
+
 
   for(int i = 1 ; i < argc ; i++){
     strcpy(str,argv[i]);
@@ -58,7 +60,7 @@ int main(int argc, char *argv[]) {
       strcpy(inputFile,argv[i+1]);
       printf("Given input File : %s\n", inputFile);
     }
-    else if(strcmp(str,"–c")==0 && (argc > i+1)){
+    else if(strcmp(str,"-c")==0 && (argc > i+1)){
       confflag++;
       strcpy(confFile,argv[i+1]);
       printf("Given configuration File : %s\n", confFile);
@@ -72,8 +74,10 @@ int main(int argc, char *argv[]) {
       strcpy(outputFile,argv[i+1]);
       printf("Given output File : %s\n", outputFile);
     }
-    else if(strcmp(str,"-update")==0 && (argc > i+1)){
+    else if(strcmp(str,"-update")==0 && (argc > i+2)){
       strcpy(update,argv[i+1]); // default
+      strcat(update," ");
+      strcat(update,argv[i+2]);
       printf("Given Update Method : %s\n", update);
     }
     else if(strcmp(str,"-assignment")==0 && (argc > i+1)){
@@ -188,7 +192,7 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
       }
 
-      clustering(list,fptr,assignment,update,numOfClusters,l,mHyper,probes,dim);
+      clustering(list,fptr,assignment,update,numOfClusters,l,mHyper,probes,dim,delta);
     }
     repeat=0;
 
