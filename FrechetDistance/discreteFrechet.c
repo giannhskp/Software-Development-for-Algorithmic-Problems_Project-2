@@ -178,8 +178,7 @@ Vector meanCurveBetween2Curves(Vector v1,Vector v2){
 Vector computeFrechetMeanCurve(List list,int count){
   Tree tree = createTreeFromList(list,count);
   Vector newCenter = treeFindMeanCurve(tree);
-  fflush(stdout);
-  // TODO: destroyTree(tree);
+  destroyTree(tree);
   return newCenter;
 }
 

@@ -18,7 +18,7 @@
 
 #define TRUE 1
 #define FALSE 0
-#define MAX_RECENTER_ITERATIONS 4
+#define MAX_RECENTER_ITERATIONS 10
 #define W_DIVIDER_LSH 60
 #define W_DIVIDER_CUBE 20
 #define METHOD_VECTOR 2
@@ -390,16 +390,16 @@ void clusteringLSH(List vecList,int numOfClusters,int l,FILE* fptr,int dim,int m
   fflush(fptr);
   fflush(stdout);
 
-  // printf("- COMPUTING SILHOUETTES FOR CLUSTERS\n");
-  // double stotal = 0.0;
-  // double * silhouettes = silhouetteLSH_Hypercube(clustersHt,clusters,numOfClusters,&stotal,dim);
-  // printf("- FINISHED COMPUTING SILHOUETTES\n");
-  // fprintf(fptr, "Silhouette: [ ");
-  // for(int i=0;i<numOfClusters;i++){
-  //   fprintf(fptr,"s%d = %f ,",i+1,silhouettes[i]);
-  // }
-  // fprintf(fptr,"stotal = %f ]\n\n",stotal/numOfVecs);
-  // free(silhouettes);
+  printf("- COMPUTING SILHOUETTES FOR CLUSTERS\n");
+  double stotal = 0.0;
+  double * silhouettes = silhouetteLSH_Hypercube(clustersHt,clusters,numOfClusters,&stotal,dim);
+  printf("- FINISHED COMPUTING SILHOUETTES\n");
+  fprintf(fptr, "Silhouette: [ ");
+  for(int i=0;i<numOfClusters;i++){
+    fprintf(fptr,"s%d = %f ,",i+1,silhouettes[i]);
+  }
+  fprintf(fptr,"stotal = %f ]\n\n",stotal/numOfVecs);
+  free(silhouettes);
 
   if(silhouette){
     for(int i=0;i<numOfClusters;i++){
@@ -618,7 +618,6 @@ void clustering(List vecList,FILE* fptr,char* assignment,char *update,int numOfC
       printf("Wrong update method!\n");
       exit(-1);
     }
-    fprintf(fptr,"Algorithm: Lloyds\n");
     clusteringLloyds(vecList,numOfClusters,fptr,dim);
   }
   else if(strcmp(assignment,"LSH")==0){
