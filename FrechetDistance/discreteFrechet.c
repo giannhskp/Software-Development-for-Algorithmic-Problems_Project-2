@@ -169,6 +169,9 @@ Vector meanCurveBetween2Curves(Vector v1,Vector v2){
     meanCurveTime[pathLength-1-i] = meanTime;
   }
   Vector meanCurve = initTimeSeries(meanCurveCoord,meanCurveTime,"meanCurve",pathLength);
+  free(meanCurveCoord);
+  free(meanCurveTime);
+  free(optimalPath);
   return meanCurve;
 }
 
@@ -183,7 +186,6 @@ Vector computeFrechetMeanCurve(List list,int count){
 Vector computeFrechetMeanCurveLSH(HashTable ht,int count){
   Tree tree = createTreeFromHt(ht,count);
   Vector newCenter = treeFindMeanCurve(tree);
-  fflush(stdout);
-  // TODO: destroyTree(tree);
+  destroyTree(tree);
   return newCenter;
 }
