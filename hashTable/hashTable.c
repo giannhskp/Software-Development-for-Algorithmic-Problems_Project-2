@@ -25,6 +25,12 @@ typedef struct hashtable_head *HashTable;
 int getNumberOfVectors(const HashTable ht){
   return ht->numberOfVectors;
 }
+int getNumberOfBuckets(const HashTable ht){
+  return ht->buckets;
+}
+List getListOfBucket(const HashTable ht,int bucket){
+  return ht->table[bucket].head;
+}
 
 
 
@@ -67,7 +73,7 @@ int htInsert(HashTable ht, Vector v,int index,int id){
 }
 
 void htRangeInsert(HashTable ht, Vector v,int id,int d){
-  int index=hashFunction(ht,v,d);
+  int index=hashFunction(ht,v,getDim(v));
   ht->table[index].head=listUniqueInsert(ht->table[index].head,v,id);
   ht->numberOfVectors++;
 }

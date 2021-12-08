@@ -4,6 +4,7 @@
 #include <time.h>
 #include <math.h>
 #include "../Vector/vector.h"
+#include "../hashTable/hashTable.h"
 #include "../hashTable/hashTableList/hashTableList.h"
 #include "../FrechetDistance/discreteFrechet.h"
 
@@ -85,6 +86,43 @@ Tree createTreeFromList(List list,int count){
   tree->height = height;
   int leafCount = 0;
   tree->root = recursiveTreeCreateFromList(&tempList,height,&leafCount);
+  tree->count=leafCount;
+  return tree;
+}
+
+TreeNode recursiveTreeCreateFromHt(List **listArray,int *arrayIndex,int height,int *leafCount){
+  if(height==0){
+    if((*arrayIndex)<0 && ((*listArray)[0]==NULL))
+      return NULL;
+    while((*listArray)[(*arrayIndex)]==NULL){
+      (*arrayIndex)--;
+      if((*arrayIndex)<0 )
+        return NULL;
+    }
+    TreeNode tn = createTreeNode(getVector((*listArray)[(*arrayIndex)]));
+    (*listArray)[(*arrayIndex)] = getNext((*listArray)[(*arrayIndex)]);
+    (*leafCount)++;
+    return tn;
+  }
+  TreeNode tn = createTreeNode(NULL);
+  tn->left = recursiveTreeCreateFromHt(listArray,arrayIndex,height-1,leafCount);
+  tn->right = recursiveTreeCreateFromHt(listArray,arrayIndex,height-1,leafCount);
+  return tn;
+}
+
+Tree createTreeFromHt(HashTable ht,int count){
+  if(count==0) return NULL;
+  int numOfBuckets = getNumberOfBuckets(ht);
+  List *listArray=malloc(numOfBuckets*sizeof(List));
+  for(int i=0;i<numOfBuckets;i++){
+    listArray[i] = getListOfBucket(ht,i);
+  }
+  int height = ceil(log2(count));
+  Tree tree = initializeTree();
+  tree->height = height;
+  int leafCount = 0;
+  int starting_index = numOfBuckets-1;
+  tree->root = recursiveTreeCreateFromHt(&listArray,&starting_index,height,&leafCount);
   tree->count=leafCount;
   return tree;
 }

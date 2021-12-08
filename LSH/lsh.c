@@ -85,49 +85,38 @@ Vector timeSeriesSnapping(Vector v,double gridDelta,double t){
   int index=0;
   int indexFinal=0;
   for(int i=0;i<dim;i++){
-    double temp=coordsVector[i] + t;  // displacement
-    double tempTime=coordsTime[i] + t;   // displacement
-    int found=0;
+    double y=coordsVector[i];
+    double x=coordsTime[i];
     double keepX;
     double keepY;
 
     // x
-    tempTime = tempTime+(0.5);
-    tempTime = tempTime/gridDelta;
-    tempTime = floor(tempTime);
-    tempTime = tempTime * gridDelta;
-    keepX = tempTime;
+    x = (x - t)/gridDelta;
+    x = x+(0.5);
+    x = floor(x);
+    x = x * gridDelta;
+    keepX = x + t;
     // y
-    temp = temp+(0.5);
-    temp = temp/gridDelta;
-    temp = floor(temp);
-    temp = temp * gridDelta;
-    keepY = temp;
+    y = (y - t)/gridDelta;
+    y = y+(0.5);
+    y = floor(y);
+    y = y * gridDelta;
+    keepY = y + t;
 
-
-    for(int j=0;j<index;j++){
-      if(snappedTime[j]==keepX && snappedVector[j]==keepY){
-        found=1;
-        break;
+    if(index>0){
+      if(snappedTime[index-1]==keepX && snappedVector[index-1]==keepY){
+        continue;
       }
     }
 
-    if(!found){
-      snappedFinal[indexFinal++]=keepX;
-      snappedFinal[indexFinal++]=keepY;
-      snappedTime[index]=keepX;
-      snappedVector[index++]=keepY;
-    }
+    snappedFinal[indexFinal++]=keepX;
+    snappedFinal[indexFinal++]=keepY;
+    snappedTime[index]=keepX;
+    snappedVector[index++]=keepY;
   }
-  // TODO: padding
-  ////////////////////////////
-  // for(int i=index;i<d;i++){
-  //   snappedVector[i]=PADDING_M;
-  //   snappedTime[i]=PADDING_M;
-  // }
+
   for(int i=index;i<2*dim;i++){
     snappedFinal[i]=PADDING_M;
-    // snappedTime[i]=PADDING_M;
   }
   ////////////////////////////
   Vector vecTmp=initVector(snappedFinal,getID(v),2*dim);
@@ -161,7 +150,6 @@ Vector continuousTimeSeriesSnapping(Vector v,double gridDelta){
 
     snappedVector[index++]=keepY;
   }
-  // TODO: padding
   ////////////////////////////
   for(int i=index;i<dim;i++){
     snappedVector[i]=PADDING_M;
@@ -376,9 +364,10 @@ void insertContinuousTimeSeriesToLSH(LSH lsh,double delta,Vector v,double epsilo
   unsigned int id;
   int index = computeG(lsh->g_fun[0],v4,&id); // compute the value of the g function for the given vector that will be inserted
   // finally insert the vector at the corresponding bucket of the current hash table
-  htInsert(lsh->hts[0],v2,index,id);
+  htInsert(lsh->hts[0],v,index,id);
 
   // TODO: FREE VECTORS
+  // free v2
   // free v3
   // free v4
 }
@@ -507,7 +496,7 @@ void nearestNeigborLSH_ContinuousFrechet(LSH lsh,Vector q,Vector *nNearest,doubl
   unsigned int q_id;
   int q_index = computeG(lsh->g_fun[0],v4,&q_id); // compute the value of the g function for the given vector that will be inserted
 
-  htFindNearestNeighbor(hts[0],q_index,v2,&nearest,&nearestDist,getDim(v2),q_id);
+  htFindNearestNeighbor(hts[0],q_index,q,&nearest,&nearestDist,getDim(v2),q_id);
 
   // check if nearest neighbor of the given vector q found or not
   if(nearestDist>=0 && nearest!=NULL){
@@ -589,6 +578,22 @@ void radiusNeigborsClustering(LSH lsh,Vector q,double radius,HashTable vecsInRad
   for(int i=0;i<l;i++){ // go at every hash table of lsh
     unsigned int q_ID;
     int q_index = computeG(gfuns[i],q,&q_ID); // compute the value of the g function for the given vector
+    // and go to the corresponding bucket of the current hash table to do the range search (to find the vectors that belong to the corresponding cluster)
+    htFindNeighborsInRadiusClustering(hts[i],q_index,centroidIndex,confList,vecsInRadius,q,getDim(q),q_ID,radius,assignCounter,iteration);
+  }
+}
+
+void radiusNeigborsClusteringTimeSeries(LSH lsh,Vector q,double radius,HashTable vecsInRadius,int centroidIndex,List* confList,int *assignCounter,int iteration,Grids grids,double delta){
+  // based on the given centroids find the clusters that the given vectors belong with the help of LSH (this function used for the "reverseAssignmentLSH")
+  // the clusters are represented by hash tables
+  int l = getL(lsh);
+  HashTable *hts = getHts(lsh);
+  g_function *gfuns = getGfuns(lsh);
+  for(int i=0;i<l;i++){ // go at every hash table of lsh
+    double t_of_grid = getTofGrid(grids,i);
+    Vector snappedToGrid = timeSeriesSnapping(q,delta,t_of_grid);
+    unsigned int q_ID;
+    int q_index = computeG(gfuns[i],snappedToGrid,&q_ID); // compute the value of the g function for the given vector
     // and go to the corresponding bucket of the current hash table to do the range search (to find the vectors that belong to the corresponding cluster)
     htFindNeighborsInRadiusClustering(hts[i],q_index,centroidIndex,confList,vecsInRadius,q,getDim(q),q_ID,radius,assignCounter,iteration);
   }
