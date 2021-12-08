@@ -308,12 +308,12 @@ void clusteringLSH(List vecList,int numOfClusters,int l,FILE* fptr,int dim,int m
   }
 
   clock_t begin = clock();
-  w = wValueCalculation(vecList,numOfVecs,dim);
-  w /= W_DIVIDER_LSH;
+  // w = wValueCalculation(vecList,numOfVecs,dim);
+  // w /= W_DIVIDER_LSH;
   w = 6;
   clock_t end = clock();
   double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-  printf("Found value of w in %f seconds, w = %d\n",time_spent,w );
+  // printf("Found value of w in %f seconds, w = %d\n",time_spent,w );
 
 
 
@@ -465,6 +465,7 @@ void reverseAssignmentHypercube(HyperCube cube,Vector *vectors,Vector *clusters,
     radius*=2; // doubled the radius for the next range search
     loopCounter++;
   }
+  printf("ASSIGN COUNTER = %d\n",assignCounter);
   int remainderCounter = 0;
   // finally one big percentage of vectors has been assigned into clusters
   // the remaining vectors will be assigned based on the nearest centroid at the corresponding cluster
@@ -481,6 +482,7 @@ void reverseAssignmentHypercube(HyperCube cube,Vector *vectors,Vector *clusters,
       remainderCounter++;
     }
   }
+  printf("remainderCounter COUNTER = %d\n",remainderCounter);
   *firstTime=1;
 }
 
@@ -503,11 +505,12 @@ void clusteringHypercube(List vecList,int numOfClusters,int m,int probes,FILE* f
   props = calloc(numOfVecs,sizeof(double));
 
   clock_t begin = clock();
-  w = wValueCalculation(vecList,numOfVecs,dim);
-  w /= W_DIVIDER_CUBE;
+  // w = wValueCalculation(vecList,numOfVecs,dim);
+  // w /= W_DIVIDER_CUBE;
+  w = 6;
   clock_t end = clock();
   double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-  printf("Found value of w in %f seconds, w = %d\n",time_spent,w );
+  // printf("Found value of w in %f seconds, w = %d\n",time_spent,w );
 
   // allocate and initialize the Hypercube with the vectors tha will be inserted into clusters
   hashTableSize=numOfVecs/16;
@@ -604,11 +607,11 @@ void clusteringHypercube(List vecList,int numOfClusters,int m,int probes,FILE* f
 void clustering(List vecList,FILE* fptr,char* assignment,char *update,int numOfClusters,int l,int mHyper,int probes,int dim,int delta){
   if(strcmp(assignment,"Classic")==0){
     if(strcmp(update,"Mean Vector")==0){
-      printf("METRIC USED: L2\n");
+      fprintf(fptr,"Algorithm: Lloyds for Vectors\n");
       distanceMetric=malloc(sizeof(char)*(strlen("l2")+1));
       strcpy(distanceMetric,"l2");
     }else if(strcmp(update,"Mean Frechet")==0){
-      printf("METRIC USED: DISCRETE FRECHET\n");
+      fprintf(fptr,"Algorithm: Lloyds for Curves\n");
       distanceMetric=malloc(sizeof(char)*(strlen("discreteFrechet")+1));
       strcpy(distanceMetric,"discreteFrechet");
     }else{
@@ -621,12 +624,12 @@ void clustering(List vecList,FILE* fptr,char* assignment,char *update,int numOfC
   else if(strcmp(assignment,"LSH")==0){
     int method;
     if(strcmp(update,"Mean Vector")==0){
-      printf("METRIC USED: L2\n");
+      fprintf(fptr,"Algorithm: Range Search LSH for Vectors\n");
       distanceMetric=malloc(sizeof(char)*(strlen("l2")+1));
       strcpy(distanceMetric,"l2");
       method = METHOD_VECTOR;
     }else if(strcmp(update,"Mean Frechet")==0){
-      printf("METRIC USED: DISCRETE FRECHET\n");
+      fprintf(fptr,"Algorithm: Range Search LSH for Curves\n");
       distanceMetric=malloc(sizeof(char)*(strlen("discreteFrechet")+1));
       strcpy(distanceMetric,"discreteFrechet");
       method = METHOD_FRECHET;
@@ -634,14 +637,15 @@ void clustering(List vecList,FILE* fptr,char* assignment,char *update,int numOfC
       printf("Wrong update method!\n");
       exit(-1);
     }
-    fprintf(fptr,"Algorithm: Lloyds\n");
-    fprintf(fptr,"Algorithm: Range Search LSH\n");
+
     clusteringLSH(vecList,numOfClusters,l,fptr,dim,method,delta);
   }
-  // else if(strcmp(method,"Hypercube")==0){
-  //   fprintf(fptr,"Algorithm: Range Search Hypercube\n");
-  //   clusteringHypercube(vecList,numOfClusters,mHyper,probes,fptr);
-  // }
+  else if(strcmp(assignment,"Hypercube")==0){
+    fprintf(fptr,"Algorithm: Range Search Hypercube for vectors\n");
+    distanceMetric=malloc(sizeof(char)*(strlen("l2")+1));
+    strcpy(distanceMetric,"l2");
+    clusteringHypercube(vecList,numOfClusters,mHyper,probes,fptr,dim);
+  }
   else{
     printf("%s\n",assignment );
     printf("INVALID assignment NAME!\n");
