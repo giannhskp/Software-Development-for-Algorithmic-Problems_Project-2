@@ -349,10 +349,9 @@ void insertContinuousTimeSeriesToLSH(LSH lsh,double delta,Vector v,double epsilo
   // finally insert the vector at the corresponding bucket of the current hash table
   htInsert(lsh->hts[0],v,index,id);
 
-  // TODO: FREE VECTORS
-  // free v2
-  // free v3
-  // free v4
+  deleteVector(v2);
+  deleteVector(v3);
+  deleteVector(v4);
 }
 
 void insertFromListToLSH(List list,LSH lsh){
@@ -491,7 +490,9 @@ void nearestNeigborLSH_ContinuousFrechet(LSH lsh,Vector q,Vector *nNearest,doubl
     fprintf(fptr,"- DID NOT FIND NEAREST NEIGHBOR\n");
   }
 
-  // TODO: FREE VECTORS
+  deleteVector(v2);
+  deleteVector(v3);
+  deleteVector(v4);
 }
 
 void kNearestNeighborsLSH(LSH lsh,Vector q,int knn,double *knearestTrueDists,FILE* fptr){

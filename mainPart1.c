@@ -196,14 +196,8 @@ int main(int argc, char *argv[])  {
   srand(time(NULL));
   char command[200];
 
-  // TODO: REMOVE
-  // strcpy(metric,"discrete");
-  // delta=2.25;
-  printf("!!!!!!!!!!!! DELTA = %f\n",delta);
-  printf("!!!!!!!!!!!! METRIC = %s\n",metric);
 
   if(strcmp(algorithm,"LSH")==0){
-    // printf(fptr,"Algorithm: LSH\n");
     distanceMetric=malloc(sizeof(char)*(strlen("l2")+1));
     strcpy(distanceMetric,"l2");
     fprintf(stdout,"Algorithm: LSH\n");
@@ -212,22 +206,20 @@ int main(int argc, char *argv[])  {
   else if(strcmp(algorithm,"Hypercube")==0){
     distanceMetric=malloc(sizeof(char)*(strlen("l2")+1));
     strcpy(distanceMetric,"l2");
-    // printf(fptr,"Algorithm: Hypercube\n");
+    fprintf(stdout,"Algorithm: LSH\n");
     vectorTimeSeriesHypecube(inputFile,queryFile,new_dimension,m,probes,outputFile);
   }
   else if(strcmp(algorithm,"Frechet")==0){
-    // printf(fptr,"Algorithm: Frechet\n");
     if(strcmp(metric,"discrete")==0){
       distanceMetric=malloc(sizeof(char)*(strlen("discreteFrechet")+1));
       strcpy(distanceMetric,"discreteFrechet");
-      printf("CALLED FUNCTION vectorTimeSeriesLSHFrechetDiscrete\n");
+      fprintf(stdout,"Algorithm: Frechet Discrece\n");
       vectorTimeSeriesLSHFrechetDiscrete(inputFile,queryFile,k_LSH,l,outputFile,delta);
-    // clusteringHypercube(vecList,numOfClusters,mHyper,probes,fptr);
     }
     else if(strcmp(metric,"continuous")==0){
       distanceMetric=malloc(sizeof(char)*(strlen("continuousFrechet")+1));
       strcpy(distanceMetric,"continuousFrechet");
-      printf("CALLED FUNCTION vectorTimeSeriesLSHFrechetContinuous\n");
+      fprintf(stdout,"Algorithm: Frechet Continuous\n");
       vectorTimeSeriesLSHFrechetContinuous(inputFile,queryFile,k_LSH,outputFile,delta,FILTERING_E);
     }
     else{

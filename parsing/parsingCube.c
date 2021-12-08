@@ -19,15 +19,14 @@
 
 // returns number of words in str
 int countWords(char *str){
-  char * token = strtok(str, " ");
-  token = strtok(NULL, " ");
+  char * token = strtok(str, "	");
+  token = strtok(NULL, "	");
    // loop through the string to extract all other tokens
    int counter = 0;
    while( token != NULL ) {
       counter++;
-      token = strtok(NULL, " ");
+      token = strtok(NULL, "	");
    }
-
   return counter;
 }
 
@@ -77,15 +76,15 @@ void readFileCube(char* fileName,List *inputs,int *vectorCount,int dim){
       continue;
     }
     double vec[dim];
-    char * token = strtok(buffer, " ");
+    char * token = strtok(buffer, "	 ");
     char name[MAX_INPUT_LENGTH];
     strcpy(name,token);
     name[strlen(name)]='\0';
-    token = strtok(NULL, " ");
+    token = strtok(NULL, "	");
     int counter = 0;
     while( token != NULL ) {
       vec[counter++]=atof(token);
-      token = strtok(NULL, " ");
+      token = strtok(NULL, "	");
      }
      Vector vecTmp=initVector(vec,name,dim);
      (*inputs) = listInsert((*inputs),vecTmp,-1);
@@ -132,15 +131,15 @@ void readQueryFileCube(char* queryFile,char* outputFile,HyperCube hc,List inputs
 
 
     int id;
-    char * token = strtok(buffer, " ");
+    char * token = strtok(buffer, "	 ");
     id=atoi(token);
     char name[MAX_INPUT_LENGTH];
     strcpy(name,token);
-    token = strtok(NULL, " ");
+    token = strtok(NULL, "	");
     int counter = 0;
     while( token != NULL ) {
       vec[counter++]=atof(token);
-      token = strtok(NULL, " ");
+      token = strtok(NULL, "	");
      }
     Vector vecTmp=initVector(vec,name,dim);
     fprintf(fptr, "Query %d:\n",id);
