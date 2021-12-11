@@ -317,10 +317,7 @@ void insertTimeSeriesToLSH(LSH lsh,Grids grids,double delta,Vector v){
   // the bucket of the hash table that the vector will be inserted depends from the corresponding g function of the specific hash Table (hash function)
   // at the new node tha will be inserted at the hash Tables save the id (Querying trick)
   int l = lsh->l;
-  // printf("*** FOR VECTOR WITH ID ");
-  // printVectorId(v);
   for(int i=0;i<l;i++){ // go at every hash table of lsh
-    // printf("----- L = %d -------\n",i);
     double t_of_grid = getTofGrid(grids,i);
 
     Vector snappedToGrid = timeSeriesSnapping(v,delta,t_of_grid);
@@ -340,36 +337,21 @@ void insertContinuousTimeSeriesToLSH(LSH lsh,double delta,Vector v,double epsilo
   // insert the given vector in all LSΗ hash tables
   // the bucket of the hash table that the vector will be inserted depends from the corresponding g function of the specific hash Table (hash function)
   // at the new node tha will be inserted at the hash Tables save the id (Querying trick)
-  // printf("*** FOR VECTOR WITH ID ");
-  // printVectorId(v);
-  // printf("ORIGINAL = ");
-  // printVector(v);
+
   Vector v2 = filtering(v,epsilon);
-  // printf("FILTERED = ");
-  // printVector(v2);
-  // printf("DELTA = %f\n",delta);
+
   Vector v3 = continuousTimeSeriesSnapping(v2,delta);
-  // printf("SNAPPED = ");
-  // printVector(v3);
+
   Vector v4 = minima_maxima(v3);
-  // printf("KEY_VECTOR = ");
-  // printVector(v4);
 
-
-  int l = lsh->l;
-  if(l!=1){ // TODO: REMOVE
-    printf("L!=1 ON CONTINUOUS LSH\n");
-
-  }
   unsigned int id;
   int index = computeG(lsh->g_fun[0],v4,&id); // compute the value of the g function for the given vector that will be inserted
   // finally insert the vector at the corresponding bucket of the current hash table
   htInsert(lsh->hts[0],v,index,id);
 
-  // TODO: FREE VECTORS
-  // free v2
-  // free v3
-  // free v4
+  deleteVector(v2);
+  deleteVector(v3);
+  deleteVector(v4);
 }
 
 void insertFromListToLSH(List list,LSH lsh){
@@ -485,8 +467,6 @@ void nearestNeigborLSH_ContinuousFrechet(LSH lsh,Vector q,Vector *nNearest,doubl
   // find the nearest neighbor of the given vector q with the help of LSH
   Vector nearest=NULL;
   double nearestDist=-1;
-  int l = getL(lsh);
-  if(l!=1){printf("L!=1 ON CONTINUOUS LSH\n");} // TODO: REMOVE
   HashTable *hts = getHts(lsh);
 
   Vector v2 = filtering(q,epsilon);
@@ -510,7 +490,9 @@ void nearestNeigborLSH_ContinuousFrechet(LSH lsh,Vector q,Vector *nNearest,doubl
     fprintf(fptr,"- DID NOT FIND NEAREST NEIGHBOR\n");
   }
 
-  // TODO: FREE VECTORS
+  deleteVector(v2);
+  deleteVector(v3);
+  deleteVector(v4);
 }
 
 void kNearestNeighborsLSH(LSH lsh,Vector q,int knn,double *knearestTrueDists,FILE* fptr){
@@ -596,5 +578,6 @@ void radiusNeigborsClusteringTimeSeries(LSH lsh,Vector q,double radius,HashTable
     int q_index = computeG(gfuns[i],snappedToGrid,&q_ID); // compute the value of the g function for the given vector
     // and go to the corresponding bucket of the current hash table to do the range search (to find the vectors that belong to the corresponding cluster)
     htFindNeighborsInRadiusClustering(hts[i],q_index,centroidIndex,confList,vecsInRadius,q,getDim(q),q_ID,radius,assignCounter,iteration);
+    deleteVector(snappedToGrid);
   }
 }

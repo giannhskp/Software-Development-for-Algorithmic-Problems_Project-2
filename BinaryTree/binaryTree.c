@@ -124,6 +124,7 @@ Tree createTreeFromHt(HashTable ht,int count){
   int starting_index = numOfBuckets-1;
   tree->root = recursiveTreeCreateFromHt(&listArray,&starting_index,height,&leafCount);
   tree->count=leafCount;
+  free(listArray);
   return tree;
 }
 

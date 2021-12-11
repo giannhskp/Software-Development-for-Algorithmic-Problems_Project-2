@@ -399,6 +399,7 @@ void clusteringLSH(List vecList,int numOfClusters,int l,FILE* fptr,int dim,int m
     fprintf(fptr,"s%d = %f ,",i+1,silhouettes[i]);
   }
   fprintf(fptr,"stotal = %f ]\n\n",stotal/numOfVecs);
+  free(silhouettes);
 
   if(silhouette){
     for(int i=0;i<numOfClusters;i++){
@@ -418,7 +419,7 @@ void clusteringLSH(List vecList,int numOfClusters,int l,FILE* fptr,int dim,int m
     htDelete(clustersHt[i],0);
   }
 
-  free(silhouettes);
+  deleteGrids(grids);
   free(props);
   free(vectors);
   free(oldClusters);
@@ -465,7 +466,6 @@ void reverseAssignmentHypercube(HyperCube cube,Vector *vectors,Vector *clusters,
     radius*=2; // doubled the radius for the next range search
     loopCounter++;
   }
-  printf("ASSIGN COUNTER = %d\n",assignCounter);
   int remainderCounter = 0;
   // finally one big percentage of vectors has been assigned into clusters
   // the remaining vectors will be assigned based on the nearest centroid at the corresponding cluster
@@ -482,7 +482,6 @@ void reverseAssignmentHypercube(HyperCube cube,Vector *vectors,Vector *clusters,
       remainderCounter++;
     }
   }
-  printf("remainderCounter COUNTER = %d\n",remainderCounter);
   *firstTime=1;
 }
 
@@ -577,6 +576,7 @@ void clusteringHypercube(List vecList,int numOfClusters,int m,int probes,FILE* f
     fprintf(fptr,"s%d = %f ,",i+1,silhouettes[i]);
   }
   fprintf(fptr,"stotal = %f ]\n\n",stotal/numOfVecs);
+  free(silhouettes);
 
   if(silhouette){
     for(int i=0;i<numOfClusters;i++){
@@ -595,7 +595,7 @@ void clusteringHypercube(List vecList,int numOfClusters,int m,int probes,FILE* f
     htDelete(clustersHt[i],0);
   }
 
-  free(silhouettes);
+
   free(props);
   free(vectors);
   free(oldClusters);
@@ -618,7 +618,6 @@ void clustering(List vecList,FILE* fptr,char* assignment,char *update,int numOfC
       printf("Wrong update method!\n");
       exit(-1);
     }
-    fprintf(fptr,"Algorithm: Lloyds\n");
     clusteringLloyds(vecList,numOfClusters,fptr,dim);
   }
   else if(strcmp(assignment,"LSH")==0){

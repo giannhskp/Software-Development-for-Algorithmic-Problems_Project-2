@@ -172,6 +172,9 @@ void deleteVector(Vector v){
   if(v->clusterInfo!=NULL){
     free(v->clusterInfo);
   }
+  if(v->times!=NULL){
+    free(v->times);
+  }
   free(v);
 }
 
