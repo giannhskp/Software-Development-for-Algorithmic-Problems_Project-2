@@ -36,7 +36,6 @@ void printOptions(){
 
 int main(int argc, char *argv[]) {
   srand(time(NULL));
-  int option;
   silhouette=0;
   char str[200];
   char inputFile[200];
@@ -86,41 +85,6 @@ int main(int argc, char *argv[]) {
     }
 
   }
-  // while((option = getopt(argc, argv, "i:c:o:m:")) != -1){
-  //    switch(option){
-  //       case 'i':
-  //       inputflag++;
-  //       strcpy(inputFile,optarg);
-  //       printf("Given input File : %s\n", inputFile);
-  //       break;
-  //
-  //       case 'c':
-  //       if(strcmp(argv[optind-1],"-silhouette")==0){
-  //         printf("silhouette option ON.\n");
-  //         silhouette=1;
-  //       }
-  //       else{
-  //         confflag++;
-  //         strcpy(confFile,optarg);
-  //         printf("Given configuration File : %s\n", confFile);
-  //       }
-  //       break;
-  //
-  //       case 'o':
-  //       outputflag++;
-  //       strcpy(outputFile,optarg);
-  //       printf("Given output File : %s\n", outputFile);
-  //       break;
-  //
-  //       case ':':
-  //        printf("option needs a value\n");
-  //        break;
-  //
-  //       default: /* '?' */
-  //         fprintf(stderr, "Usage: %s –i <input file> –c <configuration file> -o <output file> -update <Mean Frechet or Mean Vector> –assignment <Classic or LSH or Hypercube or LSH_Frechet> -silhouette <optional> -silhouette <optional>\n",argv[0]);
-  //         exit(EXIT_FAILURE);
-  //    }
-  // }
 
   if(!inputflag){
     printf(">Input file name: ");

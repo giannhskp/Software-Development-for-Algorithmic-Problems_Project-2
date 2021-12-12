@@ -145,6 +145,7 @@ void vectorTimeSeriesLSHFrechetDiscrete(char* arg_inputFile,char* arg_queryFile,
   w = wValueCalculation(list,numberOfVectorsInFile,dim);
   // w /= W_DIVIDER;
   w = w/10;
+  w=6;
   end = clock();
   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Found value of w in %f seconds, w = %d\n",time_spent,w );
