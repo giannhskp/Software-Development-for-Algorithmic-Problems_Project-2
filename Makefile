@@ -45,5 +45,5 @@ $(EXEC3): $(OBJ4)
 .PHONY: clean
 
 clean:
-	rm -f $(OBJ1) $(OBJ2) $(OBJ3) $(OBJ4) $(EXEC1) $(EXEC2)
+	rm -f $(OBJ1) $(OBJ2) $(OBJ3) $(OBJ4) $(EXEC1) $(EXEC2) $(EXEC3)
 	# rm -f $(OBJ1) $(EXEC1)

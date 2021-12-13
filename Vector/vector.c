@@ -192,8 +192,18 @@ void printVectorInFile(Vector v,FILE *fptr){
 
 int compareVectors(Vector v1,Vector v2){
   for(int i=0;i<v1->dim;i++){
-    if(fabs(v1->coords[i]-v2->coords[i])<1e-10){
-      printf("%f\n",fabs(v1->coords[i]-v2->coords[i]));
+    if(fabs(v1->coords[i]-v2->coords[i])>1e-4)
+      return 0;
+  }
+  return 1;
+}
+
+int compareTimeSeries(Vector v1,Vector v2){
+  if(v1->times==NULL || v2->times==NULL)
+    return 0;
+
+  for(int i=0;i<v1->dim;i++){
+    if(fabs(v1->coords[i]-v2->coords[i])>1e-4 || fabs(v1->times[i]-v2->times[i])>1e-4 ){
       return 0;
     }
   }
