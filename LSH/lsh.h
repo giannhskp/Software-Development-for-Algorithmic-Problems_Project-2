@@ -18,7 +18,7 @@ void nearestNeigborLSH(LSH ,Vector,Vector *,double *,FILE* ,double *);
 void kNearestNeighborsLSH(LSH, Vector,int,double *,FILE*);
 void radiusNeigborsLSH(LSH ,Vector ,double,FILE* );
 void radiusNeigborsClustering(LSH ,Vector ,double ,HashTable ,int ,List* ,int *,int );
-void radiusNeigborsClusteringTimeSeries(LSH ,Vector ,double ,HashTable ,int ,List* ,int *,int ,Grids ,double );
+void radiusNeigborsClusteringTimeSeries(LSH ,Vector ,double ,HashTable ,int ,List* ,int *,int ,Grids ,double ,int );
 
 
 Grids initializeGrids(double ,int ,int );

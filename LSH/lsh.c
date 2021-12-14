@@ -210,6 +210,66 @@ Vector filtering(Vector v,double epsilon){
   return tempVec;
 }
 
+Vector filterMeanCurve(Vector v,int finalDim){
+  printf("-------------------------------------\n");
+  int dim = getDim(v);
+  printf("MEAN CURVE DIM = %d | FINAL DIM = %d\n",dim,finalDim);
+  if(dim<=finalDim){
+    printf("-------------------------------------\n");
+    return copyVector(v);
+  }
+  double *filteredCoords = calloc(dim,(sizeof(double)));
+  double *originalCoords = getCoords(v);
+  double *originalTimes = getTime(v);
+  filteredCoords[0]=originalCoords[0];
+  double previous = originalCoords[0];
+  double epsilon = 0.001;
+  int firstIter = 1;
+  int filteredDim = dim;
+  int stop = 0;
+  while(!stop){
+    for(int i=1;i<(dim-1);i++){
+      if(!firstIter && filteredCoords[i]<0){
+        continue;
+      }
+      if((fabs(previous-originalCoords[i])<epsilon) && (fabs(originalCoords[i]-originalCoords[i+1])<epsilon)){
+        filteredCoords[i]=-1;
+        filteredDim--;
+        if(filteredDim==finalDim){
+          stop=1;
+          break;
+        }
+      }else{
+        filteredCoords[i]=originalCoords[i];
+        previous = originalCoords[i];
+      }
+    }
+    printf("EPSILON=%f | FILTERED DIM = %d\n",epsilon,filteredDim);
+    epsilon*=5;
+    firstIter=0;
+  }
+  filteredCoords[dim-1]=originalCoords[dim-1];
+  double *reducedVector = calloc(finalDim,(sizeof(double)));
+  double *reducedTimes = calloc(finalDim,(sizeof(double)));
+  int count = 0;
+  for(int i=0;i<dim;i++){
+    if(filteredCoords[i]==-1)
+      continue;
+    reducedVector[count] = originalCoords[i];
+    reducedTimes[count++] = originalTimes[i];
+  }
+  if(count!=finalDim){
+    printf("SIZE MISSMATCH!!!!!\n");
+  }
+  Vector tempVec = initTimeSeries(reducedVector,reducedTimes,getID(v),finalDim);
+  printf("REDUCED VECTOR COUNT %d | epalitheysh:%d | finalDim=%d\n",count,getDim(tempVec),finalDim);
+  printf("-------------------------------------\n");
+  free(filteredCoords);
+  free(reducedVector);
+  free(reducedTimes);
+  return tempVec;
+}
+
 
 /* H FUNCTIONS*/
 
@@ -583,16 +643,17 @@ void radiusNeigborsClustering(LSH lsh,Vector q,double radius,HashTable vecsInRad
   }
 }
 
-void radiusNeigborsClusteringTimeSeries(LSH lsh,Vector q,double radius,HashTable vecsInRadius,int centroidIndex,List* confList,int *assignCounter,int iteration,Grids grids,double delta){
+void radiusNeigborsClusteringTimeSeries(LSH lsh,Vector q,double radius,HashTable vecsInRadius,int centroidIndex,List* confList,int *assignCounter,int iteration,Grids grids,double delta,int dim){
   // based on the given centroids find the clusters that the given vectors belong with the help of LSH (this function used for the "reverseAssignmentLSH")
   // the clusters are represented by hash tables
+  Vector reduced_mean_curve = filterMeanCurve(q,dim);
   int l = getL(lsh);
   HashTable *hts = getHts(lsh);
   g_function *gfuns = getGfuns(lsh);
   for(int i=0;i<l;i++){ // go at every hash table of lsh
     double t_x = getTofGrid(grids,i,0);
     double t_y = getTofGrid(grids,i,1);
-    Vector snappedToGrid = timeSeriesSnapping(q,delta,t_x,t_y);
+    Vector snappedToGrid = timeSeriesSnapping(reduced_mean_curve,delta,t_x,t_y);
     unsigned int q_ID;
     int q_index = computeG(gfuns[i],snappedToGrid,&q_ID); // compute the value of the g function for the given vector
     // and go to the corresponding bucket of the current hash table to do the range search (to find the vectors that belong to the corresponding cluster)

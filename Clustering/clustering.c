@@ -18,7 +18,7 @@
 
 #define TRUE 1
 #define FALSE 0
-#define MAX_RECENTER_ITERATIONS 10
+#define MAX_RECENTER_ITERATIONS 5
 #define W_DIVIDER_LSH 60
 #define W_DIVIDER_CUBE 20
 #define METHOD_VECTOR 2
@@ -145,6 +145,7 @@ void clusteringLloyds(List vecList,int numOfClusters,FILE* fptr,int dim){
   // lloyds Algorithm runs until convergence between the old cluster centroids and the new ones is achieved
   while((count<2) || !centroidsConverge(clusters,oldClusters,numOfClusters)){ // check for convergence after the second one iteration
     count++;
+    printf("Iteration %d\n",count);
     if(!firstIter){
       Vector *temp = oldClusters;
       oldClusters=clusters;
@@ -245,10 +246,11 @@ void reverseAssignmentLSH(LSH lsh,Vector *vectors,Vector *clusters,Vector *oldCl
     List confList=initializeList(); // list that used to store the vectors that in range search assigned at more than one cluster
     // assign each vector to the corresponding cluster with the help of range search
     for(int i=0;i<numOfClusters;i++){
+      printf("***** ITERATION %d | RANGE %f | CLUSTER %d *****\n",iteration,radius,i);
       if(method == METHOD_VECTOR){
         radiusNeigborsClustering(lsh,clusters[i],radius,clustersHt[i],i,&confList,&assignCounter,iteration);
       }else if(method == METHOD_FRECHET){
-        radiusNeigborsClusteringTimeSeries(lsh,clusters[i],radius,clustersHt[i],i,&confList,&assignCounter,iteration,grids,delta);
+        radiusNeigborsClusteringTimeSeries(lsh,clusters[i],radius,clustersHt[i],i,&confList,&assignCounter,iteration,grids,delta,dim);
       }
     }
     // manage the vectors that presenting conflict
