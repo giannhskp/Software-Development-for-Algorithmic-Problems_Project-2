@@ -178,7 +178,7 @@ void readQueryFileLSH(char* queryFile,char* outputFile,LSH lsh,List inputs,int d
 
     clock_t end_lsh = clock();
     double time_spent_lsh = (double)(end_lsh - begin_lsh) / CLOCKS_PER_SEC;
-    if(found_neighbor){
+    if(found_neighbor>0){
       total_lsh_time += time_spent_lsh;
       total_true_time += time_spent_true;
       query_count++;
@@ -276,7 +276,7 @@ void readQueryFileLSH_DiscreteFrechet(char* queryFile,char* outputFile,LSH lsh,L
 
     clock_t end_lsh = clock();
     double time_spent_lsh = (double)(end_lsh - begin_lsh) / CLOCKS_PER_SEC;
-    if(found_neighbor){
+    if(found_neighbor>0){
       total_lsh_time += time_spent_lsh;
       total_true_time += time_spent_true;
       query_count++;
@@ -372,20 +372,23 @@ void readQueryFileLSH_ContinuousFrechet(char* queryFile,char* outputFile,LSH lsh
 
     clock_t end_lsh = clock();
     double time_spent_lsh = (double)(end_lsh - begin_lsh) / CLOCKS_PER_SEC;
-    if(found_neighbor){
+    if(found_neighbor>0){
       total_lsh_time += time_spent_lsh;
       total_true_time += time_spent_true;
       query_count++;
     }
-    // fprintf(fptr, "tApproximateAverage: %f seconds\n",time_spent_lsh);
-    // fprintf(fptr, "tTrueAverage: %f seconds\n",time_spent_true);
+    fprintf(fptr, "tApproximateAverage: %f seconds\n",time_spent_lsh);
+    fprintf(fptr, "tTrueAverage: %f seconds\n",time_spent_true);
+    fprintf(fptr, "\n");
     fflush(fptr);
     deleteVector(vecTmp);
   }
-  fprintf(fptr, "tApproximateAverage: %f seconds\n",total_lsh_time/query_count);
-  fprintf(fptr, "tTrueAverage: %f seconds\n",total_true_time/query_count);
-  fprintf(fptr, "Max Approximation Factor: %f\n",max_aproximation_factor);
-  fprintf(fptr, "Min Approximation Factor: %f\n",min_aproximation_factor);
+  if(query_count>0){
+    fprintf(fptr, "tApproximateAverage: %f seconds\n",total_lsh_time/query_count);
+    fprintf(fptr, "tTrueAverage: %f seconds\n",total_true_time/query_count);
+    fprintf(fptr, "Max Approximation Factor: %f\n",max_aproximation_factor);
+    fprintf(fptr, "Min Approximation Factor: %f\n",min_aproximation_factor);
+  }
 
   fclose(fptr);
   fclose(file);

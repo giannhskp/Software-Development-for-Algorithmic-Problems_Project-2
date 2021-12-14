@@ -66,11 +66,11 @@ int main(int argc, char *argv[]) {
       strcpy(confFile,argv[i+1]);
       printf("Given configuration File : %s\n", confFile);
     }
-    else if(strcmp(str,"-silhouette")==0 && (argc > i+1)){
+    else if(strcmp(str,"-silhouette")==0){
       printf("silhouette option ON.\n");
       silhouette=1;
     }
-    else if(strcmp(str,"-complete")==0 && (argc > i+1)){
+    else if(strcmp(str,"-complete")==0){
       printf("complete option ON.\n");
       complete=1;
     }

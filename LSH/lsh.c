@@ -18,7 +18,7 @@ extern int w;
 extern int k_LSH;
 extern int hashTableSize;
 
-#define PADDING_M 100
+#define PADDING_M 1000
 
 
 typedef struct hfunc{
@@ -390,7 +390,11 @@ void insertTimeSeriesToLSH(LSH lsh,Grids grids,double delta,Vector v){
     double t_y = getTofGrid(grids,i,1);
 
     Vector snappedToGrid = timeSeriesSnapping(v,delta,t_x,t_y);
-
+    // printf("ORIGINAL: \n");
+    // printVector(v);
+    // printf("Snapped: \n");
+    // printVector(snappedToGrid);
+    // getchar();
     unsigned int id;
     int index = computeG(lsh->g_fun[i],snappedToGrid,&id); // compute the value of the g function for the given vector that will be inserted
     // finally insert the vector at the corresponding bucket of the current hash table
@@ -646,19 +650,19 @@ void radiusNeigborsClustering(LSH lsh,Vector q,double radius,HashTable vecsInRad
 void radiusNeigborsClusteringTimeSeries(LSH lsh,Vector q,double radius,HashTable vecsInRadius,int centroidIndex,List* confList,int *assignCounter,int iteration,Grids grids,double delta,int dim){
   // based on the given centroids find the clusters that the given vectors belong with the help of LSH (this function used for the "reverseAssignmentLSH")
   // the clusters are represented by hash tables
-  Vector reduced_mean_curve = filterMeanCurve(q,dim);
+  // Vector reduced_mean_curve = filterMeanCurve(q,dim);
   int l = getL(lsh);
   HashTable *hts = getHts(lsh);
   g_function *gfuns = getGfuns(lsh);
   for(int i=0;i<l;i++){ // go at every hash table of lsh
     double t_x = getTofGrid(grids,i,0);
     double t_y = getTofGrid(grids,i,1);
-    Vector snappedToGrid = timeSeriesSnapping(reduced_mean_curve,delta,t_x,t_y);
+    Vector snappedToGrid = timeSeriesSnapping(q,delta,t_x,t_y);
     unsigned int q_ID;
     int q_index = computeG(gfuns[i],snappedToGrid,&q_ID); // compute the value of the g function for the given vector
     // and go to the corresponding bucket of the current hash table to do the range search (to find the vectors that belong to the corresponding cluster)
     htFindNeighborsInRadiusClustering(hts[i],q_index,centroidIndex,confList,vecsInRadius,q,getDim(q),q_ID,radius,assignCounter,iteration);
     deleteVector(snappedToGrid);
   }
-  deleteVector(reduced_mean_curve);
+  // deleteVector(reduced_mean_curve);
 }

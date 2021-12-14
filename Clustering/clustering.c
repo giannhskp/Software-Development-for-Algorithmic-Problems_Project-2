@@ -74,7 +74,9 @@ void lloyds(Vector* clusters,Vector *oldClusters,Vector* vectors,List* clustersL
       if(clustersList[i]!=NULL){ // check if each cluster has been formed (has vectors)
         // ok then find the new centroid for this cluster
         if(strcmp(distanceMetric,"discreteFrechet")==0){
-          newCenter = computeFrechetMeanCurve(clustersList[i],vectorCount[i]);
+          Vector tempNewCenter = computeFrechetMeanCurve(clustersList[i],vectorCount[i]);
+          newCenter = filterMeanCurve(tempNewCenter,dim);
+          deleteVector(tempNewCenter);
         }else{
           newCenter=listMeanOfCluster(clustersList[i],dim);
         }
@@ -144,6 +146,8 @@ void clusteringLloyds(List vecList,int numOfClusters,FILE* fptr,int dim){
   int firstTime=0;
   // lloyds Algorithm runs until convergence between the old cluster centroids and the new ones is achieved
   while((count<2) || !centroidsConverge(clusters,oldClusters,numOfClusters)){ // check for convergence after the second one iteration
+    if(count==MAX_RECENTER_ITERATIONS)
+      break;
     count++;
     printf("Iteration %d\n",count);
     if(!firstIter){
@@ -222,7 +226,9 @@ void reverseAssignmentLSH(LSH lsh,Vector *vectors,Vector *clusters,Vector *oldCl
       }else if(method == METHOD_VECTOR){
         newCenter = htMeanOfCluster(clustersHt[i],dim); // find the new centroid for every cluster
       }else if(method == METHOD_FRECHET){
-        newCenter = computeFrechetMeanCurveLSH(clustersHt[i],getNumberOfVectors(clustersHt[i]));
+        Vector tempNewCenter = computeFrechetMeanCurveLSH(clustersHt[i],getNumberOfVectors(clustersHt[i]));
+        newCenter = filterMeanCurve(tempNewCenter,dim);
+        deleteVector(tempNewCenter);
       }
 
       // finally delete each cluster in order to form a new one based to the new centroid

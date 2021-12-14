@@ -174,7 +174,7 @@ void readQueryFileCube(char* queryFile,char* outputFile,HyperCube hc,List inputs
     }
     clock_t end_cube = clock();
     double time_spent_cube = (double)(end_cube - begin_cube) / CLOCKS_PER_SEC;
-    if(found_neighbor){
+    if(found_neighbor>0){
       total_cube_time += time_spent_cube;
       total_true_time += time_spent_true;
       query_count++;

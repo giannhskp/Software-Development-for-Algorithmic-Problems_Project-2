@@ -28,4 +28,5 @@ void nearestNeigborLSH_DiscreteFrechet(LSH ,Vector ,Vector *,double *,FILE *,Gri
 void nearestNeigborLSH_ContinuousFrechet(LSH ,Vector ,Vector *,double *,FILE * ,double ,double ,Grids ,double *,int *);
 
 int getValueOfFirstGFun(LSH ,Vector ,unsigned int * );
+Vector filterMeanCurve(Vector ,int );
 #endif
