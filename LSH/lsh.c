@@ -126,7 +126,7 @@ Vector timeSeriesSnapping(Vector v,double gridDelta,double t){
   return vecTmp;
 }
 
-Vector continuousTimeSeriesSnapping(Vector v,double gridDelta){
+Vector continuousTimeSeriesSnapping(Vector v,double gridDelta,double t){
   int dim=getDim(v);
   double *coordsVector = getCoords(v);
   double snappedVector[dim];
@@ -143,10 +143,10 @@ Vector continuousTimeSeriesSnapping(Vector v,double gridDelta){
     // temp = temp - fmod(temp,gridDelta);
     // keepY=temp;
 
-    temp = temp+(0.5);
-    temp = temp/gridDelta;
-    temp = floor(temp);
-    temp = temp * gridDelta;
+    temp = temp+t;  // x + t
+    temp = temp/gridDelta; // (x + t)/d
+    temp = floor(temp); // floor( (x + t)/d )
+    temp = temp * gridDelta;  // floor( (x + t)/d ) * d
     keepY = temp;
 
 
@@ -341,14 +341,15 @@ void insertTimeSeriesToLSH(LSH lsh,Grids grids,double delta,Vector v){
 }
 
 
-void insertContinuousTimeSeriesToLSH(LSH lsh,double delta,Vector v,double epsilon){
+void insertContinuousTimeSeriesToLSH(LSH lsh,double delta,Vector v,double epsilon,Grids grid){
   // insert the given vector in all LSΗ hash tables
   // the bucket of the hash table that the vector will be inserted depends from the corresponding g function of the specific hash Table (hash function)
   // at the new node tha will be inserted at the hash Tables save the id (Querying trick)
 
   Vector v2 = filtering(v,epsilon);
 
-  Vector v3 = continuousTimeSeriesSnapping(v2,delta);
+  double t = getTofGrid(grid,0);
+  Vector v3 = continuousTimeSeriesSnapping(v2,delta,t);
 
   Vector v4 = minima_maxima(v3);
 
@@ -382,12 +383,12 @@ void insertTimeSeriesFromListToLSH(List list,LSH lsh,Grids grids,double delta){
   }
 }
 
-void insertContinuousTimeSeriesFromListToLSH(List list,LSH lsh,double delta,double epsilon){
+void insertContinuousTimeSeriesFromListToLSH(List list,LSH lsh,double delta,double epsilon,Grids grid){
   // insert every vector of the list at the corresponding LSH
   if(list==NULL){ return;}
   List temp=list;
   while(temp!=NULL){
-      insertContinuousTimeSeriesToLSH(lsh,delta,getVector(temp),epsilon);
+      insertContinuousTimeSeriesToLSH(lsh,delta,getVector(temp),epsilon,grid);
       temp=getNext(temp);
   }
 }
@@ -471,14 +472,15 @@ void nearestNeigborLSH_DiscreteFrechet(LSH lsh,Vector q,Vector *nNearest,double 
   }
 }
 
-void nearestNeigborLSH_ContinuousFrechet(LSH lsh,Vector q,Vector *nNearest,double *trueDist,FILE *fptr,double delta,double epsilon){
+void nearestNeigborLSH_ContinuousFrechet(LSH lsh,Vector q,Vector *nNearest,double *trueDist,FILE *fptr,double delta,double epsilon,Grids grid){
   // find the nearest neighbor of the given vector q with the help of LSH
   Vector nearest=NULL;
   double nearestDist=-1;
   HashTable *hts = getHts(lsh);
 
   Vector v2 = filtering(q,epsilon);
-  Vector v3 = continuousTimeSeriesSnapping(v2,delta);
+  double t = getTofGrid(grid,0);
+  Vector v3 = continuousTimeSeriesSnapping(v2,delta,t);
   Vector v4 = minima_maxima(v3);
 
   unsigned int q_id;

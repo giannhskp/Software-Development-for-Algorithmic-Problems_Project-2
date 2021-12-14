@@ -10,7 +10,7 @@ void insertToLSH(LSH ,Vector );
 void insertTimeSeriesToLSH(LSH ,Grids ,double ,Vector );
 void insertFromListToLSH(List ,LSH );
 void insertTimeSeriesFromListToLSH(List ,LSH ,Grids ,double );
-void insertContinuousTimeSeriesFromListToLSH(List ,LSH ,double ,double );
+void insertContinuousTimeSeriesFromListToLSH(List ,LSH ,double ,double ,Grids );
 void printLSH(LSH );
 void destroyLSH(LSH );
 
@@ -27,7 +27,7 @@ Grids initializeGrids(double ,int );
 void deleteGrids(Grids );
 double getTofGrid(Grids ,int );
 void nearestNeigborLSH_DiscreteFrechet(LSH ,Vector ,Vector *,double *,FILE *,Grids ,double );
-void nearestNeigborLSH_ContinuousFrechet(LSH ,Vector ,Vector *,double *,FILE * ,double ,double );
+void nearestNeigborLSH_ContinuousFrechet(LSH ,Vector ,Vector *,double *,FILE * ,double ,double ,Grids );
 
 int getValueOfFirstGFun(LSH ,Vector ,unsigned int * );
 #endif
