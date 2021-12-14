@@ -28,6 +28,7 @@ extern int numOfVecs;
 // extern int d;
 extern int hashTableSize;
 extern int silhouette;
+extern int complete;
 extern int w;
 char *distanceMetric;
 // Vector timeVector;
@@ -174,17 +175,20 @@ void clusteringLloyds(List vecList,int numOfClusters,FILE* fptr,int dim){
   fprintf(fptr, "clustering_time: %f seconds\n",cluster_time);
   fflush(fptr);
 
-  printf("- COMPUTING SILHOUETTES FOR CLUSTERS\n");
-  double stotal = 0.0;
-  double * silhouettes = silhouetteLloyds(clustersList,clusters,numOfClusters,vectorCount,&stotal,dim);
-  printf("- FINISHED COMPUTING SILHOUETTES\n");
-  fprintf(fptr, "Silhouette: [ ");
-  for(int i=0;i<numOfClusters;i++){
-    fprintf(fptr,"s%d = %f ,",i+1,silhouettes[i]);
-  }
-  fprintf(fptr,"stotal = %f ]\n\n",stotal/numOfVecs);
-
   if(silhouette){
+    printf("- COMPUTING SILHOUETTES FOR CLUSTERS\n");
+    double stotal = 0.0;
+    double * silhouettes = silhouetteLloyds(clustersList,clusters,numOfClusters,vectorCount,&stotal,dim);
+    printf("- FINISHED COMPUTING SILHOUETTES\n");
+    fprintf(fptr, "Silhouette: [ ");
+    for(int i=0;i<numOfClusters;i++){
+      fprintf(fptr,"s%d = %f ,",i+1,silhouettes[i]);
+    }
+    fprintf(fptr,"stotal = %f ]\n\n",stotal/numOfVecs);
+    free(silhouettes);
+  }
+
+  if(complete){
     for(int i=0;i<numOfClusters;i++){
       fprintf(fptr,"CLUSTER-%d {",i+1);
       printVectorInFile(clusters[i],fptr);
@@ -200,7 +204,6 @@ void clusteringLloyds(List vecList,int numOfClusters,FILE* fptr,int dim){
     deleteVector(clusters[i]);
   }
 
-  free(silhouettes);
   free(clusters);
   free(props);
   free(vectors);
@@ -390,18 +393,20 @@ void clusteringLSH(List vecList,int numOfClusters,int l,FILE* fptr,int dim,int m
   fflush(fptr);
   fflush(stdout);
 
-  printf("- COMPUTING SILHOUETTES FOR CLUSTERS\n");
-  double stotal = 0.0;
-  double * silhouettes = silhouetteLSH_Hypercube(clustersHt,clusters,numOfClusters,&stotal,dim);
-  printf("- FINISHED COMPUTING SILHOUETTES\n");
-  fprintf(fptr, "Silhouette: [ ");
-  for(int i=0;i<numOfClusters;i++){
-    fprintf(fptr,"s%d = %f ,",i+1,silhouettes[i]);
-  }
-  fprintf(fptr,"stotal = %f ]\n\n",stotal/numOfVecs);
-  free(silhouettes);
-
   if(silhouette){
+    printf("- COMPUTING SILHOUETTES FOR CLUSTERS\n");
+    double stotal = 0.0;
+    double * silhouettes = silhouetteLSH_Hypercube(clustersHt,clusters,numOfClusters,&stotal,dim);
+    printf("- FINISHED COMPUTING SILHOUETTES\n");
+    fprintf(fptr, "Silhouette: [ ");
+    for(int i=0;i<numOfClusters;i++){
+      fprintf(fptr,"s%d = %f ,",i+1,silhouettes[i]);
+    }
+    fprintf(fptr,"stotal = %f ]\n\n",stotal/numOfVecs);
+    free(silhouettes);
+  }
+
+  if(complete){
     for(int i=0;i<numOfClusters;i++){
       fprintf(fptr,"CLUSTER-%d {",i+1);
       printVectorInFile(clusters[i],fptr);
@@ -566,19 +571,20 @@ void clusteringHypercube(List vecList,int numOfClusters,int m,int probes,FILE* f
   fprintf(fptr, "clustering_time: %f seconds\n",cluster_time);
   fflush(fptr);
   fflush(stdout);
-
-  printf("- COMPUTING SILHOUETTES FOR CLUSTERS\n");
-  double stotal = 0.0;
-  double * silhouettes = silhouetteLSH_Hypercube(clustersHt,clusters,numOfClusters,&stotal,dim);
-  printf("- FINISHED COMPUTING SILHOUETTES\n");
-  fprintf(fptr, "Silhouette: [ ");
-  for(int i=0;i<numOfClusters;i++){
-    fprintf(fptr,"s%d = %f ,",i+1,silhouettes[i]);
-  }
-  fprintf(fptr,"stotal = %f ]\n\n",stotal/numOfVecs);
-  free(silhouettes);
-
   if(silhouette){
+    printf("- COMPUTING SILHOUETTES FOR CLUSTERS\n");
+    double stotal = 0.0;
+    double * silhouettes = silhouetteLSH_Hypercube(clustersHt,clusters,numOfClusters,&stotal,dim);
+    printf("- FINISHED COMPUTING SILHOUETTES\n");
+    fprintf(fptr, "Silhouette: [ ");
+    for(int i=0;i<numOfClusters;i++){
+      fprintf(fptr,"s%d = %f ,",i+1,silhouettes[i]);
+    }
+    fprintf(fptr,"stotal = %f ]\n\n",stotal/numOfVecs);
+    free(silhouettes);
+  }
+
+  if(complete){
     for(int i=0;i<numOfClusters;i++){
       fprintf(fptr,"CLUSTER-%d {",i+1);
       printVectorInFile(clusters[i],fptr);
