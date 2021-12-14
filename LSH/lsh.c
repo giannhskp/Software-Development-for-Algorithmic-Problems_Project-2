@@ -417,7 +417,7 @@ void destroyLSH(LSH lsh){
   free(lsh);
 }
 
-void nearestNeigborLSH(LSH lsh,Vector q,Vector *nNearest,double *trueDist,FILE *fptr){
+void nearestNeigborLSH(LSH lsh,Vector q,Vector *nNearest,double *trueDist,FILE *fptr,double *aproximation_factor){
   // find the nearest neighbor of the given vector q with the help of LSH
   Vector nearest=NULL;
   double nearestDist=-1;
@@ -439,12 +439,13 @@ void nearestNeigborLSH(LSH lsh,Vector q,Vector *nNearest,double *trueDist,FILE *
     printVectorIdInFile(*nNearest,fptr);
     fprintf(fptr,"distanceApproximate: %f\n",nearestDist);
     fprintf(fptr,"distanceTrue: %f\n", *trueDist);
+    (*aproximation_factor) = nearestDist/(*trueDist);
   }else{
     fprintf(fptr,"- DID NOT FIND NEAREST NEIGHBOR\n");
   }
 }
 
-void nearestNeigborLSH_DiscreteFrechet(LSH lsh,Vector q,Vector *nNearest,double *trueDist,FILE *fptr,Grids grids,double delta){
+void nearestNeigborLSH_DiscreteFrechet(LSH lsh,Vector q,Vector *nNearest,double *trueDist,FILE *fptr,Grids grids,double delta,double *aproximation_factor){
   // find the nearest neighbor of the given vector q with the help of LSH
   Vector nearest=NULL;
   double nearestDist=-1;
@@ -472,12 +473,13 @@ void nearestNeigborLSH_DiscreteFrechet(LSH lsh,Vector q,Vector *nNearest,double 
     printVectorIdInFile(*nNearest,fptr);
     fprintf(fptr,"distanceApproximate: %f\n",nearestDist);
     fprintf(fptr,"distanceTrue: %f\n", *trueDist);
+    (*aproximation_factor) = nearestDist/(*trueDist);
   }else{
     fprintf(fptr,"- DID NOT FIND NEAREST NEIGHBOR\n");
   }
 }
 
-void nearestNeigborLSH_ContinuousFrechet(LSH lsh,Vector q,Vector *nNearest,double *trueDist,FILE *fptr,double delta,double epsilon,Grids grid){
+void nearestNeigborLSH_ContinuousFrechet(LSH lsh,Vector q,Vector *nNearest,double *trueDist,FILE *fptr,double delta,double epsilon,Grids grid,double *aproximation_factor){
   // find the nearest neighbor of the given vector q with the help of LSH
   Vector nearest=NULL;
   double nearestDist=-1;
@@ -501,6 +503,7 @@ void nearestNeigborLSH_ContinuousFrechet(LSH lsh,Vector q,Vector *nNearest,doubl
     printVectorIdInFile(*nNearest,fptr);
     fprintf(fptr,"distanceApproximate: %f\n",nearestDist);
     fprintf(fptr,"distanceTrue: %f\n", *trueDist);
+    (*aproximation_factor) = nearestDist/(*trueDist);
   }else{
     fprintf(fptr,"- DID NOT FIND NEAREST NEIGHBOR\n");
   }

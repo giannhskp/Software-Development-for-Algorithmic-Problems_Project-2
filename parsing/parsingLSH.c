@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <float.h>
 #include "../Vector/vector.h"
 #include "../hashTable/hashTable.h"
 #include "../LSH/lsh.h"
@@ -125,7 +126,11 @@ void readQueryFileLSH(char* queryFile,char* outputFile,LSH lsh,List inputs,int d
   double knearestDists[n]; // here store the true distances from the k nearest neighbors
   double vec[dim];
 
-
+  int query_count =0;
+  double total_lsh_time = 0.0;
+  double total_true_time = 0.0;
+  double max_aproximation_factor = -1;
+  double min_aproximation_factor = DBL_MAX;
   while(!feof(file)){
     fflush(stdin);  // clear stdin buffer
     if(fscanf(file,"%[^\n]\n",buffer)<0){ // read a line from the file
@@ -161,15 +166,29 @@ void readQueryFileLSH(char* queryFile,char* outputFile,LSH lsh,List inputs,int d
 
     clock_t begin_lsh = clock(); // time calculation for the k nearest neighbors with LSH
     // find with the help of LSH the k nearest neighbor for the corresponding query vector
-    nearestNeigborLSH(lsh,vecTmp,nNearest,knearestDists,fptr);
+    double approximation_factor=-1;
+    nearestNeigborLSH(lsh,vecTmp,nNearest,knearestDists,fptr,&approximation_factor);
+    if(approximation_factor>0){
+      if(approximation_factor>max_aproximation_factor)
+        max_aproximation_factor=approximation_factor;
+      if(approximation_factor<min_aproximation_factor)
+        min_aproximation_factor=approximation_factor;
+    }
 
     clock_t end_lsh = clock();
     double time_spent_lsh = (double)(end_lsh - begin_lsh) / CLOCKS_PER_SEC;
-    fprintf(fptr, "tLSH: %f seconds\n",time_spent_lsh);
-    fprintf(fptr, "tTrue: %f seconds\n",time_spent_true);
+    total_lsh_time += time_spent_lsh;
+    total_true_time += time_spent_true;
+    query_count++;
+    // fprintf(fptr, "tLSH: %f seconds\n",time_spent_lsh);
+    // fprintf(fptr, "tTrue: %f seconds\n",time_spent_true);
     fflush(fptr);
     deleteVector(vecTmp);
   }
+  fprintf(fptr, "tApproximateAverage: %f seconds\n",total_lsh_time/query_count);
+  fprintf(fptr, "tTrueAverage: %f seconds\n",total_true_time/query_count);
+  fprintf(fptr, "Max Approximation Factor: %f\n",max_aproximation_factor);
+  fprintf(fptr, "Min Approximation Factor: %f\n",min_aproximation_factor);
   fclose(fptr);
   fclose(file);
 }
@@ -200,7 +219,11 @@ void readQueryFileLSH_DiscreteFrechet(char* queryFile,char* outputFile,LSH lsh,L
   double knearestDists[n]; // here store the true distances from the k nearest neighbors
   double vec[dim];
 
-
+  int query_count =0;
+  double total_lsh_time = 0.0;
+  double total_true_time = 0.0;
+  double max_aproximation_factor = -1;
+  double min_aproximation_factor = DBL_MAX;
   while(!feof(file)){
     fflush(stdin);  // clear stdin buffer
     if(fscanf(file,"%[^\n]\n",buffer)<0){ // read a line from the file
@@ -236,15 +259,29 @@ void readQueryFileLSH_DiscreteFrechet(char* queryFile,char* outputFile,LSH lsh,L
 
     clock_t begin_lsh = clock(); // time calculation for the k nearest neighbors with LSH
     // find with the help of LSH the k nearest neighbor for the corresponding query vector
-    nearestNeigborLSH_DiscreteFrechet(lsh,vecTmp,nNearest,knearestDists,fptr,grids,delta);
+    double approximation_factor=-1;
+    nearestNeigborLSH_DiscreteFrechet(lsh,vecTmp,nNearest,knearestDists,fptr,grids,delta,&approximation_factor);
+    if(approximation_factor>0){
+      if(approximation_factor>max_aproximation_factor)
+        max_aproximation_factor=approximation_factor;
+      if(approximation_factor<min_aproximation_factor)
+        min_aproximation_factor=approximation_factor;
+    }
 
     clock_t end_lsh = clock();
     double time_spent_lsh = (double)(end_lsh - begin_lsh) / CLOCKS_PER_SEC;
-    fprintf(fptr, "tApproximateAverage: %f seconds\n",time_spent_lsh);
-    fprintf(fptr, "tTrueAverage: %f seconds\n",time_spent_true);
+    total_lsh_time += time_spent_lsh;
+    total_true_time += time_spent_true;
+    query_count++;
+    // fprintf(fptr, "tApproximateAverage: %f seconds\n",time_spent_lsh);
+    // fprintf(fptr, "tTrueAverage: %f seconds\n",time_spent_true);
     fflush(fptr);
     deleteVector(vecTmp);
   }
+  fprintf(fptr, "tApproximateAverage: %f seconds\n",total_lsh_time/query_count);
+  fprintf(fptr, "tTrueAverage: %f seconds\n",total_true_time/query_count);
+  fprintf(fptr, "Max Approximation Factor: %f\n",max_aproximation_factor);
+  fprintf(fptr, "Min Approximation Factor: %f\n",min_aproximation_factor);
   fclose(fptr);
   fclose(file);
 }
@@ -275,7 +312,11 @@ void readQueryFileLSH_ContinuousFrechet(char* queryFile,char* outputFile,LSH lsh
   double knearestDists[n]; // here store the true distances from the k nearest neighbors
   double vec[dim];
 
-
+  int query_count =0;
+  double total_lsh_time = 0.0;
+  double total_true_time = 0.0;
+  double max_aproximation_factor = -1;
+  double min_aproximation_factor = DBL_MAX;
   while(!feof(file)){
     fflush(stdin);  // clear stdin buffer
     if(fscanf(file,"%[^\n]\n",buffer)<0){ // read a line from the file
@@ -310,16 +351,31 @@ void readQueryFileLSH_ContinuousFrechet(char* queryFile,char* outputFile,LSH lsh
     double time_spent_true = (double)(end_true - begin_true) / CLOCKS_PER_SEC;
 
     clock_t begin_lsh = clock(); // time calculation for the k nearest neighbors with LSH
+    double approximation_factor=-1;
     // find with the help of LSH the k nearest neighbor for the corresponding query vector
-    nearestNeigborLSH_ContinuousFrechet(lsh,vecTmp,nNearest,knearestDists,fptr,delta,epsilon,grid);
+    nearestNeigborLSH_ContinuousFrechet(lsh,vecTmp,nNearest,knearestDists,fptr,delta,epsilon,grid,&approximation_factor);
+    if(approximation_factor>0){
+      if(approximation_factor>max_aproximation_factor)
+        max_aproximation_factor=approximation_factor;
+      if(approximation_factor<min_aproximation_factor)
+        min_aproximation_factor=approximation_factor;
+    }
 
     clock_t end_lsh = clock();
     double time_spent_lsh = (double)(end_lsh - begin_lsh) / CLOCKS_PER_SEC;
-    fprintf(fptr, "tApproximateAverage: %f seconds\n",time_spent_lsh);
-    fprintf(fptr, "tTrueAverage: %f seconds\n",time_spent_true);
+    total_lsh_time += time_spent_lsh;
+    total_true_time += time_spent_true;
+    query_count++;
+    // fprintf(fptr, "tApproximateAverage: %f seconds\n",time_spent_lsh);
+    // fprintf(fptr, "tTrueAverage: %f seconds\n",time_spent_true);
     fflush(fptr);
     deleteVector(vecTmp);
   }
+  fprintf(fptr, "tApproximateAverage: %f seconds\n",total_lsh_time/query_count);
+  fprintf(fptr, "tTrueAverage: %f seconds\n",total_true_time/query_count);
+  fprintf(fptr, "Max Approximation Factor: %f\n",max_aproximation_factor);
+  fprintf(fptr, "Min Approximation Factor: %f\n",min_aproximation_factor);
+
   fclose(fptr);
   fclose(file);
 }
