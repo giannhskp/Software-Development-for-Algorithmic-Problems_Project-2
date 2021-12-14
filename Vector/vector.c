@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #define TRUE 1
 #define FALSE 0
 // extern int d;
@@ -66,18 +67,6 @@ void setAssignedAtRadius(Vector v,double radius){
    v->clusterInfo->assignedAtRadius = radius;
 }
 
-// Vector initVector(double *vec, char id[]){
-//   Vector v=malloc(sizeof(struct vec_node));
-//   v->coords = malloc(d*sizeof(double));
-//   v->times = NULL;
-//   for(int i=0;i<d;i++){
-//     (v->coords)[i] = vec[i];
-//   }
-//   v->vec_id = malloc((strlen(id)+1)*sizeof(char));
-//   strcpy(v->vec_id,id);
-//   v->clusterInfo = NULL;
-//   return v;
-// }
 
 Vector initVector(double *vec, char id[],int dim){
   Vector v=malloc(sizeof(struct vec_node));
@@ -92,20 +81,6 @@ Vector initVector(double *vec, char id[],int dim){
   v->clusterInfo = NULL;
   return v;
 }
-
-// Vector initTimeSeries(double *vec,double *time, char id[]){
-//   Vector v=malloc(sizeof(struct vec_node));
-//   v->coords = malloc(d*sizeof(double));
-//   v->times = malloc(d*sizeof(double));
-//   for(int i=0;i<d;i++){
-//     (v->coords)[i] = vec[i];
-//     (v->times)[i] = time[i];
-//   }
-//   v->vec_id = malloc((strlen(id)+1)*sizeof(char));
-//   strcpy(v->vec_id,id);
-//   v->clusterInfo = NULL;
-//   return v;
-// }
 
 Vector initTimeSeries(double *vec,double *time, char id[],int dim){
   Vector v=malloc(sizeof(struct vec_node));
@@ -130,18 +105,6 @@ void initializeClusterInfo(Vector v){
 }
 
 
-// Vector copyVector(Vector vec){
-//   double *coords = getCoords(vec);
-//   Vector v=malloc(sizeof(struct vec_node));
-//   v->coords = malloc(d*sizeof(double));
-//   for(int i=0;i<d;i++){
-//     (v->coords)[i] = coords[i];
-//   }
-//   v->vec_id = malloc((strlen(vec->vec_id)+1)*sizeof(char));
-//   strcpy(v->vec_id,vec->vec_id);
-//   v->clusterInfo=NULL;
-//   return v;
-// }
 
 Vector copyVector(Vector vec){
   if(vec==NULL) return NULL;
@@ -229,8 +192,20 @@ void printVectorInFile(Vector v,FILE *fptr){
 
 int compareVectors(Vector v1,Vector v2){
   for(int i=0;i<v1->dim;i++){
-    if(v1->coords[i]!=v2->coords[i])
+    if(fabs(v1->coords[i]-v2->coords[i])>1e-4)
       return 0;
+  }
+  return 1;
+}
+
+int compareTimeSeries(Vector v1,Vector v2){
+  if(v1->times==NULL || v2->times==NULL)
+    return 0;
+
+  for(int i=0;i<v1->dim;i++){
+    if(fabs(v1->coords[i]-v2->coords[i])>1e-4 || fabs(v1->times[i]-v2->times[i])>1e-4 ){
+      return 0;
+    }
   }
   return 1;
 }

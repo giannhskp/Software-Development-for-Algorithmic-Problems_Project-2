@@ -44,6 +44,8 @@ typedef struct grid_n{
 }gridNode;
 typedef gridNode *Grids;
 
+
+
 Grids initializeGrids(double delta,int l){
   Grids grids = malloc(sizeof(gridNode));
   grids->t_array = malloc(l*sizeof(double));
@@ -250,6 +252,8 @@ void generateG(g_function *gfun,int dim){
   gfun->m=(INT_MAX-4);
 }
 
+
+
 void destroyG(g_function g){
   for(int i=0;i<k_LSH;i++){
     destroyH_LSH(g.h_functions[i]);
@@ -276,6 +280,10 @@ int computeG(g_function gfun,Vector p,unsigned int *id){
   // do it only for p which: ID(p) = ID(q)
   (*id) = temp_ID;
   return mod_Int_Int(temp_ID,hashTableSize);
+}
+
+int getValueOfFirstGFun(LSH lsh,Vector p,unsigned int *id){
+  return computeG(lsh->g_fun[0],p,id);
 }
 
 

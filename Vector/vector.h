@@ -41,4 +41,6 @@ void setAssignedAtRadius(Vector ,double );
 
 Vector shiftVector(Vector ,double );
 
+int compareTimeSeries(Vector ,Vector);
+
 #endif
