@@ -21,11 +21,9 @@ void radiusNeigborsClustering(LSH ,Vector ,double ,HashTable ,int ,List* ,int *,
 void radiusNeigborsClusteringTimeSeries(LSH ,Vector ,double ,HashTable ,int ,List* ,int *,int ,Grids ,double );
 
 
-
-Vector timeSeriesSnapping(Vector,Vector ,int ,double ,double );
-Grids initializeGrids(double ,int );
+Grids initializeGrids(double ,int ,int );
 void deleteGrids(Grids );
-double getTofGrid(Grids ,int );
+double getTofGrid(Grids ,int ,int);
 void nearestNeigborLSH_DiscreteFrechet(LSH ,Vector ,Vector *,double *,FILE *,Grids ,double );
 void nearestNeigborLSH_ContinuousFrechet(LSH ,Vector ,Vector *,double *,FILE * ,double ,double ,Grids );
 

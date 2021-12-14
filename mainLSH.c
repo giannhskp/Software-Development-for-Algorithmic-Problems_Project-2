@@ -152,7 +152,7 @@ void vectorTimeSeriesLSHFrechetDiscrete(char* arg_inputFile,char* arg_queryFile,
 
   begin = clock();
   lsh = initializeLSH(l,2*dim);
-  Grids grids = initializeGrids(delta,l);
+  Grids grids = initializeGrids(delta,l,2);
   insertTimeSeriesFromListToLSH(list,lsh,grids,delta);
   end = clock();
   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
@@ -215,7 +215,7 @@ void vectorTimeSeriesLSHFrechetContinuous(char* arg_inputFile,char* arg_queryFil
 
   begin = clock();
   lsh = initializeLSH(l,dim);
-  Grids grid = initializeGrids(delta,l); // (l=1) only one t as we only have one hash table/ one grid
+  Grids grid = initializeGrids(delta,l,1); // (l=1) only one t as we only have one hash table/ one grid
   insertContinuousTimeSeriesFromListToLSH(list,lsh,delta,epsilon,grid);
   end = clock();
   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;

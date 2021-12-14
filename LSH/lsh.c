@@ -40,18 +40,21 @@ typedef struct lsh_n{
 typedef lshNode *LSH;
 
 typedef struct grid_n{
-  double *t_array;
+  double **t_array;
 }gridNode;
 typedef gridNode *Grids;
 
 
 
-Grids initializeGrids(double delta,int l){
+Grids initializeGrids(double delta,int l,int dims){
   Grids grids = malloc(sizeof(gridNode));
-  grids->t_array = malloc(l*sizeof(double));
-  for(int i=0;i<l;i++){
-    double temp = uniform_distribution(0,delta);
-    grids->t_array[i] = temp;
+  grids->t_array = malloc(dims*sizeof(double*));
+  for(int dim = 0;dim<dims;dim++){
+    grids->t_array[dim] = malloc(l*sizeof(double));
+    for(int i=0;i<l;i++){
+      double temp = uniform_distribution(0,delta);
+      grids->t_array[dim][i] = temp;
+    }
   }
   return grids;
 }
@@ -61,8 +64,8 @@ void deleteGrids(Grids grids){
   free(grids);
 }
 
-double getTofGrid(Grids grids,int index){
-  return grids->t_array[index];
+double getTofGrid(Grids grids,int index,int dim){
+  return grids->t_array[dim][index];
 }
 
 
@@ -76,7 +79,7 @@ g_function *getGfuns(LSH lsh){
   return lsh->g_fun;
 }
 
-Vector timeSeriesSnapping(Vector v,double gridDelta,double t){
+Vector timeSeriesSnapping(Vector v,double gridDelta,double t_x,double t_y){
   int dim=getDim(v);
   double *coordsVector = getCoords(v);
   double *coordsTime = getTime(v);
@@ -93,17 +96,17 @@ Vector timeSeriesSnapping(Vector v,double gridDelta,double t){
     double keepY;
 
     // x
-    x = (x - t)/gridDelta;
+    x = (x - t_x)/gridDelta;
     x = x+(0.5);
     x = floor(x);
     x = x * gridDelta;
-    keepX = x + t;
+    keepX = x + t_x;
     // y
-    y = (y - t)/gridDelta;
+    y = (y - t_y)/gridDelta;
     y = y+(0.5);
     y = floor(y);
     y = y * gridDelta;
-    keepY = y + t;
+    keepY = y + t_y;
 
     if(index>0){
       if(snappedTime[index-1]==keepX && snappedVector[index-1]==keepY){
@@ -326,9 +329,10 @@ void insertTimeSeriesToLSH(LSH lsh,Grids grids,double delta,Vector v){
   // at the new node tha will be inserted at the hash Tables save the id (Querying trick)
   int l = lsh->l;
   for(int i=0;i<l;i++){ // go at every hash table of lsh
-    double t_of_grid = getTofGrid(grids,i);
+    double t_x = getTofGrid(grids,i,0);
+    double t_y = getTofGrid(grids,i,1);
 
-    Vector snappedToGrid = timeSeriesSnapping(v,delta,t_of_grid);
+    Vector snappedToGrid = timeSeriesSnapping(v,delta,t_x,t_y);
 
     unsigned int id;
     int index = computeG(lsh->g_fun[i],snappedToGrid,&id); // compute the value of the g function for the given vector that will be inserted
@@ -348,7 +352,7 @@ void insertContinuousTimeSeriesToLSH(LSH lsh,double delta,Vector v,double epsilo
 
   Vector v2 = filtering(v,epsilon);
 
-  double t = getTofGrid(grid,0);
+  double t = getTofGrid(grid,0,0);
   Vector v3 = continuousTimeSeriesSnapping(v2,delta,t);
 
   Vector v4 = minima_maxima(v3);
@@ -449,8 +453,9 @@ void nearestNeigborLSH_DiscreteFrechet(LSH lsh,Vector q,Vector *nNearest,double 
   g_function *gfuns = getGfuns(lsh);
   // to find the nearest neighbor of the given vector q, euclidean distance must be applied between the vector q and the vectors of the corresponding bucket of every LSH hash table
   for(int i=0;i<l;i++){ // go at every hash table of lsh
-    double t_of_grid = getTofGrid(grids,i);
-    Vector snappedToGrid = timeSeriesSnapping(q,delta,t_of_grid);
+    double t_x = getTofGrid(grids,i,0);
+    double t_y = getTofGrid(grids,i,1);
+    Vector snappedToGrid = timeSeriesSnapping(q,delta,t_x,t_y);
     unsigned int q_ID;
 
     int q_index = computeG(gfuns[i],snappedToGrid,&q_ID); // compute the value of the g function for the given vector
@@ -479,7 +484,7 @@ void nearestNeigborLSH_ContinuousFrechet(LSH lsh,Vector q,Vector *nNearest,doubl
   HashTable *hts = getHts(lsh);
 
   Vector v2 = filtering(q,epsilon);
-  double t = getTofGrid(grid,0);
+  double t = getTofGrid(grid,0,0);
   Vector v3 = continuousTimeSeriesSnapping(v2,delta,t);
   Vector v4 = minima_maxima(v3);
 
@@ -582,8 +587,9 @@ void radiusNeigborsClusteringTimeSeries(LSH lsh,Vector q,double radius,HashTable
   HashTable *hts = getHts(lsh);
   g_function *gfuns = getGfuns(lsh);
   for(int i=0;i<l;i++){ // go at every hash table of lsh
-    double t_of_grid = getTofGrid(grids,i);
-    Vector snappedToGrid = timeSeriesSnapping(q,delta,t_of_grid);
+    double t_x = getTofGrid(grids,i,0);
+    double t_y = getTofGrid(grids,i,1);
+    Vector snappedToGrid = timeSeriesSnapping(q,delta,t_x,t_y);
     unsigned int q_ID;
     int q_index = computeG(gfuns[i],snappedToGrid,&q_ID); // compute the value of the g function for the given vector
     // and go to the corresponding bucket of the current hash table to do the range search (to find the vectors that belong to the corresponding cluster)

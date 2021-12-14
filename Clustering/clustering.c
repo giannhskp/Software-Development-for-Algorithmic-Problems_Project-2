@@ -329,7 +329,7 @@ void clusteringLSH(List vecList,int numOfClusters,int l,FILE* fptr,int dim,int m
   if(method == METHOD_VECTOR){
     grids = NULL;
   }else if(method == METHOD_FRECHET){
-    grids = initializeGrids(delta,l);
+    grids = initializeGrids(delta,l,2);
   }
   for(int i=0;i<numOfVecs;i++){
     initializeClusterInfo(vectors[i]);
