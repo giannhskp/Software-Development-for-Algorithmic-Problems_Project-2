@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <float.h>
 #include "../Vector/vector.h"
 #include "../hashTable/hashTable.h"
 #include "../Hypercube/hypercube.h"
@@ -13,21 +14,21 @@
 #define FALSE    0
 #define TRUE    1
 
-#define MAX_INPUT_LENGTH 2048
+#define MAX_INPUT_LENGTH 10240
 
 // extern int d;
 
 // returns number of words in str
-int countWords(char *str){
-  char * token = strtok(str, "	");
-  token = strtok(NULL, "	");
-   // loop through the string to extract all other tokens
-   int counter = 0;
-   while( token != NULL ) {
-      counter++;
-      token = strtok(NULL, "	");
-   }
-  return counter;
+static int countWords(char *str){
+    char * token = strtok(str, "	");
+    token = strtok(NULL, "	");
+     // loop through the string to extract all other tokens
+     int counter = 0;
+     while( token != NULL ) {
+        counter++;
+        token = strtok(NULL, "	");
+     }
+    return counter;
 }
 
 
@@ -122,6 +123,11 @@ void readQueryFileCube(char* queryFile,char* outputFile,HyperCube hc,List inputs
   double knearestDists[n]; // here store the true distances from the k nearest neighbors
   double vec[dim];
 
+  int query_count =0;
+  double total_cube_time = 0.0;
+  double total_true_time = 0.0;
+  double max_aproximation_factor = -1;
+  double min_aproximation_factor = DBL_MAX;
   while(!feof(file)){
     fflush(stdin);  // clear stdin buffer
     if(fscanf(file,"%[^\n]\n",buffer)<0){ // read a line from the file
@@ -130,9 +136,7 @@ void readQueryFileCube(char* queryFile,char* outputFile,HyperCube hc,List inputs
 
 
 
-    int id;
     char * token = strtok(buffer, "	 ");
-    id=atoi(token);
     char name[MAX_INPUT_LENGTH];
     strcpy(name,token);
     token = strtok(NULL, "	");
@@ -142,7 +146,7 @@ void readQueryFileCube(char* queryFile,char* outputFile,HyperCube hc,List inputs
       token = strtok(NULL, "	");
      }
     Vector vecTmp=initVector(vec,name,dim);
-    fprintf(fptr, "Query %d:\n",id);
+    fprintf(fptr, "Query %s:\n",name);
 
 
     for (int i = 0; i < n; i++){
@@ -158,13 +162,34 @@ void readQueryFileCube(char* queryFile,char* outputFile,HyperCube hc,List inputs
 
     clock_t begin_cube = clock(); // time calculation for the Hypercube
 
+    double approximation_factor=-1;
+    int found_neighbor = -1;
     // find with the help of Hypercube the k nearest neighbors corresponding query vector
-    nearestNeigborHypercube(hc,vecTmp,hammingDist,m,knearestDists,fptr);
+    nearestNeigborHypercube(hc,vecTmp,nNearest,hammingDist,m,knearestDists,fptr,&approximation_factor,&found_neighbor);
+    if(approximation_factor>0){
+      if(approximation_factor>max_aproximation_factor)
+        max_aproximation_factor=approximation_factor;
+      if(approximation_factor<min_aproximation_factor)
+        min_aproximation_factor=approximation_factor;
+    }
     clock_t end_cube = clock();
     double time_spent_cube = (double)(end_cube - begin_cube) / CLOCKS_PER_SEC;
-    fprintf(fptr, "tCube: %f seconds\n",time_spent_cube);
-    fprintf(fptr, "tTrue: %f seconds\n",time_spent_true);
+    if(found_neighbor){
+      total_cube_time += time_spent_cube;
+      total_true_time += time_spent_true;
+      query_count++;
+    }
+    // fprintf(fptr, "tCube: %f seconds\n",time_spent_cube);
+    // fprintf(fptr, "tTrue: %f seconds\n",time_spent_true);
+    fprintf(fptr, "\n");
+    fflush(fptr);
     deleteVector(vecTmp);
+  }
+  if(query_count>0){
+    fprintf(fptr, "tApproximateAverage: %f seconds\n",total_cube_time/query_count);
+    fprintf(fptr, "tTrueAverage: %f seconds\n",total_true_time/query_count);
+    fprintf(fptr, "Max Approximation Factor: %f\n",max_aproximation_factor);
+    fprintf(fptr, "Min Approximation Factor: %f\n",min_aproximation_factor);
   }
   fclose(fptr);
   fclose(file);

@@ -259,6 +259,7 @@ void reverseAssignmentLSH(LSH lsh,Vector *vectors,Vector *clusters,Vector *oldCl
     radius*=2; // doubled the radius for the next range search
     loopCounter++;
   }
+  printf("-*-*-*  ASSIGNED ITEMS = %d AT ITERATION %d\n",assignCounter,iteration);
   int remainderCounter = 0;
   // finally one big percentage of vectors has been assigned into clusters
   // the remaining vectors will be assigned based on the nearest centroid at the corresponding cluster
@@ -287,7 +288,7 @@ double *silhouetteLSH_Hypercube(HashTable *clustersHt,Vector *clusters,int numOf
   return silhouettes;
 }
 
-void clusteringLSH(List vecList,int numOfClusters,int l,FILE* fptr,int dim,int method,int delta){
+void clusteringLSH(List vecList,int numOfClusters,int l,FILE* fptr,int dim,int method,double delta){
   Vector *vectors;
   Vector *clusters;
   Vector *oldClusters = NULL;
@@ -308,8 +309,10 @@ void clusteringLSH(List vecList,int numOfClusters,int l,FILE* fptr,int dim,int m
   // allocate and initialize the LSH with the vectors tha will be inserted into clusters
   if(numOfVecs>1000){
     hashTableSize = (int)(numOfVecs*0.005);
+  }else if(numOfVecs>150){
+    hashTableSize=numOfVecs/16;
   }else{
-    hashTableSize=numOfVecs/32;
+    hashTableSize=numOfVecs/10;
   }
 
   clock_t begin = clock();
@@ -327,7 +330,7 @@ void clusteringLSH(List vecList,int numOfClusters,int l,FILE* fptr,int dim,int m
   if(method == METHOD_VECTOR){
     vector_v_dim = dim;
   }else if(method == METHOD_FRECHET){
-    vector_v_dim = 2*dim*numOfVecs; // TODO: ADD AN UPPER BOUND
+    vector_v_dim = 2*dim;
   }
   LSH lsh = initializeLSH(l,vector_v_dim);
   Grids grids;
@@ -347,7 +350,6 @@ void clusteringLSH(List vecList,int numOfClusters,int l,FILE* fptr,int dim,int m
   end = clock();
   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Created LSH in : %f seconds\n",time_spent);
-
 
   clock_t cluster_start = clock();
   // find the original centroids with the kmeans++ Algorithm
@@ -426,7 +428,7 @@ void clusteringLSH(List vecList,int numOfClusters,int l,FILE* fptr,int dim,int m
     htDelete(clustersHt[i],0);
   }
 
-  deleteGrids(grids);
+  deleteGrids(grids,2);
   free(props);
   free(vectors);
   free(oldClusters);
@@ -612,7 +614,7 @@ void clusteringHypercube(List vecList,int numOfClusters,int m,int probes,FILE* f
   deleteHyperCube(cube);
 }
 
-void clustering(List vecList,FILE* fptr,char* assignment,char *update,int numOfClusters,int l,int mHyper,int probes,int dim,int delta){
+void clustering(List vecList,FILE* fptr,char* assignment,char *update,int numOfClusters,int l,int mHyper,int probes,int dim,double delta){
   if(strcmp(assignment,"Classic")==0){
     if(strcmp(update,"Mean Vector")==0){
       fprintf(fptr,"Algorithm: Lloyds for Vectors\n");

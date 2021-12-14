@@ -10,7 +10,7 @@
 #include "./parsing/parsingLSH.h"
 #include "./hashTable/hashTableList/hashTableList.h"
 
-#define W_DIVIDER 80
+#define W_DIVIDER 40
 
 // int d;
 int w;
@@ -31,7 +31,7 @@ static int wValueCalculation(List list,int numberOfVectorsInFile,int dim){
   }else{
     persentageToCheck = 0.000001;
   }
-  persentageToCheck = 0.00001; // TODO: CHANGE
+  // persentageToCheck = 0.00001; // TODO: CHANGE
   int stopBound = persentageToCheck*numberOfVectorsInFile*numberOfVectorsInFile;
 
   while(list!=NULL){
@@ -82,9 +82,9 @@ void vectorTimeSeriesLSH(char* arg_inputFile,char* arg_queryFile,int arg_k_LSH,i
 
   printf("Finding optimal value of w based on the input file\n");
   begin = clock();
-  // w = wValueCalculation(list,numberOfVectorsInFile,dim);
-  // w /= W_DIVIDER;
-  w=6;
+  w = wValueCalculation(list,numberOfVectorsInFile,dim);
+  w /= W_DIVIDER;
+  // w=12;
   end = clock();
   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Found value of w in %f seconds, w = %d\n",time_spent,w );
@@ -159,8 +159,9 @@ void vectorTimeSeriesLSHFrechetDiscrete(char* arg_inputFile,char* arg_queryFile,
   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Created LSH in : %f seconds\n",time_spent);
 
+
   readQueryFileLSH_DiscreteFrechet(queryFile,outputFile,lsh,list,grids,delta,time,dim);
-  deleteGrids(grids);
+  deleteGrids(grids,2);
   destroyLSH(lsh);
   listDelete(list,0);
 }
@@ -223,6 +224,8 @@ void vectorTimeSeriesLSHFrechetContinuous(char* arg_inputFile,char* arg_queryFil
   printf("Created LSH in : %f seconds\n",time_spent);
 
   readQueryFileLSH_ContinuousFrechet(queryFile,outputFile,lsh,list,delta,epsilon,time,dim,grid);
+
+  deleteGrids(grid,1);
   destroyLSH(lsh);
   listDelete(list,0);
 }

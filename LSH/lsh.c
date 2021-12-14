@@ -18,7 +18,7 @@ extern int w;
 extern int k_LSH;
 extern int hashTableSize;
 
-#define PADDING_M 300
+#define PADDING_M 100
 
 
 typedef struct hfunc{
@@ -52,14 +52,20 @@ Grids initializeGrids(double delta,int l,int dims){
   for(int dim = 0;dim<dims;dim++){
     grids->t_array[dim] = malloc(l*sizeof(double));
     for(int i=0;i<l;i++){
-      double temp = uniform_distribution(0,delta);
+      double temp = uniform_distribution_double(0,delta);
       grids->t_array[dim][i] = temp;
     }
   }
   return grids;
 }
 
-void deleteGrids(Grids grids){
+void deleteGrids(Grids grids,int dims){
+  if(grids==NULL){
+    return;
+  }
+  for(int i=0;i<dims;i++){
+    free(grids->t_array[i]);
+  }
   free(grids->t_array);
   free(grids);
 }
@@ -86,7 +92,6 @@ Vector timeSeriesSnapping(Vector v,double gridDelta,double t_x,double t_y){
   double snappedVector[dim];
   double snappedTime[dim];
   double snappedFinal[2*dim];
-
   int index=0;
   int indexFinal=0;
   for(int i=0;i<dim;i++){
@@ -102,11 +107,11 @@ Vector timeSeriesSnapping(Vector v,double gridDelta,double t_x,double t_y){
     x = x * gridDelta;
     keepX = x + t_x;
     // y
-    y = (y - t_y)/gridDelta;
+    y = (y - t_x)/gridDelta;
     y = y+(0.5);
     y = floor(y);
     y = y * gridDelta;
-    keepY = y + t_y;
+    keepY = y + t_x;
 
     if(index>0){
       if(snappedTime[index-1]==keepX && snappedVector[index-1]==keepY){
@@ -114,8 +119,9 @@ Vector timeSeriesSnapping(Vector v,double gridDelta,double t_x,double t_y){
       }
     }
 
-    snappedFinal[indexFinal++]=keepX;
+
     snappedFinal[indexFinal++]=keepY;
+    snappedFinal[indexFinal++]=keepX;
     snappedTime[index]=keepX;
     snappedVector[index++]=keepY;
   }
@@ -211,11 +217,8 @@ Vector filtering(Vector v,double epsilon){
 }
 
 Vector filterMeanCurve(Vector v,int finalDim){
-  printf("-------------------------------------\n");
   int dim = getDim(v);
-  printf("MEAN CURVE DIM = %d | FINAL DIM = %d\n",dim,finalDim);
   if(dim<=finalDim){
-    printf("-------------------------------------\n");
     return copyVector(v);
   }
   double *filteredCoords = calloc(dim,(sizeof(double)));
@@ -244,7 +247,6 @@ Vector filterMeanCurve(Vector v,int finalDim){
         previous = originalCoords[i];
       }
     }
-    printf("EPSILON=%f | FILTERED DIM = %d\n",epsilon,filteredDim);
     epsilon*=5;
     firstIter=0;
   }
@@ -258,12 +260,7 @@ Vector filterMeanCurve(Vector v,int finalDim){
     reducedVector[count] = originalCoords[i];
     reducedTimes[count++] = originalTimes[i];
   }
-  if(count!=finalDim){
-    printf("SIZE MISSMATCH!!!!!\n");
-  }
   Vector tempVec = initTimeSeries(reducedVector,reducedTimes,getID(v),finalDim);
-  printf("REDUCED VECTOR COUNT %d | epalitheysh:%d | finalDim=%d\n",count,getDim(tempVec),finalDim);
-  printf("-------------------------------------\n");
   free(filteredCoords);
   free(reducedVector);
   free(reducedTimes);
@@ -477,7 +474,7 @@ void destroyLSH(LSH lsh){
   free(lsh);
 }
 
-void nearestNeigborLSH(LSH lsh,Vector q,Vector *nNearest,double *trueDist,FILE *fptr,double *aproximation_factor){
+void nearestNeigborLSH(LSH lsh,Vector q,Vector *nNearest,double *trueDist,FILE *fptr,double *aproximation_factor,int *found_neighbor){
   // find the nearest neighbor of the given vector q with the help of LSH
   Vector nearest=NULL;
   double nearestDist=-1;
@@ -500,12 +497,13 @@ void nearestNeigborLSH(LSH lsh,Vector q,Vector *nNearest,double *trueDist,FILE *
     fprintf(fptr,"distanceApproximate: %f\n",nearestDist);
     fprintf(fptr,"distanceTrue: %f\n", *trueDist);
     (*aproximation_factor) = nearestDist/(*trueDist);
+    (*found_neighbor) = 1;
   }else{
     fprintf(fptr,"- DID NOT FIND NEAREST NEIGHBOR\n");
   }
 }
 
-void nearestNeigborLSH_DiscreteFrechet(LSH lsh,Vector q,Vector *nNearest,double *trueDist,FILE *fptr,Grids grids,double delta,double *aproximation_factor){
+void nearestNeigborLSH_DiscreteFrechet(LSH lsh,Vector q,Vector *nNearest,double *trueDist,FILE *fptr,Grids grids,double delta,double *aproximation_factor,int *found_neighbor){
   // find the nearest neighbor of the given vector q with the help of LSH
   Vector nearest=NULL;
   double nearestDist=-1;
@@ -534,12 +532,13 @@ void nearestNeigborLSH_DiscreteFrechet(LSH lsh,Vector q,Vector *nNearest,double 
     fprintf(fptr,"distanceApproximate: %f\n",nearestDist);
     fprintf(fptr,"distanceTrue: %f\n", *trueDist);
     (*aproximation_factor) = nearestDist/(*trueDist);
+    (*found_neighbor)=1;
   }else{
     fprintf(fptr,"- DID NOT FIND NEAREST NEIGHBOR\n");
   }
 }
 
-void nearestNeigborLSH_ContinuousFrechet(LSH lsh,Vector q,Vector *nNearest,double *trueDist,FILE *fptr,double delta,double epsilon,Grids grid,double *aproximation_factor){
+void nearestNeigborLSH_ContinuousFrechet(LSH lsh,Vector q,Vector *nNearest,double *trueDist,FILE *fptr,double delta,double epsilon,Grids grid,double *aproximation_factor,int *found_neighbor){
   // find the nearest neighbor of the given vector q with the help of LSH
   Vector nearest=NULL;
   double nearestDist=-1;
@@ -564,6 +563,7 @@ void nearestNeigborLSH_ContinuousFrechet(LSH lsh,Vector q,Vector *nNearest,doubl
     fprintf(fptr,"distanceApproximate: %f\n",nearestDist);
     fprintf(fptr,"distanceTrue: %f\n", *trueDist);
     (*aproximation_factor) = nearestDist/(*trueDist);
+    (*found_neighbor) = 1;
   }else{
     fprintf(fptr,"- DID NOT FIND NEAREST NEIGHBOR\n");
   }
@@ -660,4 +660,5 @@ void radiusNeigborsClusteringTimeSeries(LSH lsh,Vector q,double radius,HashTable
     htFindNeighborsInRadiusClustering(hts[i],q_index,centroidIndex,confList,vecsInRadius,q,getDim(q),q_ID,radius,assignCounter,iteration);
     deleteVector(snappedToGrid);
   }
+  deleteVector(reduced_mean_curve);
 }

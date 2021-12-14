@@ -208,9 +208,11 @@ List listDelete(List list,int freeVectors){
 void listFindNearestNeighbor(List list,Vector q,Vector *nearest,double *nearestDist,int dim,int id){
   //  used to LSH to find the nearest neighbor and the corresponding distance for the given vector q at a list
   if(list==NULL){ return;}
+  int found = 0;
   List temp=list;
   while(temp!=NULL){
     if(id==(temp->vector_ID)){ // (Querying trick, to avoid to compute Euclidean distance for all vectors in bucket)
+      found=1;
       double dist = distance_metric(temp->v,q);
       if(dist<(*nearestDist) || (*nearestDist)<0){
         (*nearestDist) = dist;
@@ -219,6 +221,20 @@ void listFindNearestNeighbor(List list,Vector q,Vector *nearest,double *nearestD
     }
     temp=temp->next;
   }
+  // if(!found){
+  //   temp=list;
+  //   while(temp!=NULL){
+  //     if(1){ // (Querying trick, to avoid to compute Euclidean distance for all vectors in bucket)
+  //       found=1;
+  //       double dist = distance_metric(temp->v,q);
+  //       if(dist<(*nearestDist) || (*nearestDist)<0){
+  //         (*nearestDist) = dist;
+  //         (*nearest) = temp->v;
+  //       }
+  //     }
+  //     temp=temp->next;
+  //   }
+  // }
 }
 
 void listFindNearestNeighborCube(List list,Vector q,Vector *nearest,double *nearestDist,int dim,int *numOfSearched,int maxToSearch){
@@ -419,7 +435,7 @@ void listFindNeighborsInRadiusClustering(List list,int centroidIndex,List* confL
   if(list==NULL){ return;}
   List temp=list;
   while(temp!=NULL){
-    if(id==(temp->vector_ID)){ // (Querying trick, to avoid to compute Euclidean distance for all vectors in bucket)
+    if(1 || id==(temp->vector_ID)){ // (Querying trick, to avoid to compute Euclidean distance for all vectors in bucket)
         // check if vector has already been assigned at the same iteration in one cluster
         if(assignedToCluster(temp->v) && (getAssignedIteration(temp->v)==iteration)){
           int assignedCluster = getAssignedCluster(temp->v);
