@@ -246,7 +246,6 @@ void reverseAssignmentLSH(LSH lsh,Vector *vectors,Vector *clusters,Vector *oldCl
     List confList=initializeList(); // list that used to store the vectors that in range search assigned at more than one cluster
     // assign each vector to the corresponding cluster with the help of range search
     for(int i=0;i<numOfClusters;i++){
-      printf("***** ITERATION %d | RANGE %f | CLUSTER %d *****\n",iteration,radius,i);
       if(method == METHOD_VECTOR){
         radiusNeigborsClustering(lsh,clusters[i],radius,clustersHt[i],i,&confList,&assignCounter,iteration);
       }else if(method == METHOD_FRECHET){
@@ -259,7 +258,6 @@ void reverseAssignmentLSH(LSH lsh,Vector *vectors,Vector *clusters,Vector *oldCl
     radius*=2; // doubled the radius for the next range search
     loopCounter++;
   }
-  printf("-*-*-*  ASSIGNED ITEMS = %d AT ITERATION %d\n",assignCounter,iteration);
   int remainderCounter = 0;
   // finally one big percentage of vectors has been assigned into clusters
   // the remaining vectors will be assigned based on the nearest centroid at the corresponding cluster

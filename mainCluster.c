@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
   char assignment[200];
   strcpy(assignment,"Classic"); // default
 
-  double delta = 0.1;
+  double delta = 2.5;
 
 
   for(int i = 1 ; i < argc ; i++){
@@ -88,6 +88,10 @@ int main(int argc, char *argv[]) {
     else if(strcmp(str,"-assignment")==0 && (argc > i+1)){
       strcpy(assignment,argv[i+1]); // default
       printf("Given Assignment Method : %s\n", assignment);
+    }
+    else if(strcmp(str,"-delta")==0 && (argc > i+1)){
+      delta = atof(argv[i+1]);
+      printf("Delta Given : %f\n", delta);
     }
 
   }

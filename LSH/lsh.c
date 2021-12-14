@@ -107,11 +107,11 @@ Vector timeSeriesSnapping(Vector v,double gridDelta,double t_x,double t_y){
     x = x * gridDelta;
     keepX = x + t_x;
     // y
-    y = (y - t_x)/gridDelta;
+    y = (y - t_y)/gridDelta;
     y = y+(0.5);
     y = floor(y);
     y = y * gridDelta;
-    keepY = y + t_x;
+    keepY = y + t_y;
 
     if(index>0){
       if(snappedTime[index-1]==keepX && snappedVector[index-1]==keepY){
