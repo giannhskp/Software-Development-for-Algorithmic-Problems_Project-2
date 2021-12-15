@@ -152,7 +152,7 @@ Vector continuousTimeSeriesSnapping(Vector v,double gridDelta,double t){
     // temp = temp - fmod(temp,gridDelta);
     // keepY=temp;
 
-    temp = temp+t;  // x + t
+    temp = temp;  // x + t
     temp = temp/gridDelta; // (x + t)/d
     temp = floor(temp); // floor( (x + t)/d )
     temp = temp * gridDelta;  // floor( (x + t)/d ) * d
@@ -417,7 +417,16 @@ void insertContinuousTimeSeriesToLSH(LSH lsh,double delta,Vector v,double epsilo
   Vector v3 = continuousTimeSeriesSnapping(v2,delta,t);
 
   Vector v4 = minima_maxima(v3);
-
+  // printf("ORIGINAL: \n");
+  // printVector(v);
+  // printf("FILTERED: \n");
+  // printVector(v2);
+  // printf("SNAPPED: \n");
+  // printVector(v3);
+  // printf("MINIMA MAXIMA: \n");
+  // printVector(v4);
+  // fflush(stdout);
+  // getchar();
   unsigned int id;
   int index = computeG(lsh->g_fun[0],v4,&id); // compute the value of the g function for the given vector that will be inserted
   // finally insert the vector at the corresponding bucket of the current hash table
