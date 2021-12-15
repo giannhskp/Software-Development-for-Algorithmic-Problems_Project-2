@@ -86,7 +86,7 @@ void vectorTimeSeriesLSH(char* arg_inputFile,char* arg_queryFile,int arg_k_LSH,i
   begin = clock();
   w = wValueCalculation(list,numberOfVectorsInFile,dim);
   w /= W_DIVIDER;
-  // w=12;
+  w=6;
   end = clock();
   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Found value of w in %f seconds, w = %d\n",time_spent,w );
@@ -115,7 +115,7 @@ void vectorTimeSeriesLSHFrechetDiscrete(char* arg_inputFile,char* arg_queryFile,
   int l=arg_L;
   double delta=arg_delta;
   // k_LSH = arg_k_LSH;
-  k_LSH = 1;
+  k_LSH = 4;
   hashTableSize = 1000;
 
 
@@ -149,7 +149,7 @@ void vectorTimeSeriesLSHFrechetDiscrete(char* arg_inputFile,char* arg_queryFile,
   // w = wValueCalculation(list,numberOfVectorsInFile,dim);
   // // w /= W_DIVIDER;
   // w = w/10;
-  w=6;
+  w=200;
   end = clock();
   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Found value of w in %f seconds, w = %d\n",time_spent,w );
@@ -179,9 +179,9 @@ void vectorTimeSeriesLSHFrechetContinuous(char* arg_inputFile,char* arg_queryFil
   strcpy(outputFile,arg_outputFile);
   int l=1;
   double delta=arg_delta;
-  // k_LSH = arg_k_LSH;
+  k_LSH = arg_k_LSH;
   k_LSH = 1;
-  hashTableSize = 1000;
+  // hashTableSize = 1000;
 
 
 
@@ -214,7 +214,7 @@ void vectorTimeSeriesLSHFrechetContinuous(char* arg_inputFile,char* arg_queryFil
   // w = wValueCalculation(list,numberOfVectorsInFile,dim);
   // w /= W_DIVIDER;
   // w = w/10;
-  w=6; // TODO CHANGE
+  w=200; // TODO CHANGE
   end = clock();
   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Found value of w in %f seconds, w = %d\n",time_spent,w );
