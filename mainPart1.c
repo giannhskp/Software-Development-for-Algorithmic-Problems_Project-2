@@ -30,7 +30,7 @@ int main(int argc, char *argv[])  {
   char algorithm[100];
   char metric[100];
   int m=10;
-  double delta=2.5;
+  double delta=1;
   int outputflag=0;
   int l=5;
   int k_LSH = 4;

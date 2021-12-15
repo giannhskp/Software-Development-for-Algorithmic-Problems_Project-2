@@ -85,6 +85,7 @@ void vectorTimeSeriesLSH(char* arg_inputFile,char* arg_queryFile,int arg_k_LSH,i
   printf("Finding optimal value of w based on the input file\n");
   begin = clock();
   // w = wValueCalculation(list,numberOfVectorsInFile,dim);
+  // printf("WVALUEEEEE = %d\n",w);
   // w /= W_DIVIDER;
   // w=6;
   w=200;

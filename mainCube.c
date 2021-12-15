@@ -112,7 +112,7 @@ void vectorTimeSeriesHypecube(char* arg_inputFile,char* arg_queryFile,int arg_ne
   begin = clock();
   // w = wValueCalculation(list,numberOfVectorsInFile,dim);
   // w /= W_DIVIDER;
-  w=6;
+  w=600;
   end = clock();
   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Found value of w in %f seconds, w = %d\n",time_spent,w );
@@ -124,7 +124,6 @@ void vectorTimeSeriesHypecube(char* arg_inputFile,char* arg_queryFile,int arg_ne
   end = clock();
   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Created HyperCube in : %f seconds\n",time_spent);
-  printHyperCube(hc);
 
   readQueryFileCube(queryFile,outputFile,hc,list,probes,m,dim,distanceTrueOff);
 

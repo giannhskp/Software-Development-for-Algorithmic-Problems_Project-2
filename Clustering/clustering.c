@@ -264,7 +264,6 @@ void reverseAssignmentLSH(LSH lsh,Vector *vectors,Vector *clusters,Vector *oldCl
     radius*=2; // doubled the radius for the next range search
     loopCounter++;
   }
-  printf("ITERATION %d | ASSIGNED = %d\n",iteration,assignCounter);
   int remainderCounter = 0;
   // finally one big percentage of vectors has been assigned into clusters
   // the remaining vectors will be assigned based on the nearest centroid at the corresponding cluster
@@ -520,7 +519,7 @@ void clusteringHypercube(List vecList,int numOfClusters,int m,int probes,FILE* f
   clock_t begin = clock();
   // w = wValueCalculation(vecList,numOfVecs,dim);
   // w /= W_DIVIDER_CUBE;
-  w = 6;
+  w = 800;
   clock_t end = clock();
   double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   // printf("Found value of w in %f seconds, w = %d\n",time_spent,w );
