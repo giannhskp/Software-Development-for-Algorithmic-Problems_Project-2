@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
   char assignment[200];
   strcpy(assignment,"Classic"); // default
 
-  double delta = 2.5;
+  double delta = 1;
 
 
   for(int i = 1 ; i < argc ; i++){

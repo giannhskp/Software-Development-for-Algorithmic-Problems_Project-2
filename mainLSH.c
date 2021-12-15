@@ -84,9 +84,10 @@ void vectorTimeSeriesLSH(char* arg_inputFile,char* arg_queryFile,int arg_k_LSH,i
 
   printf("Finding optimal value of w based on the input file\n");
   begin = clock();
-  w = wValueCalculation(list,numberOfVectorsInFile,dim);
-  w /= W_DIVIDER;
-  w=6;
+  // w = wValueCalculation(list,numberOfVectorsInFile,dim);
+  // w /= W_DIVIDER;
+  // w=6;
+  w=200;
   end = clock();
   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Found value of w in %f seconds, w = %d\n",time_spent,w );
@@ -183,11 +184,7 @@ void vectorTimeSeriesLSHFrechetContinuous(char* arg_inputFile,char* arg_queryFil
   k_LSH = 1;
   hashTableSize = 1000;
 
-
-
   srand(time(NULL));
-
-
 
   LSH lsh;
   List list;

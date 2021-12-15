@@ -124,6 +124,7 @@ void vectorTimeSeriesHypecube(char* arg_inputFile,char* arg_queryFile,int arg_ne
   end = clock();
   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Created HyperCube in : %f seconds\n",time_spent);
+  printHyperCube(hc);
 
   readQueryFileCube(queryFile,outputFile,hc,list,probes,m,dim,distanceTrueOff);
 
