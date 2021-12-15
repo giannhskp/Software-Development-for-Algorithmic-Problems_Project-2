@@ -33,11 +33,13 @@ double discreteFrechet(Vector v1,Vector v2){
   double *coordsTime1 = getTime(v1);
   double *coordsTime2 = getTime(v2);
 
-
   for(int i=0;i<i_dim;i++){
     dynamicArray[i]=malloc(j_dim*sizeof(double));
   }
+
+
   dynamicArray[0][0] = l2_metric(coords1[0],coordsTime1[0],coords2[0],coordsTime2[0]);
+
   for(int j=1;j<j_dim;j++){
     double p1qj = l2_metric(coords1[0],coordsTime1[0],coords2[j],coordsTime2[j]);
     dynamicArray[0][j] = MAX( dynamicArray[0][j-1], p1qj);

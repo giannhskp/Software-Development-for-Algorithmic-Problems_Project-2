@@ -13,7 +13,7 @@
 #define FALSE    0
 #define TRUE    1
 
-#define MAX_INPUT_LENGTH 2048
+#define MAX_INPUT_LENGTH 10240
 
 // extern int d;
 
@@ -42,15 +42,15 @@ int findDimCube(char* fileName){
  if (feof(file)){ // empty file, return
    return -1;
  }
-  char buffer[MAX_INPUT_LENGTH];
+ char buffer[MAX_INPUT_LENGTH];
  fflush(stdin);  // clear stdin buffer
  if(fscanf(file,"%[^\n]\n",buffer)<0){ // read a line from the file
    perror("Error while reading the file.\n");
    exit(-1);
  }
- int dims = countWords(buffer)-1;
+ int dims = countWords(buffer);
  fclose(file);
- return dims;
+ return dims-1;
 }
 
 

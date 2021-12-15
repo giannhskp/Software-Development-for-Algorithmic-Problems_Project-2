@@ -13,9 +13,6 @@
 
 #define W_VALUE 4
 
-
-// int d;
-// int k;
 int new_dimension;
 int m;
 int probes;
@@ -83,7 +80,6 @@ int main(int argc, char *argv[]) {
       strcpy(assignment,argv[i+1]); // default
       printf("Given Assignment Method : %s\n", assignment);
     }
-
   }
 
   if(!inputflag){
