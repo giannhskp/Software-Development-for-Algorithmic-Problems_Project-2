@@ -38,7 +38,6 @@ void test_gFunction(void){
   Vector vec2=initVector(coords2,"2",dim);
   unsigned int temp=-1;
   LSH lsh = initializeLSH(5,dim);
-  getValueOfFirstGFun(lsh,vec1,&temp);
   CU_ASSERT(getValueOfFirstGFun(lsh,vec1,&temp)==getValueOfFirstGFun(lsh,vec2,&temp));
   deleteVector(vec1);
   deleteVector(vec2);

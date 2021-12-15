@@ -25,10 +25,8 @@ EXEC2 = cluster
 EXEC3 = unitTesting
 
 all: $(EXEC1) $(EXEC2)
-#
-# search: $(EXEC1)
-#
-testing: $(EXEC3)
+
+unit_testing: $(EXEC3)
 
 $(EXEC1): $(OBJ1)
 	$(CCPLUSPLUS) -c $(FRECHERCONT)/my_interface.cpp $(FRECHERCONT)/simplification.cpp $(FRECHERCONT)/point.cpp $(FRECHERCONT)/interval.cpp $(FRECHERCONT)/frechet.cpp $(FRECHERCONT)/curve.cpp $(FRECHERCONT)/config.cpp
