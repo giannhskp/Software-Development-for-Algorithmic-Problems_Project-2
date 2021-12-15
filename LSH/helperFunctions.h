@@ -2,6 +2,7 @@
 #define HELPFUN_H
 
 double uniform_distribution(int , int );
+double uniform_distribution_double(double , double );
 
 double normalRandom();
 

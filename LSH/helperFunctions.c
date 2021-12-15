@@ -15,6 +15,13 @@ double uniform_distribution(int rangeLow, int rangeHigh) {
     return myRand_scaled;
 }
 
+double uniform_distribution_double(double rangeLow, double rangeHigh) {
+    double myRand = rand()/(1.0 + RAND_MAX);
+    double range = rangeHigh - rangeLow;
+    double myRand_scaled = (myRand * range) + rangeLow;
+    return myRand_scaled;
+}
+
 double rand_gen() {
    // return a uniformly distributed random value
    return ( (double)(rand()) + 1. )/( (double)(RAND_MAX) + 1. );
@@ -29,8 +36,10 @@ double normalRandom() {
 double dot_product(double *v, double *u,int d){
   // calculate the dot product between the given vectors and return it
   double result = 0.0;
-  for (int i = 0; i < d; i++)
-      result += v[i]*u[i];
+  for (int i = 0; i < d; i++){
+    result += v[i]*u[i];
+  }
+
   return result;
 }
 

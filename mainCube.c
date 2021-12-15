@@ -10,7 +10,7 @@
 #include "./parsing/parsingCube.h"
 #include "./hashTable/hashTableList/hashTableList.h"
 
-#define W_DIVIDER 80
+#define W_DIVIDER 40
 
 // int d;
 int new_dimension;
@@ -96,6 +96,7 @@ void vectorTimeSeriesHypecube(char* arg_inputFile,char* arg_queryFile,int arg_ne
 
   List list;
   clock_t begin = clock();
+
   int dim = findDimCube(inputFile);
   printf("DIMENSION = %d\n",dim);
 
@@ -109,8 +110,8 @@ void vectorTimeSeriesHypecube(char* arg_inputFile,char* arg_queryFile,int arg_ne
 
   printf("Finding optimal value of w based on the input file\n");
   begin = clock();
-  w = wValueCalculation(list,numberOfVectorsInFile,dim);
-  w /= W_DIVIDER;
+  // w = wValueCalculation(list,numberOfVectorsInFile,dim);
+  // w /= W_DIVIDER;
   w=6;
   end = clock();
   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;

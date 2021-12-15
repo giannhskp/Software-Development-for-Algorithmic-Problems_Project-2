@@ -18,7 +18,7 @@
 
 #define TRUE 1
 #define FALSE 0
-#define MAX_RECENTER_ITERATIONS 10
+#define MAX_RECENTER_ITERATIONS 5
 #define W_DIVIDER_LSH 60
 #define W_DIVIDER_CUBE 20
 #define METHOD_VECTOR 2
@@ -28,6 +28,7 @@ extern int numOfVecs;
 // extern int d;
 extern int hashTableSize;
 extern int silhouette;
+extern int complete;
 extern int w;
 char *distanceMetric;
 // Vector timeVector;
@@ -73,7 +74,9 @@ void lloyds(Vector* clusters,Vector *oldClusters,Vector* vectors,List* clustersL
       if(clustersList[i]!=NULL){ // check if each cluster has been formed (has vectors)
         // ok then find the new centroid for this cluster
         if(strcmp(distanceMetric,"discreteFrechet")==0){
-          newCenter = computeFrechetMeanCurve(clustersList[i],vectorCount[i]);
+          Vector tempNewCenter = computeFrechetMeanCurve(clustersList[i],vectorCount[i]);
+          newCenter = filterMeanCurve(tempNewCenter,dim);
+          deleteVector(tempNewCenter);
         }else{
           newCenter=listMeanOfCluster(clustersList[i],dim);
         }
@@ -143,7 +146,10 @@ void clusteringLloyds(List vecList,int numOfClusters,FILE* fptr,int dim){
   int firstTime=0;
   // lloyds Algorithm runs until convergence between the old cluster centroids and the new ones is achieved
   while((count<2) || !centroidsConverge(clusters,oldClusters,numOfClusters)){ // check for convergence after the second one iteration
+    if(count==MAX_RECENTER_ITERATIONS)
+      break;
     count++;
+    printf("Iteration %d\n",count);
     if(!firstIter){
       Vector *temp = oldClusters;
       oldClusters=clusters;
@@ -174,17 +180,20 @@ void clusteringLloyds(List vecList,int numOfClusters,FILE* fptr,int dim){
   fprintf(fptr, "clustering_time: %f seconds\n",cluster_time);
   fflush(fptr);
 
-  printf("- COMPUTING SILHOUETTES FOR CLUSTERS\n");
-  double stotal = 0.0;
-  double * silhouettes = silhouetteLloyds(clustersList,clusters,numOfClusters,vectorCount,&stotal,dim);
-  printf("- FINISHED COMPUTING SILHOUETTES\n");
-  fprintf(fptr, "Silhouette: [ ");
-  for(int i=0;i<numOfClusters;i++){
-    fprintf(fptr,"s%d = %f ,",i+1,silhouettes[i]);
-  }
-  fprintf(fptr,"stotal = %f ]\n\n",stotal/numOfVecs);
-
   if(silhouette){
+    printf("- COMPUTING SILHOUETTES FOR CLUSTERS\n");
+    double stotal = 0.0;
+    double * silhouettes = silhouetteLloyds(clustersList,clusters,numOfClusters,vectorCount,&stotal,dim);
+    printf("- FINISHED COMPUTING SILHOUETTES\n");
+    fprintf(fptr, "Silhouette: [ ");
+    for(int i=0;i<numOfClusters;i++){
+      fprintf(fptr,"s%d = %f ,",i+1,silhouettes[i]);
+    }
+    fprintf(fptr,"stotal = %f ]\n\n",stotal/numOfVecs);
+    free(silhouettes);
+  }
+
+  if(complete){
     for(int i=0;i<numOfClusters;i++){
       fprintf(fptr,"CLUSTER-%d {",i+1);
       printVectorInFile(clusters[i],fptr);
@@ -200,7 +209,6 @@ void clusteringLloyds(List vecList,int numOfClusters,FILE* fptr,int dim){
     deleteVector(clusters[i]);
   }
 
-  free(silhouettes);
   free(clusters);
   free(props);
   free(vectors);
@@ -218,7 +226,9 @@ void reverseAssignmentLSH(LSH lsh,Vector *vectors,Vector *clusters,Vector *oldCl
       }else if(method == METHOD_VECTOR){
         newCenter = htMeanOfCluster(clustersHt[i],dim); // find the new centroid for every cluster
       }else if(method == METHOD_FRECHET){
-        newCenter = computeFrechetMeanCurveLSH(clustersHt[i],getNumberOfVectors(clustersHt[i]));
+        Vector tempNewCenter = computeFrechetMeanCurveLSH(clustersHt[i],getNumberOfVectors(clustersHt[i]));
+        newCenter = filterMeanCurve(tempNewCenter,dim);
+        deleteVector(tempNewCenter);
       }
 
       // finally delete each cluster in order to form a new one based to the new centroid
@@ -245,7 +255,7 @@ void reverseAssignmentLSH(LSH lsh,Vector *vectors,Vector *clusters,Vector *oldCl
       if(method == METHOD_VECTOR){
         radiusNeigborsClustering(lsh,clusters[i],radius,clustersHt[i],i,&confList,&assignCounter,iteration);
       }else if(method == METHOD_FRECHET){
-        radiusNeigborsClusteringTimeSeries(lsh,clusters[i],radius,clustersHt[i],i,&confList,&assignCounter,iteration,grids,delta);
+        radiusNeigborsClusteringTimeSeries(lsh,clusters[i],radius,clustersHt[i],i,&confList,&assignCounter,iteration,grids,delta,dim);
       }
     }
     // manage the vectors that presenting conflict
@@ -282,7 +292,7 @@ double *silhouetteLSH_Hypercube(HashTable *clustersHt,Vector *clusters,int numOf
   return silhouettes;
 }
 
-void clusteringLSH(List vecList,int numOfClusters,int l,FILE* fptr,int dim,int method,int delta){
+void clusteringLSH(List vecList,int numOfClusters,int l,FILE* fptr,int dim,int method,double delta){
   Vector *vectors;
   Vector *clusters;
   Vector *oldClusters = NULL;
@@ -303,8 +313,10 @@ void clusteringLSH(List vecList,int numOfClusters,int l,FILE* fptr,int dim,int m
   // allocate and initialize the LSH with the vectors tha will be inserted into clusters
   if(numOfVecs>1000){
     hashTableSize = (int)(numOfVecs*0.005);
+  }else if(numOfVecs>150){
+    hashTableSize=numOfVecs/16;
   }else{
-    hashTableSize=numOfVecs/32;
+    hashTableSize=numOfVecs/10;
   }
 
   clock_t begin = clock();
@@ -322,14 +334,14 @@ void clusteringLSH(List vecList,int numOfClusters,int l,FILE* fptr,int dim,int m
   if(method == METHOD_VECTOR){
     vector_v_dim = dim;
   }else if(method == METHOD_FRECHET){
-    vector_v_dim = 2*dim*numOfVecs; // TODO: ADD AN UPPER BOUND
+    vector_v_dim = 2*dim;
   }
   LSH lsh = initializeLSH(l,vector_v_dim);
   Grids grids;
   if(method == METHOD_VECTOR){
     grids = NULL;
   }else if(method == METHOD_FRECHET){
-    grids = initializeGrids(delta,l);
+    grids = initializeGrids(delta,l,2);
   }
   for(int i=0;i<numOfVecs;i++){
     initializeClusterInfo(vectors[i]);
@@ -342,7 +354,6 @@ void clusteringLSH(List vecList,int numOfClusters,int l,FILE* fptr,int dim,int m
   end = clock();
   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Created LSH in : %f seconds\n",time_spent);
-
 
   clock_t cluster_start = clock();
   // find the original centroids with the kmeans++ Algorithm
@@ -390,18 +401,20 @@ void clusteringLSH(List vecList,int numOfClusters,int l,FILE* fptr,int dim,int m
   fflush(fptr);
   fflush(stdout);
 
-  printf("- COMPUTING SILHOUETTES FOR CLUSTERS\n");
-  double stotal = 0.0;
-  double * silhouettes = silhouetteLSH_Hypercube(clustersHt,clusters,numOfClusters,&stotal,dim);
-  printf("- FINISHED COMPUTING SILHOUETTES\n");
-  fprintf(fptr, "Silhouette: [ ");
-  for(int i=0;i<numOfClusters;i++){
-    fprintf(fptr,"s%d = %f ,",i+1,silhouettes[i]);
-  }
-  fprintf(fptr,"stotal = %f ]\n\n",stotal/numOfVecs);
-  free(silhouettes);
-
   if(silhouette){
+    printf("- COMPUTING SILHOUETTES FOR CLUSTERS\n");
+    double stotal = 0.0;
+    double * silhouettes = silhouetteLSH_Hypercube(clustersHt,clusters,numOfClusters,&stotal,dim);
+    printf("- FINISHED COMPUTING SILHOUETTES\n");
+    fprintf(fptr, "Silhouette: [ ");
+    for(int i=0;i<numOfClusters;i++){
+      fprintf(fptr,"s%d = %f ,",i+1,silhouettes[i]);
+    }
+    fprintf(fptr,"stotal = %f ]\n\n",stotal/numOfVecs);
+    free(silhouettes);
+  }
+
+  if(complete){
     for(int i=0;i<numOfClusters;i++){
       fprintf(fptr,"CLUSTER-%d {",i+1);
       printVectorInFile(clusters[i],fptr);
@@ -419,7 +432,7 @@ void clusteringLSH(List vecList,int numOfClusters,int l,FILE* fptr,int dim,int m
     htDelete(clustersHt[i],0);
   }
 
-  deleteGrids(grids);
+  deleteGrids(grids,2);
   free(props);
   free(vectors);
   free(oldClusters);
@@ -566,19 +579,20 @@ void clusteringHypercube(List vecList,int numOfClusters,int m,int probes,FILE* f
   fprintf(fptr, "clustering_time: %f seconds\n",cluster_time);
   fflush(fptr);
   fflush(stdout);
-
-  printf("- COMPUTING SILHOUETTES FOR CLUSTERS\n");
-  double stotal = 0.0;
-  double * silhouettes = silhouetteLSH_Hypercube(clustersHt,clusters,numOfClusters,&stotal,dim);
-  printf("- FINISHED COMPUTING SILHOUETTES\n");
-  fprintf(fptr, "Silhouette: [ ");
-  for(int i=0;i<numOfClusters;i++){
-    fprintf(fptr,"s%d = %f ,",i+1,silhouettes[i]);
-  }
-  fprintf(fptr,"stotal = %f ]\n\n",stotal/numOfVecs);
-  free(silhouettes);
-
   if(silhouette){
+    printf("- COMPUTING SILHOUETTES FOR CLUSTERS\n");
+    double stotal = 0.0;
+    double * silhouettes = silhouetteLSH_Hypercube(clustersHt,clusters,numOfClusters,&stotal,dim);
+    printf("- FINISHED COMPUTING SILHOUETTES\n");
+    fprintf(fptr, "Silhouette: [ ");
+    for(int i=0;i<numOfClusters;i++){
+      fprintf(fptr,"s%d = %f ,",i+1,silhouettes[i]);
+    }
+    fprintf(fptr,"stotal = %f ]\n\n",stotal/numOfVecs);
+    free(silhouettes);
+  }
+
+  if(complete){
     for(int i=0;i<numOfClusters;i++){
       fprintf(fptr,"CLUSTER-%d {",i+1);
       printVectorInFile(clusters[i],fptr);
@@ -604,7 +618,7 @@ void clusteringHypercube(List vecList,int numOfClusters,int m,int probes,FILE* f
   deleteHyperCube(cube);
 }
 
-void clustering(List vecList,FILE* fptr,char* assignment,char *update,int numOfClusters,int l,int mHyper,int probes,int dim,int delta){
+void clustering(List vecList,FILE* fptr,char* assignment,char *update,int numOfClusters,int l,int mHyper,int probes,int dim,double delta){
   if(strcmp(assignment,"Classic")==0){
     if(strcmp(update,"Mean Vector")==0){
       fprintf(fptr,"Algorithm: Lloyds for Vectors\n");
