@@ -1,0 +1,84 @@
+Query aer:
+Approximate Nearest neighbor: abt
+True Nearest neighbor: abt
+distanceApproximate: 9.786175
+distanceTrue: 9.786175
+tApproximateAverage: 0.194395 seconds
+tTrueAverage: 2.474876 seconds
+
+Query aeri:
+Approximate Nearest neighbor: abcb
+True Nearest neighbor: abcb
+distanceApproximate: 17.167161
+distanceTrue: 17.167161
+tApproximateAverage: 1.186782 seconds
+tTrueAverage: 2.500978 seconds
+
+Query aes:
+Approximate Nearest neighbor: abdc
+True Nearest neighbor: abdc
+distanceApproximate: 3.448800
+distanceTrue: 3.448800
+tApproximateAverage: 1.705815 seconds
+tTrueAverage: 2.454127 seconds
+
+Query aet:
+Approximate Nearest neighbor: abmd
+True Nearest neighbor: aapl
+distanceApproximate: 51.421405
+distanceTrue: 27.694014
+tApproximateAverage: 0.024658 seconds
+tTrueAverage: 2.508894 seconds
+
+Query aeti:
+Approximate Nearest neighbor: acst
+True Nearest neighbor: acst
+distanceApproximate: 2.565300
+distanceTrue: 2.565300
+tApproximateAverage: 1.213613 seconds
+tTrueAverage: 2.457973 seconds
+
+Query aey:
+Approximate Nearest neighbor: aau
+True Nearest neighbor: aau
+distanceApproximate: 1.882000
+distanceTrue: 1.882000
+tApproximateAverage: 0.757561 seconds
+tTrueAverage: 2.477615 seconds
+
+Query aezs:
+Approximate Nearest neighbor: acad
+True Nearest neighbor: acad
+distanceApproximate: 38.446513
+distanceTrue: 38.446513
+tApproximateAverage: 0.048891 seconds
+tTrueAverage: 2.443792 seconds
+
+Query afam:
+Approximate Nearest neighbor: abm
+True Nearest neighbor: abt
+distanceApproximate: 21.004390
+distanceTrue: 14.887600
+tApproximateAverage: 0.283582 seconds
+tTrueAverage: 2.508143 seconds
+
+Query afb:
+Approximate Nearest neighbor: adx
+True Nearest neighbor: adx
+distanceApproximate: 3.010000
+distanceTrue: 3.010000
+tApproximateAverage: 1.541599 seconds
+tTrueAverage: 2.475952 seconds
+
+Query afc:
+Approximate Nearest neighbor: aeh
+True Nearest neighbor: aeh
+distanceApproximate: 1.194000
+distanceTrue: 1.194000
+tApproximateAverage: 1.675196 seconds
+tTrueAverage: 2.460895 seconds
+
+tApproximateAverage: 0.863209 seconds
+tTrueAverage: 2.476325 seconds
+Max Approximation Factor: 1.856770
+Min Approximation Factor: 1.000000
