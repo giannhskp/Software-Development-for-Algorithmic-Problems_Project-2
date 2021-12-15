@@ -152,7 +152,7 @@ Vector continuousTimeSeriesSnapping(Vector v,double gridDelta,double t){
     // temp = temp - fmod(temp,gridDelta);
     // keepY=temp;
 
-    temp = temp;  // x + t
+    temp = temp + t;  // x + t
     temp = temp/gridDelta; // (x + t)/d
     temp = floor(temp); // floor( (x + t)/d )
     temp = temp * gridDelta;  // floor( (x + t)/d ) * d
