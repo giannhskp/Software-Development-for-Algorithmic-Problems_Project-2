@@ -50,7 +50,7 @@ static int wValueCalculation(List list,int numberOfVectorsInFile,int dim){
 }
 
 
-void vectorTimeSeriesLSH(char* arg_inputFile,char* arg_queryFile,int arg_k_LSH,int arg_L,char* arg_outputFile)  {
+void vectorTimeSeriesLSH(char* arg_inputFile,char* arg_queryFile,int arg_k_LSH,int arg_L,char* arg_outputFile,int distanceTrueOff)  {
 
   char inputFile[100];
   strcpy(inputFile,arg_inputFile);
@@ -98,14 +98,14 @@ void vectorTimeSeriesLSH(char* arg_inputFile,char* arg_queryFile,int arg_k_LSH,i
   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Created LSH in : %f seconds\n",time_spent);
 
-  readQueryFileLSH(queryFile,outputFile,lsh,list,dim);
+  readQueryFileLSH(queryFile,outputFile,lsh,list,dim,distanceTrueOff);
 
   destroyLSH(lsh);
   listDelete(list,0);
 }
 
 
-void vectorTimeSeriesLSHFrechetDiscrete(char* arg_inputFile,char* arg_queryFile,int arg_k_LSH,int arg_L,char* arg_outputFile,double arg_delta){
+void vectorTimeSeriesLSHFrechetDiscrete(char* arg_inputFile,char* arg_queryFile,int arg_k_LSH,int arg_L,char* arg_outputFile,double arg_delta,int distanceTrueOff){
   char inputFile[100];
   strcpy(inputFile,arg_inputFile);
   char queryFile[100];
@@ -163,14 +163,14 @@ void vectorTimeSeriesLSHFrechetDiscrete(char* arg_inputFile,char* arg_queryFile,
   printf("Created LSH in : %f seconds\n",time_spent);
   printLSH(lsh);
 
-  readQueryFileLSH_DiscreteFrechet(queryFile,outputFile,lsh,list,grids,delta,time,dim);
+  readQueryFileLSH_DiscreteFrechet(queryFile,outputFile,lsh,list,grids,delta,time,dim,distanceTrueOff);
   deleteGrids(grids,2);
   destroyLSH(lsh);
   listDelete(list,0);
 }
 
 
-void vectorTimeSeriesLSHFrechetContinuous(char* arg_inputFile,char* arg_queryFile,int arg_k_LSH,char* arg_outputFile,double arg_delta,double epsilon){
+void vectorTimeSeriesLSHFrechetContinuous(char* arg_inputFile,char* arg_queryFile,int arg_k_LSH,char* arg_outputFile,double arg_delta,double epsilon,int distanceTrueOff){
   char inputFile[100];
   strcpy(inputFile,arg_inputFile);
   char queryFile[100];
@@ -181,7 +181,7 @@ void vectorTimeSeriesLSHFrechetContinuous(char* arg_inputFile,char* arg_queryFil
   double delta=arg_delta;
   k_LSH = arg_k_LSH;
   k_LSH = 1;
-  // hashTableSize = 1000;
+  hashTableSize = 1000;
 
 
 
@@ -227,7 +227,7 @@ void vectorTimeSeriesLSHFrechetContinuous(char* arg_inputFile,char* arg_queryFil
   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Created LSH in : %f seconds\n",time_spent);
   printLSH(lsh);
-  readQueryFileLSH_ContinuousFrechet(queryFile,outputFile,lsh,list,delta,epsilon,time,dim,grid);
+  readQueryFileLSH_ContinuousFrechet(queryFile,outputFile,lsh,list,delta,epsilon,time,dim,grid,distanceTrueOff);
 
   deleteGrids(grid,1);
   destroyLSH(lsh);

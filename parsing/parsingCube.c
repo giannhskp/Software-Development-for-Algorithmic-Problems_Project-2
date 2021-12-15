@@ -97,7 +97,7 @@ void readFileCube(char* fileName,List *inputs,int *vectorCount,int dim){
 
 
 
-void readQueryFileCube(char* queryFile,char* outputFile,HyperCube hc,List inputs,int hammingDist,int m,int dim){
+void readQueryFileCube(char* queryFile,char* outputFile,HyperCube hc,List inputs,int hammingDist,int m,int dim,int distanceTrueOff){
 
    FILE *file = fopen(queryFile, "r"); // read mode
 
@@ -156,7 +156,10 @@ void readQueryFileCube(char* queryFile,char* outputFile,HyperCube hc,List inputs
 
     clock_t begin_true = clock(); // time calculation for the brute force method
     // find with the brute force method the k nearest neighbors for the corresponding query vector
-    listFindNearestNeighbor(inputs,vecTmp,nNearest,knearestDists,dim,-1);
+
+    if(distanceTrueOff!=1)
+      listFindNearestNeighbor(inputs,vecTmp,nNearest,knearestDists,dim,-1);
+
     clock_t end_true = clock();
     double time_spent_true = (double)(end_true - begin_true) / CLOCKS_PER_SEC;
 
@@ -165,7 +168,7 @@ void readQueryFileCube(char* queryFile,char* outputFile,HyperCube hc,List inputs
     double approximation_factor=-1;
     int found_neighbor = -1;
     // find with the help of Hypercube the k nearest neighbors corresponding query vector
-    nearestNeigborHypercube(hc,vecTmp,nNearest,hammingDist,m,knearestDists,fptr,&approximation_factor,&found_neighbor);
+    nearestNeigborHypercube(hc,vecTmp,nNearest,hammingDist,m,knearestDists,fptr,&approximation_factor,&found_neighbor,distanceTrueOff);
     if(approximation_factor>0){
       if(approximation_factor>max_aproximation_factor)
         max_aproximation_factor=approximation_factor;
@@ -187,9 +190,14 @@ void readQueryFileCube(char* queryFile,char* outputFile,HyperCube hc,List inputs
   }
   if(query_count>0){
     fprintf(fptr, "tApproximateAverage: %f seconds\n",total_cube_time/query_count);
-    fprintf(fptr, "tTrueAverage: %f seconds\n",total_true_time/query_count);
-    fprintf(fptr, "Max Approximation Factor: %f\n",max_aproximation_factor);
-    fprintf(fptr, "Min Approximation Factor: %f\n",min_aproximation_factor);
+    if(distanceTrueOff!=1){
+      fprintf(fptr, "tTrueAverage: %f seconds\n",total_true_time/query_count);
+      fprintf(fptr, "Max Approximation Factor: %f\n",max_aproximation_factor);
+      fprintf(fptr, "Min Approximation Factor: %f\n",min_aproximation_factor);
+    }else{
+      fprintf(fptr, "tTrueAverage: True Distances were not computed\n");
+      fprintf(fptr, "Min/Max Approximation Factor are not defined without distanceTrue\n");
+    }
   }
   fclose(fptr);
   fclose(file);

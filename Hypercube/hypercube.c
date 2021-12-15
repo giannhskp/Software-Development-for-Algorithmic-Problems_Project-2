@@ -189,7 +189,7 @@ void searchForHammingDistance(HyperCube hc,Vector v,int *v_index,int hammingDist
   }
 }
 
-void nearestNeigborHypercube(HyperCube hc,Vector q,Vector *nNearest,int hammingDist,int m,double *trueDist,FILE *fptr,double *aproximation_factor,int *found_neighbor){
+void nearestNeigborHypercube(HyperCube hc,Vector q,Vector *nNearest,int hammingDist,int m,double *trueDist,FILE *fptr,double *aproximation_factor,int *found_neighbor,int distanceTrueOff){
   Vector nearest=NULL;
   double nearestDist=-1;
   int index[new_dimension];
@@ -222,10 +222,18 @@ void nearestNeigborHypercube(HyperCube hc,Vector q,Vector *nNearest,int hammingD
   if(nearestDist>=0 && nearest!=NULL){
     fprintf(fptr,"Approximate Nearest neighbor: ");
     printVectorIdInFile(nearest,fptr);
-    fprintf(fptr,"True Nearest neighbor: ");
-    printVectorIdInFile(*nNearest,fptr);
-    fprintf(fptr,"distanceHypercube: %f\n",nearestDist);
-    fprintf(fptr,"distanceTrue: %f\n", *trueDist);
+    if(distanceTrueOff==1){
+      fprintf(fptr,"True Nearest neighbor: was not computed\n");
+    }else{
+      fprintf(fptr,"True Nearest neighbor: ");
+      printVectorIdInFile(*nNearest,fptr);
+    }
+    fprintf(fptr,"distanceApproximate: %f\n",nearestDist);
+    if(distanceTrueOff==1){
+      fprintf(fptr,"distanceTrue: was not computed\n");
+    }else{
+      fprintf(fptr,"distanceTrue: %f\n", *trueDist);
+    }
     (*aproximation_factor) = nearestDist/(*trueDist);
     (*found_neighbor) = 1;
   }else{

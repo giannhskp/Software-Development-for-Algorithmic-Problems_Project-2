@@ -49,7 +49,7 @@ static int wValueCalculation(List list,int numberOfVectorsInFile,int dim){
 
 
 
-void vectorTimeSeriesHypecube(char* arg_inputFile,char* arg_queryFile,int arg_new_dimension,int arg_M,int arg_probes,char* arg_outputFile) {
+void vectorTimeSeriesHypecube(char* arg_inputFile,char* arg_queryFile,int arg_new_dimension,int arg_M,int arg_probes,char* arg_outputFile,int distanceTrueOff) {
   srand(time(NULL));
   char str[200];
   char inputFile[100];
@@ -125,7 +125,7 @@ void vectorTimeSeriesHypecube(char* arg_inputFile,char* arg_queryFile,int arg_ne
   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Created HyperCube in : %f seconds\n",time_spent);
 
-  readQueryFileCube(queryFile,outputFile,hc,list,probes,m,dim);
+  readQueryFileCube(queryFile,outputFile,hc,list,probes,m,dim,distanceTrueOff);
 
   deleteHyperCube(hc);
   listDelete(list,0);

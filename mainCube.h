@@ -1,4 +1,4 @@
 #ifndef MAINCUBE_H
 #define MAINCUBE_H
-void vectorTimeSeriesHypecube(char* ,char* ,int ,int ,int ,char* );
+void vectorTimeSeriesHypecube(char* ,char* ,int ,int ,int ,char* ,int );
 #endif

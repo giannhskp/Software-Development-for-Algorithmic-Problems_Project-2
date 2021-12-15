@@ -1,0 +1,70 @@
+Query aer:
+Approximate Nearest neighbor: aaww
+True Nearest neighbor: distanceApproximate: 17.950000
+distanceTrue: -1.000000
+tApproximateAverage: 32.925322 seconds
+tTrueAverage: 0.000001 seconds
+
+Query aeri:
+Approximate Nearest neighbor: adi
+True Nearest neighbor: distanceApproximate: 49.121310
+distanceTrue: -1.000000
+tApproximateAverage: 24.279043 seconds
+tTrueAverage: 0.000001 seconds
+
+Query aes:
+Approximate Nearest neighbor: acre
+True Nearest neighbor: distanceApproximate: 3.606700
+distanceTrue: -1.000000
+tApproximateAverage: 21.188876 seconds
+tTrueAverage: 0.000001 seconds
+
+Query aet:
+- DID NOT FIND NEAREST NEIGHBOR
+tApproximateAverage: 0.000064 seconds
+tTrueAverage: 0.000001 seconds
+
+Query aeti:
+Approximate Nearest neighbor: adxs
+True Nearest neighbor: distanceApproximate: 23.281486
+distanceTrue: -1.000000
+tApproximateAverage: 28.589774 seconds
+tTrueAverage: 0.000002 seconds
+
+Query aey:
+- DID NOT FIND NEAREST NEIGHBOR
+tApproximateAverage: 0.000046 seconds
+tTrueAverage: 0.000001 seconds
+
+Query aezs:
+Approximate Nearest neighbor: acet
+True Nearest neighbor: distanceApproximate: 63.266422
+distanceTrue: -1.000000
+tApproximateAverage: 12.319670 seconds
+tTrueAverage: 0.000002 seconds
+
+Query afam:
+Approximate Nearest neighbor: aaww
+True Nearest neighbor: distanceApproximate: 20.111440
+distanceTrue: -1.000000
+tApproximateAverage: 40.461497 seconds
+tTrueAverage: 0.000002 seconds
+
+Query afb:
+Approximate Nearest neighbor: abm
+True Nearest neighbor: distanceApproximate: 31.549852
+distanceTrue: -1.000000
+tApproximateAverage: 8.825894 seconds
+tTrueAverage: 0.000001 seconds
+
+Query afc:
+Approximate Nearest neighbor: adx
+True Nearest neighbor: distanceApproximate: 12.518094
+distanceTrue: -1.000000
+tApproximateAverage: 15.223795 seconds
+tTrueAverage: 0.000001 seconds
+
+tApproximateAverage: 22.976734 seconds
+tTrueAverage: 0.000001 seconds
+Max Approximation Factor: -1.000000
+Min Approximation Factor: 179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368.000000

@@ -100,7 +100,7 @@ void readFileLSH(char* fileName,List *inputs,int *vectorCount,int keepTimes,doub
 }
 
 
-void readQueryFileLSH(char* queryFile,char* outputFile,LSH lsh,List inputs,int dim){
+void readQueryFileLSH(char* queryFile,char* outputFile,LSH lsh,List inputs,int dim,int distanceTrueOff){
 
    FILE *file = fopen(queryFile, "r"); // read mode
 
@@ -158,8 +158,8 @@ void readQueryFileLSH(char* queryFile,char* outputFile,LSH lsh,List inputs,int d
 
     clock_t begin_true = clock(); // time calculation for the k nearest neighbors with brute force method
     // find with the brute force method the k nearest neighbors for the corresponding query vector
-
-    listFindNearestNeighbor(inputs,vecTmp,nNearest,knearestDists,dim,-1);
+    if(distanceTrueOff!=1)
+      listFindNearestNeighbor(inputs,vecTmp,nNearest,knearestDists,dim,-1);
 
     clock_t end_true = clock();
     double time_spent_true = (double)(end_true - begin_true) / CLOCKS_PER_SEC;
@@ -168,7 +168,7 @@ void readQueryFileLSH(char* queryFile,char* outputFile,LSH lsh,List inputs,int d
     // find with the help of LSH the k nearest neighbor for the corresponding query vector
     double approximation_factor=-1;
     int found_neighbor = -1;
-    nearestNeigborLSH(lsh,vecTmp,nNearest,knearestDists,fptr,&approximation_factor,&found_neighbor);
+    nearestNeigborLSH(lsh,vecTmp,nNearest,knearestDists,fptr,&approximation_factor,&found_neighbor,distanceTrueOff);
     if(approximation_factor>0){
       if(approximation_factor>max_aproximation_factor)
         max_aproximation_factor=approximation_factor;
@@ -184,21 +184,27 @@ void readQueryFileLSH(char* queryFile,char* outputFile,LSH lsh,List inputs,int d
       query_count++;
     }
     fprintf(fptr, "tLSH: %f seconds\n",time_spent_lsh);
-    fprintf(fptr, "tTrue: %f seconds\n\n",time_spent_true);
+    fprintf(fptr, "tTrue: %f seconds\n",time_spent_true);
+    fprintf(fptr, "\n");
     fflush(fptr);
     deleteVector(vecTmp);
   }
   if(query_count>0){
     fprintf(fptr, "tApproximateAverage: %f seconds\n",total_lsh_time/query_count);
-    fprintf(fptr, "tTrueAverage: %f seconds\n",total_true_time/query_count);
-    fprintf(fptr, "Max Approximation Factor: %f\n",max_aproximation_factor);
-    fprintf(fptr, "Min Approximation Factor: %f\n",min_aproximation_factor);
+    if(distanceTrueOff!=1){
+      fprintf(fptr, "tTrueAverage: %f seconds\n",total_true_time/query_count);
+      fprintf(fptr, "Max Approximation Factor: %f\n",max_aproximation_factor);
+      fprintf(fptr, "Min Approximation Factor: %f\n",min_aproximation_factor);
+    }else{
+      fprintf(fptr, "tTrueAverage: True Distances were not computed\n");
+      fprintf(fptr, "Min/Max Approximation Factor are not defined without distanceTrue\n");
+    }
   }
   fclose(fptr);
   fclose(file);
 }
 
-void readQueryFileLSH_DiscreteFrechet(char* queryFile,char* outputFile,LSH lsh,List inputs,Grids grids,double delta,double *time,int dim){
+void readQueryFileLSH_DiscreteFrechet(char* queryFile,char* outputFile,LSH lsh,List inputs,Grids grids,double delta,double *time,int dim,int distanceTrueOff){
 
    FILE *file = fopen(queryFile, "r"); // read mode
 
@@ -256,8 +262,8 @@ void readQueryFileLSH_DiscreteFrechet(char* queryFile,char* outputFile,LSH lsh,L
 
     clock_t begin_true = clock(); // time calculation for the k nearest neighbors with brute force method
     // find with the brute force method the k nearest neighbors for the corresponding query vector
-
-    listFindNearestNeighbor(inputs,vecTmp,nNearest,knearestDists,dim,-1);
+    if(distanceTrueOff!=1)
+      listFindNearestNeighbor(inputs,vecTmp,nNearest,knearestDists,dim,-1);
 
     clock_t end_true = clock();
     double time_spent_true = (double)(end_true - begin_true) / CLOCKS_PER_SEC;
@@ -266,7 +272,7 @@ void readQueryFileLSH_DiscreteFrechet(char* queryFile,char* outputFile,LSH lsh,L
     // find with the help of LSH the k nearest neighbor for the corresponding query vector
     double approximation_factor=-1;
     int found_neighbor=-1;
-    nearestNeigborLSH_DiscreteFrechet(lsh,vecTmp,nNearest,knearestDists,fptr,grids,delta,&approximation_factor,&found_neighbor);
+    nearestNeigborLSH_DiscreteFrechet(lsh,vecTmp,nNearest,knearestDists,fptr,grids,delta,&approximation_factor,&found_neighbor,distanceTrueOff);
     if(approximation_factor>0){
       if(approximation_factor>max_aproximation_factor)
         max_aproximation_factor=approximation_factor;
@@ -282,19 +288,25 @@ void readQueryFileLSH_DiscreteFrechet(char* queryFile,char* outputFile,LSH lsh,L
       query_count++;
     }
     fprintf(fptr, "tApproximateAverage: %f seconds\n",time_spent_lsh);
-    fprintf(fptr, "tTrueAverage: %f seconds\n\n",time_spent_true);
+    fprintf(fptr, "tTrueAverage: %f seconds\n",time_spent_true);
+    fprintf(fptr, "\n");
     fflush(fptr);
     deleteVector(vecTmp);
   }
   fprintf(fptr, "tApproximateAverage: %f seconds\n",total_lsh_time/query_count);
-  fprintf(fptr, "tTrueAverage: %f seconds\n",total_true_time/query_count);
-  fprintf(fptr, "Max Approximation Factor: %f\n",max_aproximation_factor);
-  fprintf(fptr, "Min Approximation Factor: %f\n",min_aproximation_factor);
+  if(distanceTrueOff!=1){
+    fprintf(fptr, "tTrueAverage: %f seconds\n",total_true_time/query_count);
+    fprintf(fptr, "Max Approximation Factor: %f\n",max_aproximation_factor);
+    fprintf(fptr, "Min Approximation Factor: %f\n",min_aproximation_factor);
+  }else{
+    fprintf(fptr, "tTrueAverage: True Distances were not computed\n");
+    fprintf(fptr, "Min/Max Approximation Factor are not defined without distanceTrue\n");
+  }
   fclose(fptr);
   fclose(file);
 }
 
-void readQueryFileLSH_ContinuousFrechet(char* queryFile,char* outputFile,LSH lsh,List inputs,double delta,double epsilon,double *time,int dim,Grids grid){
+void readQueryFileLSH_ContinuousFrechet(char* queryFile,char* outputFile,LSH lsh,List inputs,double delta,double epsilon,double *time,int dim,Grids grid,int distanceTrueOff){
 
    FILE *file = fopen(queryFile, "r"); // read mode
 
@@ -352,8 +364,8 @@ void readQueryFileLSH_ContinuousFrechet(char* queryFile,char* outputFile,LSH lsh
 
     clock_t begin_true = clock(); // time calculation for the k nearest neighbors with brute force method
     // find with the brute force method the k nearest neighbors for the corresponding query vector
-
-    // listFindNearestNeighbor(inputs,vecTmp,nNearest,knearestDists,dim,-1);
+    if(distanceTrueOff!=1)
+      listFindNearestNeighbor(inputs,vecTmp,nNearest,knearestDists,dim,-1);
 
     clock_t end_true = clock();
     double time_spent_true = (double)(end_true - begin_true) / CLOCKS_PER_SEC;
@@ -362,7 +374,7 @@ void readQueryFileLSH_ContinuousFrechet(char* queryFile,char* outputFile,LSH lsh
     double approximation_factor=-1;
     int found_neighbor=-1;
     // find with the help of LSH the k nearest neighbor for the corresponding query vector
-    nearestNeigborLSH_ContinuousFrechet(lsh,vecTmp,nNearest,knearestDists,fptr,delta,epsilon,grid,&approximation_factor,&found_neighbor);
+    nearestNeigborLSH_ContinuousFrechet(lsh,vecTmp,nNearest,knearestDists,fptr,delta,epsilon,grid,&approximation_factor,&found_neighbor,distanceTrueOff);
     if(approximation_factor>0){
       if(approximation_factor>max_aproximation_factor)
         max_aproximation_factor=approximation_factor;
@@ -385,9 +397,14 @@ void readQueryFileLSH_ContinuousFrechet(char* queryFile,char* outputFile,LSH lsh
   }
   if(query_count>0){
     fprintf(fptr, "tApproximateAverage: %f seconds\n",total_lsh_time/query_count);
-    fprintf(fptr, "tTrueAverage: %f seconds\n",total_true_time/query_count);
-    fprintf(fptr, "Max Approximation Factor: %f\n",max_aproximation_factor);
-    fprintf(fptr, "Min Approximation Factor: %f\n",min_aproximation_factor);
+    if(distanceTrueOff!=1){
+      fprintf(fptr, "tTrueAverage: %f seconds\n",total_true_time/query_count);
+      fprintf(fptr, "Max Approximation Factor: %f\n",max_aproximation_factor);
+      fprintf(fptr, "Min Approximation Factor: %f\n",min_aproximation_factor);
+    }else{
+      fprintf(fptr, "tTrueAverage: True Distances were not computed\n");
+      fprintf(fptr, "Min/Max Approximation Factor are not defined without distanceTrue\n");
+    }
   }
 
   fclose(fptr);

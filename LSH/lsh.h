@@ -14,7 +14,7 @@ void insertContinuousTimeSeriesFromListToLSH(List ,LSH ,double ,double ,Grids );
 void printLSH(LSH );
 void destroyLSH(LSH );
 
-void nearestNeigborLSH(LSH ,Vector,Vector *,double *,FILE* ,double *,int *);
+void nearestNeigborLSH(LSH ,Vector,Vector *,double *,FILE* ,double *,int *, int);
 void kNearestNeighborsLSH(LSH, Vector,int,double *,FILE*);
 void radiusNeigborsLSH(LSH ,Vector ,double,FILE* );
 void radiusNeigborsClustering(LSH ,Vector ,double ,HashTable ,int ,List* ,int *,int );
@@ -24,8 +24,8 @@ void radiusNeigborsClusteringTimeSeries(LSH ,Vector ,double ,HashTable ,int ,Lis
 Grids initializeGrids(double ,int ,int );
 void deleteGrids(Grids ,int );
 double getTofGrid(Grids ,int ,int);
-void nearestNeigborLSH_DiscreteFrechet(LSH ,Vector ,Vector *,double *,FILE *,Grids ,double ,double *,int *);
-void nearestNeigborLSH_ContinuousFrechet(LSH ,Vector ,Vector *,double *,FILE * ,double ,double ,Grids ,double *,int *);
+void nearestNeigborLSH_DiscreteFrechet(LSH ,Vector ,Vector *,double *,FILE *,Grids ,double ,double *,int *, int);
+void nearestNeigborLSH_ContinuousFrechet(LSH ,Vector ,Vector *,double *,FILE * ,double ,double ,Grids ,double *,int *,int );
 
 int getValueOfFirstGFun(LSH ,Vector ,unsigned int * );
 Vector filterMeanCurve(Vector ,int );
