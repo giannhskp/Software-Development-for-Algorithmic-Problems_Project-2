@@ -322,7 +322,7 @@ void clusteringLSH(List vecList,int numOfClusters,int l,FILE* fptr,int dim,int m
   clock_t begin = clock();
   // w = wValueCalculation(vecList,numOfVecs,dim);
   // w /= W_DIVIDER_LSH;
-  w = 6;
+  w = 200;
   clock_t end = clock();
   double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   // printf("Found value of w in %f seconds, w = %d\n",time_spent,w );
@@ -519,7 +519,7 @@ void clusteringHypercube(List vecList,int numOfClusters,int m,int probes,FILE* f
   clock_t begin = clock();
   // w = wValueCalculation(vecList,numOfVecs,dim);
   // w /= W_DIVIDER_CUBE;
-  w = 6;
+  w = 800;
   clock_t end = clock();
   double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   // printf("Found value of w in %f seconds, w = %d\n",time_spent,w );

@@ -487,7 +487,7 @@ void destroyLSH(LSH lsh){
   free(lsh);
 }
 
-void nearestNeigborLSH(LSH lsh,Vector q,Vector *nNearest,double *trueDist,FILE *fptr,double *aproximation_factor,int *found_neighbor){
+void nearestNeigborLSH(LSH lsh,Vector q,Vector *nNearest,double *trueDist,FILE *fptr,double *aproximation_factor,int *found_neighbor,int distanceTrueOff){
   // find the nearest neighbor of the given vector q with the help of LSH
   Vector nearest=NULL;
   double nearestDist=-1;
@@ -505,10 +505,18 @@ void nearestNeigborLSH(LSH lsh,Vector q,Vector *nNearest,double *trueDist,FILE *
   if(nearestDist>=0 && nearest!=NULL){
     fprintf(fptr,"Approximate Nearest neighbor: ");
     printVectorIdInFile(nearest,fptr);
-    fprintf(fptr,"True Nearest neighbor: ");
-    printVectorIdInFile(*nNearest,fptr);
+    if(distanceTrueOff==1){
+      fprintf(fptr,"True Nearest neighbor: was not computed\n");
+    }else{
+      fprintf(fptr,"True Nearest neighbor: ");
+      printVectorIdInFile(*nNearest,fptr);
+    }
     fprintf(fptr,"distanceApproximate: %f\n",nearestDist);
-    fprintf(fptr,"distanceTrue: %f\n", *trueDist);
+    if(distanceTrueOff==1){
+      fprintf(fptr,"distanceTrue: was not computed\n");
+    }else{
+      fprintf(fptr,"distanceTrue: %f\n", *trueDist);
+    }
     (*aproximation_factor) = nearestDist/(*trueDist);
     (*found_neighbor) = 1;
   }else{
@@ -516,7 +524,7 @@ void nearestNeigborLSH(LSH lsh,Vector q,Vector *nNearest,double *trueDist,FILE *
   }
 }
 
-void nearestNeigborLSH_DiscreteFrechet(LSH lsh,Vector q,Vector *nNearest,double *trueDist,FILE *fptr,Grids grids,double delta,double *aproximation_factor,int *found_neighbor){
+void nearestNeigborLSH_DiscreteFrechet(LSH lsh,Vector q,Vector *nNearest,double *trueDist,FILE *fptr,Grids grids,double delta,double *aproximation_factor,int *found_neighbor,int distanceTrueOff){
   // find the nearest neighbor of the given vector q with the help of LSH
   Vector nearest=NULL;
   double nearestDist=-1;
@@ -540,10 +548,18 @@ void nearestNeigborLSH_DiscreteFrechet(LSH lsh,Vector q,Vector *nNearest,double 
   if(nearestDist>=0 && nearest!=NULL){
     fprintf(fptr,"Approximate Nearest neighbor: ");
     printVectorIdInFile(nearest,fptr);
-    fprintf(fptr,"True Nearest neighbor: ");
-    printVectorIdInFile(*nNearest,fptr);
+    if(distanceTrueOff==1){
+      fprintf(fptr,"True Nearest neighbor: was not computed\n");
+    }else{
+      fprintf(fptr,"True Nearest neighbor: ");
+      printVectorIdInFile(*nNearest,fptr);
+    }
     fprintf(fptr,"distanceApproximate: %f\n",nearestDist);
-    fprintf(fptr,"distanceTrue: %f\n", *trueDist);
+    if(distanceTrueOff==1){
+      fprintf(fptr,"distanceTrue: was not computed\n");
+    }else{
+      fprintf(fptr,"distanceTrue: %f\n", *trueDist);
+    }
     (*aproximation_factor) = nearestDist/(*trueDist);
     (*found_neighbor)=1;
   }else{
@@ -551,7 +567,7 @@ void nearestNeigborLSH_DiscreteFrechet(LSH lsh,Vector q,Vector *nNearest,double 
   }
 }
 
-void nearestNeigborLSH_ContinuousFrechet(LSH lsh,Vector q,Vector *nNearest,double *trueDist,FILE *fptr,double delta,double epsilon,Grids grid,double *aproximation_factor,int *found_neighbor){
+void nearestNeigborLSH_ContinuousFrechet(LSH lsh,Vector q,Vector *nNearest,double *trueDist,FILE *fptr,double delta,double epsilon,Grids grid,double *aproximation_factor,int *found_neighbor,int trueDistOff){
   // find the nearest neighbor of the given vector q with the help of LSH
   Vector nearest=NULL;
   double nearestDist=-1;
@@ -571,10 +587,19 @@ void nearestNeigborLSH_ContinuousFrechet(LSH lsh,Vector q,Vector *nNearest,doubl
   if(nearestDist>=0 && nearest!=NULL){
     fprintf(fptr,"Approximate Nearest neighbor: ");
     printVectorIdInFile(nearest,fptr);
-    fprintf(fptr,"True Nearest neighbor: ");
-    printVectorIdInFile(*nNearest,fptr);
+    if(trueDistOff==1){
+      fprintf(fptr,"True Nearest neighbor: was not computed\n");
+    }else{
+      fprintf(fptr,"True Nearest neighbor: ");
+      printVectorIdInFile(*nNearest,fptr);
+    }
     fprintf(fptr,"distanceApproximate: %f\n",nearestDist);
-    fprintf(fptr,"distanceTrue: %f\n", *trueDist);
+    if(trueDistOff==1){
+      fprintf(fptr,"distanceTrue: was not computed\n");
+    }else{
+      fprintf(fptr,"distanceTrue: %f\n", *trueDist);
+    }
+
     (*aproximation_factor) = nearestDist/(*trueDist);
     (*found_neighbor) = 1;
   }else{

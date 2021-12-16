@@ -30,12 +30,13 @@ int main(int argc, char *argv[])  {
   char algorithm[100];
   char metric[100];
   int m=10;
-  double delta=2.5;
+  double delta=1;
   int outputflag=0;
   int l=5;
   int k_LSH = 4;
   int new_dimension = 14;
   int probes=2;
+  int distanceTrueOff = 0;
 
   for(int i = 1 ; i < argc ; i++){
     strcpy(str,argv[i]);
@@ -83,6 +84,10 @@ int main(int argc, char *argv[])  {
       m=atoi(argv[i+1]);
       printf("M : %d\n", m);
     }
+    else if(strcmp(str,"-distanceTrueOff")==0){
+      distanceTrueOff=1;
+      printf("distanceTrueOff : Enabled\n");
+    }
 
   }
 
@@ -126,26 +131,26 @@ int main(int argc, char *argv[])  {
         distanceMetric=malloc(sizeof(char)*(strlen("l2")+1));
         strcpy(distanceMetric,"l2");
         fprintf(stdout,"Algorithm: LSH\n");
-        vectorTimeSeriesLSH(inputFile,queryFile,k_LSH,l,outputFile);
+        vectorTimeSeriesLSH(inputFile,queryFile,k_LSH,l,outputFile,distanceTrueOff);
       }
       else if(strcmp(algorithm,"Hypercube")==0){
         distanceMetric=malloc(sizeof(char)*(strlen("l2")+1));
         strcpy(distanceMetric,"l2");
         fprintf(stdout,"Algorithm: LSH\n");
-        vectorTimeSeriesHypecube(inputFile,queryFile,new_dimension,m,probes,outputFile);
+        vectorTimeSeriesHypecube(inputFile,queryFile,new_dimension,m,probes,outputFile,distanceTrueOff);
       }
       else if(strcmp(algorithm,"Frechet")==0){
         if(strcmp(metric,"discrete")==0){
           distanceMetric=malloc(sizeof(char)*(strlen("discreteFrechet")+1));
           strcpy(distanceMetric,"discreteFrechet");
           fprintf(stdout,"Algorithm: Frechet Discrece\n");
-          vectorTimeSeriesLSHFrechetDiscrete(inputFile,queryFile,k_LSH,l,outputFile,delta);
+          vectorTimeSeriesLSHFrechetDiscrete(inputFile,queryFile,k_LSH,l,outputFile,delta,distanceTrueOff);
         }
         else if(strcmp(metric,"continuous")==0){
           distanceMetric=malloc(sizeof(char)*(strlen("continuousFrechet")+1));
           strcpy(distanceMetric,"continuousFrechet");
           fprintf(stdout,"Algorithm: Frechet Continuous\n");
-          vectorTimeSeriesLSHFrechetContinuous(inputFile,queryFile,k_LSH,outputFile,delta,FILTERING_E);
+          vectorTimeSeriesLSHFrechetContinuous(inputFile,queryFile,k_LSH,outputFile,delta,FILTERING_E,distanceTrueOff);
         }
         else{
           // TODO: GIVE METRIC
