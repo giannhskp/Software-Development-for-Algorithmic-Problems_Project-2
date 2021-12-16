@@ -18,35 +18,51 @@ int k_LSH;
 int hashTableSize;
 // Vector timeVector;
 
-static int wValueCalculation(List list,int numberOfVectorsInFile,int dim){
-  long double sumDist = 0.0;
-  int count=0;
-  double persentageToCheck;
-  if(numberOfVectorsInFile<=1000){
-    persentageToCheck = 0.1;
-  }else if(numberOfVectorsInFile<=10000){
-    persentageToCheck = 0.001;
-  }else if (numberOfVectorsInFile<=100000){
-    persentageToCheck = 0.0001;
-  }else{
-    persentageToCheck = 0.000001;
-  }
-  // persentageToCheck = 0.00001; // TODO: CHANGE
-  int stopBound = persentageToCheck*numberOfVectorsInFile*numberOfVectorsInFile;
+// static int wValueCalculation(List list,int numberOfVectorsInFile,int dim){
+//   long double sumDist = 0.0;
+//   int count=0;
+//   double persentageToCheck;
+//   if(numberOfVectorsInFile<=1000){
+//     persentageToCheck = 0.1;
+//   }else if(numberOfVectorsInFile<=10000){
+//     persentageToCheck = 0.001;
+//   }else if (numberOfVectorsInFile<=100000){
+//     persentageToCheck = 0.0001;
+//   }else{
+//     persentageToCheck = 0.000001;
+//   }
+//   // persentageToCheck = 0.00001; // TODO: CHANGE
+//   int stopBound = persentageToCheck*numberOfVectorsInFile*numberOfVectorsInFile;
+//
+//   while(list!=NULL){
+//     List nested = list;
+//     while(nested!=NULL){
+//       if(count>stopBound){
+//         return floor(sumDist/count);
+//       }
+//       sumDist += distance_metric(getVector(list),getVector(nested));
+//       count++;
+//       nested = getNext(nested);
+//     }
+//     list=getNext(list);
+//   }
+//   return floor(sumDist/count);
+// }
 
-  while(list!=NULL){
-    List nested = list;
-    while(nested!=NULL){
-      if(count>stopBound){
-        return floor(sumDist/count);
-      }
-      sumDist += distance_metric(getVector(list),getVector(nested));
-      count++;
-      nested = getNext(nested);
-    }
-    list=getNext(list);
+static int wValueCalculation(int dim){
+  if(dim>850){
+    return 400;
+  }else if(dim>700){
+    return 200;
+  }else if(dim>500){
+    return 100;
+  }else if(dim>300){
+    return 50;
+  }else if(dim>150){
+    return 20;
+  }else{
+    return 6;
   }
-  return floor(sumDist/count);
 }
 
 
@@ -83,15 +99,13 @@ void vectorTimeSeriesLSH(char* arg_inputFile,char* arg_queryFile,int arg_k_LSH,i
   hashTableSize=numberOfVectorsInFile/16;
 
   printf("Finding optimal value of w based on the input file\n");
-  begin = clock();
-  // w = wValueCalculation(list,numberOfVectorsInFile,dim);
+  // begin = clock();
+  w = wValueCalculation(dim);
   // printf("WVALUEEEEE = %d\n",w);
   // w /= W_DIVIDER;
-  // w=6;
-  w=200;
-  end = clock();
-  time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-  printf("Found value of w in %f seconds, w = %d\n",time_spent,w );
+  // end = clock();
+  // time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+  printf("Found value of w = %d\n",w );
 
   begin = clock();
   lsh = initializeLSH(l,dim);
@@ -147,14 +161,14 @@ void vectorTimeSeriesLSHFrechetDiscrete(char* arg_inputFile,char* arg_queryFile,
   hashTableSize=numberOfVectorsInFile/16;
 
   printf("Finding optimal value of w based on the input file\n");
-  begin = clock();
-  // w = wValueCalculation(list,numberOfVectorsInFile,dim);
+  // begin = clock();
+  w = wValueCalculation(dim);
   // // w /= W_DIVIDER;
   // w = w/10;
-  w=200;
-  end = clock();
-  time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-  printf("Found value of w in %f seconds, w = %d\n",time_spent,w );
+  // w=200;
+  // end = clock();
+  // time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+  printf("Found value of w = %d\n",w );
 
   begin = clock();
   lsh = initializeLSH(l,2*dim);
@@ -208,14 +222,14 @@ void vectorTimeSeriesLSHFrechetContinuous(char* arg_inputFile,char* arg_queryFil
   hashTableSize=numberOfVectorsInFile/16;
 
   printf("Finding optimal value of w based on the input file\n");
-  begin = clock();
-  // w = wValueCalculation(list,numberOfVectorsInFile,dim);
+  // begin = clock();
+  w = wValueCalculation(dim);
   // w /= W_DIVIDER;
   // w = w/10;
-  w=200; // TODO CHANGE
-  end = clock();
-  time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-  printf("Found value of w in %f seconds, w = %d\n",time_spent,w );
+  // w=200; // TODO CHANGE
+  // end = clock();
+  // time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+  printf("Found value of w = %d\n",w );
 
   begin = clock();
   lsh = initializeLSH(l,dim);
