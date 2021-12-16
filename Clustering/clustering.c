@@ -34,36 +34,51 @@ char *distanceMetric;
 // Vector timeVector;
 
 
-int wValueCalculation(List list,int numberOfVectorsInFile,int dim){
-  long double sumDist = 0.0;
-  int count=0;
-  double persentageToCheck;
-  if(numberOfVectorsInFile<=1000){
-    persentageToCheck = 0.1;
-  }else if(numberOfVectorsInFile<=10000){
-    persentageToCheck = 0.001;
-  }else if (numberOfVectorsInFile<=100000){
-    persentageToCheck = 0.0001;
-  }else{
-    persentageToCheck = 0.000001;
-  }
-  persentageToCheck = 0.0001; // TODO: REMOVE
-  int stopBound = persentageToCheck*numberOfVectorsInFile*numberOfVectorsInFile;
-  while(list!=NULL){
-    List nested = list;
-    while(nested!=NULL){
-      if(count>stopBound){
-        return floor(sumDist/count);
-      }
-      sumDist += distance_metric(getVector(list),getVector(nested));
-      count++;
-      nested = getNext(nested);
-    }
-    list=getNext(list);
-  }
-  return floor(sumDist/count);
-}
+// int wValueCalculation(List list,int numberOfVectorsInFile,int dim){
+//   long double sumDist = 0.0;
+//   int count=0;
+//   double persentageToCheck;
+//   if(numberOfVectorsInFile<=1000){
+//     persentageToCheck = 0.1;
+//   }else if(numberOfVectorsInFile<=10000){
+//     persentageToCheck = 0.001;
+//   }else if (numberOfVectorsInFile<=100000){
+//     persentageToCheck = 0.0001;
+//   }else{
+//     persentageToCheck = 0.000001;
+//   }
+//   persentageToCheck = 0.0001; // TODO: REMOVE
+//   int stopBound = persentageToCheck*numberOfVectorsInFile*numberOfVectorsInFile;
+//   while(list!=NULL){
+//     List nested = list;
+//     while(nested!=NULL){
+//       if(count>stopBound){
+//         return floor(sumDist/count);
+//       }
+//       sumDist += distance_metric(getVector(list),getVector(nested));
+//       count++;
+//       nested = getNext(nested);
+//     }
+//     list=getNext(list);
+//   }
+//   return floor(sumDist/count);
+// }
 
+static int wValueCalculation(int dim){
+  if(dim>850){
+    return 700;
+  }else if(dim>700){
+    return 600;
+  }else if(dim>500){
+    return 500;
+  }else if(dim>300){
+    return 400;
+  }else if(dim>150){
+    return 300;
+  }else{
+    return 200;
+  }
+}
 
 
 void lloyds(Vector* clusters,Vector *oldClusters,Vector* vectors,List* clustersList,int numberOfVectors,int numOfClusters,int *vectorCount,int *firstTime,int dim) {
@@ -264,6 +279,7 @@ void reverseAssignmentLSH(LSH lsh,Vector *vectors,Vector *clusters,Vector *oldCl
     radius*=2; // doubled the radius for the next range search
     loopCounter++;
   }
+  printf("ITERATION %d | ASSIGNED = %d\n",iteration,assignCounter);
   int remainderCounter = 0;
   // finally one big percentage of vectors has been assigned into clusters
   // the remaining vectors will be assigned based on the nearest centroid at the corresponding cluster
@@ -319,17 +335,17 @@ void clusteringLSH(List vecList,int numOfClusters,int l,FILE* fptr,int dim,int m
     hashTableSize=numOfVecs/10;
   }
 
-  clock_t begin = clock();
-  // w = wValueCalculation(vecList,numOfVecs,dim);
+  // clock_t begin = clock();
+  w = wValueCalculation(dim);
   // w /= W_DIVIDER_LSH;
-  w = 200;
-  clock_t end = clock();
-  double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-  // printf("Found value of w in %f seconds, w = %d\n",time_spent,w );
+  // w = 600;
+  // clock_t end = clock();
+  // double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+  printf("Found value of w = %d\n",w );
 
 
 
-  begin = clock();
+  clock_t begin = clock();
   int vector_v_dim = -1;
   if(method == METHOD_VECTOR){
     vector_v_dim = dim;
@@ -351,8 +367,8 @@ void clusteringLSH(List vecList,int numOfClusters,int l,FILE* fptr,int dim,int m
       insertTimeSeriesToLSH(lsh,grids,delta,vectors[i]);
     }
   }
-  end = clock();
-  time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+  clock_t end = clock();
+  double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Created LSH in : %f seconds\n",time_spent);
 
   clock_t cluster_start = clock();
@@ -516,24 +532,24 @@ void clusteringHypercube(List vecList,int numOfClusters,int m,int probes,FILE* f
   }
   props = calloc(numOfVecs,sizeof(double));
 
-  clock_t begin = clock();
-  // w = wValueCalculation(vecList,numOfVecs,dim);
+  // clock_t begin = clock();
+  w = wValueCalculation(dim);
   // w /= W_DIVIDER_CUBE;
-  w = 800;
-  clock_t end = clock();
-  double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-  // printf("Found value of w in %f seconds, w = %d\n",time_spent,w );
+  // w = 800;
+  // clock_t end = clock();
+  // double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+  printf("Found value of w = %d\n",w );
 
   // allocate and initialize the Hypercube with the vectors tha will be inserted into clusters
   hashTableSize=numOfVecs/16;
-  begin = clock();
+  clock_t begin = clock();
   HyperCube cube = initializeHyperCube(dim);
   for(int i=0;i<numOfVecs;i++){
     initializeClusterInfo(vectors[i]);
     insertToHyperCube(cube,vectors[i]);
   }
-  end = clock();
-  time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+  clock_t end = clock();
+  double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Created Hypercube in : %f seconds\n",time_spent);
 
   clock_t cluster_start = clock();
