@@ -12,6 +12,7 @@
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #define MIN3(a, b, c) MIN((MIN((a),(b))),(c))
 
+// structure that used to save the optimal path indexes
 struct index_node {
   int i;
   int j;
@@ -25,6 +26,10 @@ static double l2_metric(double x1,double y1,double x2,double y2){
 }
 
 double discreteFrechet(Vector v1,Vector v2){
+  // calculate the Discrete Frechet distance between the 2 given timeseries.
+  // these two timeseries may have different dimensions, so the dynamic 2-d array
+  // has as many rows as the first given timeserie and as many column as the second timeSerie has.
+  // We find the distance between them by applying Dynamic Programming, will appear in the lower right part of the dynamic array.
   int i_dim = getDim(v1);
   int j_dim = getDim(v2);
   double **dynamicArray=malloc(i_dim*sizeof(double*));
@@ -37,7 +42,9 @@ double discreteFrechet(Vector v1,Vector v2){
   for(int i=0;i<i_dim;i++){
     dynamicArray[i]=malloc(j_dim*sizeof(double));
   }
+
   dynamicArray[0][0] = l2_metric(coords1[0],coordsTime1[0],coords2[0],coordsTime2[0]);
+
   for(int j=1;j<j_dim;j++){
     double p1qj = l2_metric(coords1[0],coordsTime1[0],coords2[j],coordsTime2[j]);
     dynamicArray[0][j] = MAX( dynamicArray[0][j-1], p1qj);
@@ -66,6 +73,9 @@ double discreteFrechet(Vector v1,Vector v2){
 }
 
 Index *discreteFrechet_optimalPath(Vector v1,Vector v2,int *pathLength){
+  // find the optimal path between the 2 given timeseries that comes up through the calculation of Discrete Frechet distance.
+  // these two timeseries may have different dimensions, so the dynamic 2-d array
+  // has as many rows as the first given timeserie and as many column as the second timeSerie has.
   int i_dim = getDim(v1);
   int j_dim = getDim(v2);
 

@@ -16,14 +16,9 @@ int init_suite1(void){
    return 0;
 }
 
-/* The suite cleanup function.
-* Closes the temporary file used by the tests.
-* Returns zero on success, non-zero otherwise.
-*/
 int clean_suite1(void){
   return 0;
 }
-
 
 int k_LSH=5;
 int hashTableSize=100;
@@ -31,6 +26,7 @@ int w=6;
 
 
 void test_gFunction(void){
+  // Tests the g function of LSH if finds the same value between two similar vectors
   int dim=5;
   double coords1[5]={3.53,7.56,13.34,54.33,10.02};
   double coords2[5]={3.4,7.7,13.5,54.5,10};
@@ -46,40 +42,32 @@ void test_gFunction(void){
 }
 
 void test_discreteFrechet(void){
+  // Tests the discreteFrechet() if finds the correct distance between two following curves
   int dim=5;
-  double coords1[5]={5.53,75.6,3.34,54.3,10.02};
-  double coords2[5]={2.13,67.06,1.44,94.3,31.3};
-  double sum=0.0;
-  double time[dim];
-  for(int i=0;i<dim;i++){
-    time[i]=sum;
-    sum+=1.0;
-  }
+  double coords1[5]={0,0,0,0,0};
+  double time[5]={1,2,3,4,5};
+  double coords2[5]={1.0,1.1,1.2,1.1,1.0};
   Vector timeSeries1=initTimeSeries(coords1,time,"1",dim);
   Vector timeSeries2=initTimeSeries(coords2,time,"2",dim);
-  CU_ASSERT(40.00 == discreteFrechet(timeSeries1,timeSeries2));
+  CU_ASSERT(1.2 == discreteFrechet(timeSeries1,timeSeries2));
   deleteVector(timeSeries1);
   deleteVector(timeSeries2);
 }
 
 void test_meanCurveBetween2Curves(void){
+  // Tests the meanCurveBetween2Curves() if finds the correct mean curve
   int dim=5;
-  double coords1[5]={5.53,75.6,3.34,54.3,10.02};
-  double coords2[5]={2.13,67.06,1.44,94.3,31.3};
-  double meanCoords[6]={3.83,71.33,2.390,74.3,42.8,20.66};
-  double meanTime[6]={0.0,1.0,2.0,3.0,3.5,4.0};
-  double sum=0.0;
-  double time[dim];
-  for(int i=0;i<dim;i++){
-    time[i]=sum;
-    sum+=1.0;
-  }
+  double coords1[5]={0,0,0,0,0};
+  double time[5]={1,2,3,4,5};
+  double coords2[5]={1.0,1.1,1.2,1.1,1.0};
+  double meanCoords[5]={0.5,0.55,0.6,0.55,0.5};
   Vector timeSeries1=initTimeSeries(coords1,time,"1",dim);
   Vector timeSeries2=initTimeSeries(coords2,time,"2",dim);
-  Vector realMean=initTimeSeries(meanCoords,meanTime,"real",6);
+  Vector realMean=initTimeSeries(meanCoords,time,"real",dim);
   Vector test = meanCurveBetween2Curves(timeSeries1,timeSeries2);
+  printVector(test);
+  printTimes(test);
   CU_ASSERT(compareTimeSeries(test,realMean) == 1);
-
 
   deleteVector(timeSeries1);
   deleteVector(timeSeries2);

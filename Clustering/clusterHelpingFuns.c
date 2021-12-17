@@ -15,7 +15,6 @@
 #define TRUE 1
 #define FALSE 0
 
-// extern int d;
 
 int existsInArray(int *array,int check,int arraySize){
   for(int i=0;i<arraySize;i++){
@@ -82,7 +81,6 @@ int findClosestCentroid(Vector v,Vector *clusters,int numOfClusters){
       printVector(clusters[i]);
       exit(0);
     }
-    // printf("tempDist[%d] = %f\n",i,tempDist);
     if(tempDist<minDist){
       minDistIndex = i;
       minDist = tempDist;

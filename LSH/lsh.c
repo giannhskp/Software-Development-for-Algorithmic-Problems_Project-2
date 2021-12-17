@@ -14,7 +14,6 @@
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
 extern int w;
-// extern int d;
 extern int k_LSH;
 extern int hashTableSize;
 
@@ -47,6 +46,12 @@ typedef gridNode *Grids;
 
 
 Grids initializeGrids(double delta,int l,int dims){
+  // returns a array with rows as many as the number of dimensions (dims)
+  // and with columns as many as the number of hash tables at LSH (l)
+  // the array contains numbers generated from the uniform distribution~[0,delta]
+  // with purpose to use these ones at the snapping proccess
+  // (the grids between the hash tables differ by this t number
+  // and each dimension has a different t)
   Grids grids = malloc(sizeof(gridNode));
   grids->t_array = malloc(dims*sizeof(double*));
   for(int dim = 0;dim<dims;dim++){
@@ -60,6 +65,7 @@ Grids initializeGrids(double delta,int l,int dims){
 }
 
 void deleteGrids(Grids grids,int dims){
+  // free the allocated space
   if(grids==NULL){
     return;
   }
@@ -86,12 +92,23 @@ g_function *getGfuns(LSH lsh){
 }
 
 Vector timeSeriesSnapping(Vector v,double gridDelta,double t_x,double t_y){
+  // This snapping process used at the case of Discrete Frechet metric
+  // more especially every point of the timeSerie should be snapped at the
+  // "closest" point of the grid based on the this formula: xi' = floor((x-t)/δ + 1/2)*δ + t.
+  // Appyling this formula at every dimension separately.
+  // Also consecutive duplicates points that snap at the same grid point will be removed.
+  // After all, the given time timeSerie will be converted to a vector (after applying padding process to the deleted points)
+  // which has this format : [x1,y1,x2,y2,...,x2n,y2n] with double dimension compared with the timeserie
+  // This vector will be returned from this function
+
   int dim=getDim(v);
   double *coordsVector = getCoords(v);
   double *coordsTime = getTime(v);
-  double snappedVector[dim];
-  double snappedTime[dim];
-  double snappedFinal[2*dim];
+  // the following 2 arrays use to remove the consecutive duplicates timeserie points
+  double snappedTime[dim]; // array to store the snapped x coordinates of the time serie
+  double snappedVector[dim]; // array to store the snapped y coordinates of the time serie
+
+  double snappedFinal[2*dim]; // array to use to shape the final vector, the point here stored as tuples: x1,y1,x2,y2...
   int index=0;
   int indexFinal=0;
   for(int i=0;i<dim;i++){
@@ -100,19 +117,21 @@ Vector timeSeriesSnapping(Vector v,double gridDelta,double t_x,double t_y){
     double keepX;
     double keepY;
 
-    // x
+    // apply the corresponding formula at each dimension to snap the point at the corresponding grid point
+    // x coordinate
     x = (x - t_x)/gridDelta;
     x = x+(0.5);
     x = floor(x);
     x = x * gridDelta;
     keepX = x + t_x;
-    // y
+    // y coordinate
     y = (y - t_y)/gridDelta;
     y = y+(0.5);
     y = floor(y);
     y = y * gridDelta;
     keepY = y + t_y;
 
+    // remove consecutive duplicates timeserie points
     if(index>0){
       if(snappedTime[index-1]==keepX && snappedVector[index-1]==keepY){
         continue;
@@ -126,84 +145,108 @@ Vector timeSeriesSnapping(Vector v,double gridDelta,double t_x,double t_y){
     snappedVector[index++]=keepY;
   }
 
+  // apply padding to fill the remaining positions
   for(int i=index;i<2*dim;i++){
     snappedFinal[i]=PADDING_M;
   }
-  ////////////////////////////
+  // finally generate the vector the comed up from this snapping process
   Vector vecTmp=initVector(snappedFinal,getID(v),2*dim);
-
+  // and return it
   return vecTmp;
 }
 
 Vector continuousTimeSeriesSnapping(Vector v,double gridDelta,double t){
+  // This snapping process used at the case of Continuous Frechet metric
+  // more especially every point of the timeSerie should be snapped at the
+  // "closest" point of the grid based on the this formula: xi' = floor((x-t)/δ + 1/2)*δ + t.
+  // Appyling this formula only at the y coordinate.
+  // After all, the given time timeSerie will be converted to a vector (after applying padding process to fill the removed points from filtering)
+  // which has this format : [y1,y2,...,yn] with same dimension with the timeserie
+  // This vector will be returned from this function.
   int dim=getDim(v);
   double *coordsVector = getCoords(v);
-  double snappedVector[dim];
+  double snappedVector[dim]; // array to use to shape the final snapped vector
 
   int index=0;
   for(int i=0;i<dim;i++){
-    double temp=coordsVector[i];  // displacement
+    double temp=coordsVector[i];
     if(temp==-1){
       continue;
     }
     double keepY;
-    // y
-    // temp = temp + gridDelta/2;
-    // temp = temp - fmod(temp,gridDelta);
-    // keepY=temp;
 
-    temp = temp + t;  // x + t
-    temp = temp/gridDelta; // (x + t)/d
-    temp = floor(temp); // floor( (x + t)/d )
-    temp = temp * gridDelta;  // floor( (x + t)/d ) * d
+    // apply the corresponding formula only at y coordinate
+    temp = temp + t;
+    temp = temp/gridDelta;
+    temp = floor(temp);
+    temp = temp * gridDelta;
     keepY = temp;
 
 
     snappedVector[index++]=keepY;
   }
   ////////////////////////////
+  // apply padding to fill the remaining positions
   for(int i=index;i<dim;i++){
     snappedVector[i]=PADDING_M;
   }
   ////////////////////////////
+  // finally generate the vector the comed up from this snapping process
   Vector vecTmp=initVector(snappedVector,getID(v),dim);
+  // and return it
   return vecTmp;
 }
 
 Vector minima_maxima(Vector v){
+  // The minima maxima process used at the case of Continuous Frechet metric
+  // after snapping is applied (timeserie has been converted in to vector ).
+  // This function for every three consecutive points a,b,c of the vector finds
+  // which point is the maximum and which is the minimum between the a and the c
+  // and checks if the point b is among them 2, if it is then remove this point.
+  // After all, return the vector that comes up from this process (after applying padding process to fill the removed points).
   int dim=getDim(v);
   double *coordsVector = getCoords(v);
-  double keyVector[dim];
+  double keyVector[dim];  // array to use to shape the final vector
   int newIndex = 0;
   int prev = 0;
   for(int i=1;i<(dim-1);i++){
-    if(coordsVector[i+1]==PADDING_M){
+    if(coordsVector[i+1]==PADDING_M){ // break, when first padding value is displayed
       break;
     }
+    // find the minimum and the maximum value from the corresponding points
     double minimum = MIN(coordsVector[prev],coordsVector[i+1]);
     double maximum = MAX(coordsVector[prev],coordsVector[i+1]);
+    // check if the  other point is among them 2, if it is then remove this point.
     if(coordsVector[i]>=minimum && coordsVector[i]<=maximum){
       continue;
     }else{
-      keyVector[newIndex++] = coordsVector[i];
+      keyVector[newIndex++] = coordsVector[i]; // else store the point
       prev=i;
     }
   }
+  // apply padding to fill the remaining positions
   for(int i=newIndex;i<dim;i++){
     keyVector[i] = PADDING_M;
   }
+  // finally generate the vector the comed up from this snapping process
   Vector tempVec = initVector(keyVector,"keyVector",dim);
+  // and return it
   return tempVec;
 }
 
 Vector filtering(Vector v,double epsilon){
+  // This filtering process used at the case of Continuous Frechet metric
+  // more especially use to remove some points from the timeserie.
+  // we take every time three consecutive points a,b,c from the timeserie and we have one constant epsilon
+  // so if |a-b|<=epsilon AND |b-c|<=epsilon then the corresponding b point will be removed.
+  // Finally, function returns the vector that comes up from this process.
   int dim = getDim(v);
   double *filteredCoords = malloc(dim*(sizeof(double)));
   double *originalCoords = getCoords(v);
   filteredCoords[0]=originalCoords[0];
   double previous = originalCoords[0];
   for(int i=1;i<(dim-1);i++){
-    if((fabs(previous-originalCoords[i])<epsilon) && (fabs(originalCoords[i]-originalCoords[i+1])<epsilon)){
+    if((fabs(previous-originalCoords[i])<=epsilon) && (fabs(originalCoords[i]-originalCoords[i+1])<=epsilon)){
       filteredCoords[i]=-1;
     }else{
       filteredCoords[i]=originalCoords[i];
@@ -390,11 +433,7 @@ void insertTimeSeriesToLSH(LSH lsh,Grids grids,double delta,Vector v){
     double t_y = getTofGrid(grids,i,1);
 
     Vector snappedToGrid = timeSeriesSnapping(v,delta,t_x,t_y);
-    // printf("ORIGINAL: \n");
-    // printVector(v);
-    // printf("Snapped: \n");
-    // printVector(snappedToGrid);
-    // getchar();
+
     unsigned int id;
     int index = computeG(lsh->g_fun[i],snappedToGrid,&id); // compute the value of the g function for the given vector that will be inserted
     // finally insert the vector at the corresponding bucket of the current hash table
@@ -417,16 +456,7 @@ void insertContinuousTimeSeriesToLSH(LSH lsh,double delta,Vector v,double epsilo
   Vector v3 = continuousTimeSeriesSnapping(v2,delta,t);
 
   Vector v4 = minima_maxima(v3);
-  // printf("ORIGINAL: \n");
-  // printVector(v);
-  // printf("FILTERED: \n");
-  // printVector(v2);
-  // printf("SNAPPED: \n");
-  // printVector(v3);
-  // printf("MINIMA MAXIMA: \n");
-  // printVector(v4);
-  // fflush(stdout);
-  // getchar();
+
   unsigned int id;
   int index = computeG(lsh->g_fun[0],v4,&id); // compute the value of the g function for the given vector that will be inserted
   // finally insert the vector at the corresponding bucket of the current hash table
@@ -698,5 +728,4 @@ void radiusNeigborsClusteringTimeSeries(LSH lsh,Vector q,double radius,HashTable
     htFindNeighborsInRadiusClustering(hts[i],q_index,centroidIndex,confList,vecsInRadius,q,getDim(q),q_ID,radius,assignCounter,iteration);
     deleteVector(snappedToGrid);
   }
-  // deleteVector(reduced_mean_curve);
 }

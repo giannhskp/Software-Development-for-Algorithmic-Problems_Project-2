@@ -13,9 +13,6 @@
 
 #define W_VALUE 4
 
-
-// int d;
-// int k;
 int new_dimension;
 int m;
 int probes;

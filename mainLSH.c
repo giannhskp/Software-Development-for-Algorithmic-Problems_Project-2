@@ -12,42 +12,11 @@
 
 #define W_DIVIDER 40
 
-// int d;
+
 int w;
 int k_LSH;
 int hashTableSize;
-// Vector timeVector;
 
-// static int wValueCalculation(List list,int numberOfVectorsInFile,int dim){
-//   long double sumDist = 0.0;
-//   int count=0;
-//   double persentageToCheck;
-//   if(numberOfVectorsInFile<=1000){
-//     persentageToCheck = 0.1;
-//   }else if(numberOfVectorsInFile<=10000){
-//     persentageToCheck = 0.001;
-//   }else if (numberOfVectorsInFile<=100000){
-//     persentageToCheck = 0.0001;
-//   }else{
-//     persentageToCheck = 0.000001;
-//   }
-//   // persentageToCheck = 0.00001; // TODO: CHANGE
-//   int stopBound = persentageToCheck*numberOfVectorsInFile*numberOfVectorsInFile;
-//
-//   while(list!=NULL){
-//     List nested = list;
-//     while(nested!=NULL){
-//       if(count>stopBound){
-//         return floor(sumDist/count);
-//       }
-//       sumDist += distance_metric(getVector(list),getVector(nested));
-//       count++;
-//       nested = getNext(nested);
-//     }
-//     list=getNext(list);
-//   }
-//   return floor(sumDist/count);
-// }
 
 static int wValueCalculation(int dim){
   if(dim>850){
@@ -67,6 +36,8 @@ static int wValueCalculation(int dim){
 
 
 void vectorTimeSeriesLSH(char* arg_inputFile,char* arg_queryFile,int arg_k_LSH,int arg_L,char* arg_outputFile,int distanceTrueOff)  {
+  // for this case every timeSerie represented as vector in R^d
+  // (not time representation needed,same implementation with the previous project)
 
   char inputFile[100];
   strcpy(inputFile,arg_inputFile);
@@ -87,30 +58,31 @@ void vectorTimeSeriesLSH(char* arg_inputFile,char* arg_queryFile,int arg_k_LSH,i
   LSH lsh;
   List list;
   clock_t begin = clock();
+
   int dim = findDimLSH(inputFile);
   printf("DIMENSION = %d\n",dim);
+
   list = initializeList();
+
   int numberOfVectorsInFile = 0;
   readFileLSH(inputFile,&list,&numberOfVectorsInFile,0,NULL,dim);
+
   clock_t end = clock();
+
   double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Parsed input file in : %f seconds\n",time_spent);
   printf("Number of vectors in input file: %d\n",numberOfVectorsInFile);
   hashTableSize=numberOfVectorsInFile/16;
 
   printf("Finding optimal value of w based on the input file\n");
-  // begin = clock();
   w = wValueCalculation(dim);
-  // printf("WVALUEEEEE = %d\n",w);
-  // w /= W_DIVIDER;
-  // end = clock();
-  // time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Found value of w = %d\n",w );
 
   begin = clock();
   lsh = initializeLSH(l,dim);
   insertFromListToLSH(list,lsh);
   end = clock();
+
   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Created LSH in : %f seconds\n",time_spent);
 
@@ -122,6 +94,10 @@ void vectorTimeSeriesLSH(char* arg_inputFile,char* arg_queryFile,int arg_k_LSH,i
 
 
 void vectorTimeSeriesLSHFrechetDiscrete(char* arg_inputFile,char* arg_queryFile,int arg_k_LSH,int arg_L,char* arg_outputFile,double arg_delta,int distanceTrueOff){
+  // for this case every timeSerie represented as curve in R^2
+  // in this implementation (compared with the previous one) snapping and padding added (before a timeserie being inserted or searched in LSH)
+  // and the distance between 2 curves now calculated with the Discrete Frechet metric
+
   char inputFile[100];
   strcpy(inputFile,arg_inputFile);
   char queryFile[100];
@@ -130,7 +106,6 @@ void vectorTimeSeriesLSHFrechetDiscrete(char* arg_inputFile,char* arg_queryFile,
   strcpy(outputFile,arg_outputFile);
   int l=arg_L;
   double delta=arg_delta;
-  // k_LSH = arg_k_LSH;
   k_LSH = 4;
   hashTableSize = 1000;
 
@@ -161,23 +136,18 @@ void vectorTimeSeriesLSHFrechetDiscrete(char* arg_inputFile,char* arg_queryFile,
   hashTableSize=numberOfVectorsInFile/16;
 
   printf("Finding optimal value of w based on the input file\n");
-  // begin = clock();
   w = wValueCalculation(dim);
-  // // w /= W_DIVIDER;
-  // w = w/10;
-  // w=200;
-  // end = clock();
-  // time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Found value of w = %d\n",w );
 
   begin = clock();
   lsh = initializeLSH(l,2*dim);
-  Grids grids = initializeGrids(delta,l,2);
+
+  Grids grids = initializeGrids(delta,l,2); //  initialize the corresponding t for the 2 dimensions (x,y coordinates) that use at the snapping
+
   insertTimeSeriesFromListToLSH(list,lsh,grids,delta);
   end = clock();
   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Created LSH in : %f seconds\n",time_spent);
-  printLSH(lsh);
 
   readQueryFileLSH_DiscreteFrechet(queryFile,outputFile,lsh,list,grids,delta,time,dim,distanceTrueOff);
   deleteGrids(grids,2);
@@ -187,6 +157,15 @@ void vectorTimeSeriesLSHFrechetDiscrete(char* arg_inputFile,char* arg_queryFile,
 
 
 void vectorTimeSeriesLSHFrechetContinuous(char* arg_inputFile,char* arg_queryFile,int arg_k_LSH,char* arg_outputFile,double arg_delta,double epsilon,int distanceTrueOff){
+  // for this case every timeSerie represented as curve in the line R.
+  // in this implementation (compared with the previous one) added:
+  // filtering, snapping, minima n' maxima, padding
+  // (before a timeserie being inserted or searched in LSH)
+  // and the distance between 2 curves now calculated with the Continuous Frechet metric from the corresponding library
+  // (Fred-master, an interface function has been created to link this library with our code).
+  // Also, LSH structure for this case has only one hash table, not L hash tables.
+
+
   char inputFile[100];
   strcpy(inputFile,arg_inputFile);
   char queryFile[100];
@@ -222,23 +201,16 @@ void vectorTimeSeriesLSHFrechetContinuous(char* arg_inputFile,char* arg_queryFil
   hashTableSize=numberOfVectorsInFile/16;
 
   printf("Finding optimal value of w based on the input file\n");
-  // begin = clock();
   w = wValueCalculation(dim);
-  // w /= W_DIVIDER;
-  // w = w/10;
-  // w=200; // TODO CHANGE
-  // end = clock();
-  // time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Found value of w = %d\n",w );
 
   begin = clock();
   lsh = initializeLSH(l,dim);
-  Grids grid = initializeGrids(delta,l,1); // (l=1) only one t as we only have one hash table/ one grid
+  Grids grid = initializeGrids(delta,l,1); // (l=1) -> only one t as we only have one hash table / one grid
   insertContinuousTimeSeriesFromListToLSH(list,lsh,delta,epsilon,grid);
   end = clock();
   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Created LSH in : %f seconds\n",time_spent);
-  printLSH(lsh);
   readQueryFileLSH_ContinuousFrechet(queryFile,outputFile,lsh,list,delta,epsilon,time,dim,grid,distanceTrueOff);
 
   deleteGrids(grid,1);
