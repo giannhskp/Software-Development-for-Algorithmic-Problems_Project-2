@@ -588,20 +588,25 @@ void nearestNeigborLSH_DiscreteFrechet(LSH lsh,Vector q,Vector *nNearest,double 
   int l = getL(lsh);
   HashTable *hts = getHts(lsh);
   g_function *gfuns = getGfuns(lsh);
-  // to find the nearest neighbor of the given vector q, euclidean distance must be applied between the vector q and the vectors of the corresponding bucket of every LSH hash table
+  // at this case to find the nearest neighbor of the given timeseries q,
+  // Discrete Frechet distance must be applied between the timeseries q and the timeseries of the corresponding bucket of every LSH hash table
+  // in order to find each time the bucket of the hash table,
+  // timeseries goes through the snapping process to be converted in to vector so that
+  // be able to calculate the value of the correspoding g function.
   for(int i=0;i<l;i++){ // go at every hash table of lsh
     double t_x = getTofGrid(grids,i,0);
     double t_y = getTofGrid(grids,i,1);
+    // timeseries goes through the snapping process
     Vector snappedToGrid = timeSeriesSnapping(q,delta,t_x,t_y);
     unsigned int q_ID;
 
-    int q_index = computeG(gfuns[i],snappedToGrid,&q_ID); // compute the value of the g function for the given vector
+    int q_index = computeG(gfuns[i],snappedToGrid,&q_ID); // compute the value of the g function for the given timeserie
 
-    // and go to the corresponding bucket of the current hash table to find the  nearest neighbor for the given query vector
+    // and go to the corresponding bucket of the current hash table to find the nearest neighbor for the given query timeserie
     htFindNearestNeighbor(hts[i],q_index,q,&nearest,&nearestDist,getDim(q),q_ID);
     deleteVector(snappedToGrid);
   }
-  // check if nearest neighbor of the given vector q found or not
+  // check if nearest neighbor of the given timeseries q found or not
   if(nearestDist>=0 && nearest!=NULL){
     fprintf(fptr,"Approximate Nearest neighbor: ");
     printVectorIdInFile(nearest,fptr);
@@ -625,22 +630,33 @@ void nearestNeigborLSH_DiscreteFrechet(LSH lsh,Vector q,Vector *nNearest,double 
 }
 
 void nearestNeigborLSH_ContinuousFrechet(LSH lsh,Vector q,Vector *nNearest,double *trueDist,FILE *fptr,double delta,double epsilon,Grids grid,double *aproximation_factor,int *found_neighbor,int trueDistOff){
-  // find the nearest neighbor of the given vector q with the help of LSH
+  // find the nearest neighbor of the given timeseries q with the help of LSH
+  // at this case to find the nearest neighbor of the given timeseries q,
+  // Continuous Frechet distance must be applied between the timeseries q and the timeseries of the corresponding bucket of LSH hash table
+  // in order to find the bucket of the hash table,
+  // timeseries goes through the following process: filtering, snapping, minima and maxima, padding
+  // to be converted in to vector so that
+  // be able to calculate the value of the correspoding g function.
+
   Vector nearest=NULL;
   double nearestDist=-1;
   HashTable *hts = getHts(lsh);
 
+  // timeseries goes through the filtering process
   Vector v2 = filtering(q,epsilon);
   double t = getTofGrid(grid,0,0);
+  // timeseries goes through the snapping process
   Vector v3 = continuousTimeSeriesSnapping(v2,delta,t);
+  // timeseries goes through the minima and maxim process
   Vector v4 = minima_maxima(v3);
 
   unsigned int q_id;
-  int q_index = computeG(lsh->g_fun[0],v4,&q_id); // compute the value of the g function for the given vector that will be inserted
+  int q_index = computeG(lsh->g_fun[0],v4,&q_id); // compute the value of the g function for the given timeseries
 
+  // and go to the corresponding bucket of the hash table to find the nearest neighbor for the given query timeserie
   htFindNearestNeighbor(hts[0],q_index,q,&nearest,&nearestDist,getDim(v2),q_id);
 
-  // check if nearest neighbor of the given vector q found or not
+  // check if nearest neighbor of the given timeseries q found or not
   if(nearestDist>=0 && nearest!=NULL){
     fprintf(fptr,"Approximate Nearest neighbor: ");
     printVectorIdInFile(nearest,fptr);
@@ -740,19 +756,24 @@ void radiusNeigborsClustering(LSH lsh,Vector q,double radius,HashTable vecsInRad
 }
 
 void radiusNeigborsClusteringTimeSeries(LSH lsh,Vector q,double radius,HashTable vecsInRadius,int centroidIndex,List* confList,int *assignCounter,int iteration,Grids grids,double delta,int dim){
-  // based on the given centroids find the clusters that the given vectors belong with the help of LSH (this function used for the "reverseAssignmentLSH")
-  // the clusters are represented by hash tables
-  // Vector reduced_mean_curve = filterMeanCurve(q,dim);
+  // based on the given centroids find the clusters that the given timeseries belong with the help of LSH (this function used for the "reverseAssignmentLSH")
+  // the clusters are represented by hash tables.
+  // Discrete Frechet Distance used.
+  // In order to find each time the bucket of the hash table,
+  // timeseries goes through the snapping process to be converted in to vector so that
+  // be able to calculate the value of the correspoding g function.
+
   int l = getL(lsh);
   HashTable *hts = getHts(lsh);
   g_function *gfuns = getGfuns(lsh);
   for(int i=0;i<l;i++){ // go at every hash table of lsh
     double t_x = getTofGrid(grids,i,0);
     double t_y = getTofGrid(grids,i,1);
+    // timeseries goes through the snapping process
     Vector snappedToGrid = timeSeriesSnapping(q,delta,t_x,t_y);
     unsigned int q_ID;
-    int q_index = computeG(gfuns[i],snappedToGrid,&q_ID); // compute the value of the g function for the given vector
-    // and go to the corresponding bucket of the current hash table to do the range search (to find the vectors that belong to the corresponding cluster)
+    int q_index = computeG(gfuns[i],snappedToGrid,&q_ID); // compute the value of the g function for the given timeseries
+    // and go to the corresponding bucket of the current hash table to do the range search (to find the timeseries that belong to the corresponding cluster)
     htFindNeighborsInRadiusClustering(hts[i],q_index,centroidIndex,confList,vecsInRadius,q,getDim(q),q_ID,radius,assignCounter,iteration);
     deleteVector(snappedToGrid);
   }
