@@ -270,6 +270,7 @@ Vector filterMeanCurve(Vector v,int finalDim){
   // which increases each loop as it multiplies by 5 (the initial value of epsilon is 0.001).
   // so if |a-b|<=epsilon AND |b-c|<=epsilon then the corresponding b point will be removed.
   // Finally, function returns the mean curve that comes up from this process.
+  if(v==NULL){return NULL;} // never actually happens
   int dim = getDim(v);
   if(dim<=finalDim){
     return copyVector(v);
