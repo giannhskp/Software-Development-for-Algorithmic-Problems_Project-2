@@ -18,36 +18,6 @@ int m;
 int probes;
 int w;
 
-// static int wValueCalculation(List list,int numberOfVectorsInFile,int dim){
-//   long double sumDist = 0.0;
-//   int count=0;
-//   double persentageToCheck;
-//   if(numberOfVectorsInFile<=1000){
-//     persentageToCheck = 0.1;
-//   }else if(numberOfVectorsInFile<=10000){
-//     persentageToCheck = 0.001;
-//   }else if (numberOfVectorsInFile<=100000){
-//     persentageToCheck = 0.0001;
-//   }else{
-//     persentageToCheck = 0.000001;
-//   }
-//   int stopBound = persentageToCheck*numberOfVectorsInFile*numberOfVectorsInFile;
-//   while(list!=NULL){
-//     List nested = list;
-//     while(nested!=NULL){
-//       if(count>stopBound){
-//         return floor(sumDist/count);
-//       }
-//       sumDist += distance_metric(getVector(list),getVector(nested));
-//       count++;
-//       nested = getNext(nested);
-//     }
-//     list=getNext(list);
-//   }
-//   return floor(sumDist/count);
-// }
-
-
 
 void vectorTimeSeriesHypecube(char* arg_inputFile,char* arg_queryFile,int arg_new_dimension,int arg_M,int arg_probes,char* arg_outputFile,int distanceTrueOff) {
   srand(time(NULL));
@@ -109,12 +79,9 @@ void vectorTimeSeriesHypecube(char* arg_inputFile,char* arg_queryFile,int arg_ne
   printf("Number of vectors in input file: %d\n",numberOfVectorsInFile);
 
   printf("Finding optimal value of w based on the input file\n");
-  // begin = clock();
-  // w = wValueCalculation(list,numberOfVectorsInFile,dim);
-  // w /= W_DIVIDER;
+
   w=600;
-  // end = clock();
-  // time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+
   printf("Found value of w = %d\n",w );
 
   HyperCube hc;

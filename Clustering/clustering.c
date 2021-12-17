@@ -62,6 +62,10 @@ void lloyds(Vector* clusters,Vector *oldClusters,Vector* vectors,List* clustersL
         }else{
           newCenter=listMeanOfCluster(clustersList[i],dim);
         }
+        if(newCenter==NULL){
+          // this cluster hasn't been formed, let as centroid the previous one
+          newCenter=copyVector(oldClusters[i]);
+        }
       }
       else{
         // this cluster hasn't been formed, let as centroid the previous one
@@ -131,7 +135,6 @@ void clusteringLloyds(List vecList,int numOfClusters,FILE* fptr,int dim){
     if(count==MAX_RECENTER_ITERATIONS)
       break;
     count++;
-    printf("Iteration %d\n",count);
     if(!firstIter){
       Vector *temp = oldClusters;
       oldClusters=clusters;
@@ -246,7 +249,6 @@ void reverseAssignmentLSH(LSH lsh,Vector *vectors,Vector *clusters,Vector *oldCl
     radius*=2; // doubled the radius for the next range search
     loopCounter++;
   }
-  printf("ITERATION %d | ASSIGNED = %d\n",iteration,assignCounter);
   int remainderCounter = 0;
   // finally one big percentage of vectors has been assigned into clusters
   // the remaining vectors will be assigned based on the nearest centroid at the corresponding cluster
@@ -324,6 +326,9 @@ void clusteringLSH(List vecList,int numOfClusters,int l,FILE* fptr,int dim,int m
     grids = NULL;
   }else if(method == METHOD_FRECHET){
     grids = initializeGrids(delta,l,2);
+  }else{
+    // never actually happens
+    grids = NULL;
   }
   for(int i=0;i<numOfVecs;i++){
     initializeClusterInfo(vectors[i]);
@@ -415,7 +420,7 @@ void clusteringLSH(List vecList,int numOfClusters,int l,FILE* fptr,int dim,int m
   }
   if (grids!=NULL)
     deleteGrids(grids,2);
-    
+
   free(props);
   free(vectors);
   free(oldClusters);

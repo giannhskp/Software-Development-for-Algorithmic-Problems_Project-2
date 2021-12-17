@@ -283,8 +283,8 @@ void readQueryFileLSH_DiscreteFrechet(char* queryFile,char* outputFile,LSH lsh,L
       total_true_time += time_spent_true;
       query_count++;
     }
-    fprintf(fptr, "tApproximateAverage: %f seconds\n",time_spent_lsh);
-    fprintf(fptr, "tTrueAverage: %f seconds\n",time_spent_true);
+    // fprintf(fptr, "tApproximateAverage: %f seconds\n",time_spent_lsh);
+    // fprintf(fptr, "tTrueAverage: %f seconds\n",time_spent_true);
     fprintf(fptr, "\n");
     fflush(fptr);
     deleteVector(vecTmp);
