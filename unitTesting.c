@@ -45,8 +45,8 @@ void test_discreteFrechet(void){
   // Tests the discreteFrechet() if finds the correct distance between two following curves
   int dim=5;
   double coords1[5]={0,0,0,0,0};
-  double time[5]={1,2,3,4,5};
   double coords2[5]={1.0,1.1,1.2,1.1,1.0};
+  double time[5]={1,2,3,4,5};
   Vector timeSeries1=initTimeSeries(coords1,time,"1",dim);
   Vector timeSeries2=initTimeSeries(coords2,time,"2",dim);
   CU_ASSERT(1.2 == discreteFrechet(timeSeries1,timeSeries2));
@@ -58,9 +58,9 @@ void test_meanCurveBetween2Curves(void){
   // Tests the meanCurveBetween2Curves() if finds the correct mean curve
   int dim=5;
   double coords1[5]={0,0,0,0,0};
-  double time[5]={1,2,3,4,5};
   double coords2[5]={1.0,1.1,1.2,1.1,1.0};
   double meanCoords[5]={0.5,0.55,0.6,0.55,0.5};
+  double time[5]={1,2,3,4,5};
   Vector timeSeries1=initTimeSeries(coords1,time,"1",dim);
   Vector timeSeries2=initTimeSeries(coords2,time,"2",dim);
   Vector realMean=initTimeSeries(meanCoords,time,"real",dim);
