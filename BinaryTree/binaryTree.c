@@ -95,40 +95,48 @@ Tree createTreeFromList(List list,int count){
 }
 
 TreeNode recursiveTreeCreateFromHt(List **listArray,int *arrayIndex,int height,int *leafCount){
-  if(height==0){
-    if((*arrayIndex)<0 && ((*listArray)[0]==NULL))
+  // create a tree that contains all the curves of the array of lists at it's leaves
+  if(height==0){    // if we reached at the leaf level
+    if((*arrayIndex)<0 && ((*listArray)[0]==NULL))  // if we are at the last index of the array and at the end of the list
       return NULL;
-    while((*listArray)[(*arrayIndex)]==NULL){
+    while((*listArray)[(*arrayIndex)]==NULL){ // while the index of the array contains an empty list, go to the next array index
       (*arrayIndex)--;
-      if((*arrayIndex)<0 )
+      if((*arrayIndex)<0 )  // if we reached at the end of the array, stop
         return NULL;
     }
+     // create a node that contains the vector of the current list node on the current array index
     TreeNode tn = createTreeNode(getVector((*listArray)[(*arrayIndex)]));
+    // go to the next node of the list
     (*listArray)[(*arrayIndex)] = getNext((*listArray)[(*arrayIndex)]);
     (*leafCount)++;
     return tn;
   }
+  // if we are at an inner node
+  // inner nodes are empty in the beggining, as the mean curves will be stored afterwards
   TreeNode tn = createTreeNode(NULL);
-  tn->left = recursiveTreeCreateFromHt(listArray,arrayIndex,height-1,leafCount);
-  tn->right = recursiveTreeCreateFromHt(listArray,arrayIndex,height-1,leafCount);
+  tn->left = recursiveTreeCreateFromHt(listArray,arrayIndex,height-1,leafCount);   // create left child at the next level, height is reduced by 1
+  tn->right = recursiveTreeCreateFromHt(listArray,arrayIndex,height-1,leafCount);  // create right child at the next level, height is reduced by 1
   return tn;
 }
 
 Tree createTreeFromHt(HashTable ht,int count){
+  // create a tree that contains all the curves of the given hash table at it's leaves
+  // every bucket of the hash table contains a list
+  // so we keep all the lists to an array, an create a tree by getting the curves from this array
   if(count==0) return NULL;
   int numOfBuckets = getNumberOfBuckets(ht);
-  List *listArray=malloc(numOfBuckets*sizeof(List));
+  List *listArray=malloc(numOfBuckets*sizeof(List));  // create an array with size same as the number of buckets
   for(int i=0;i<numOfBuckets;i++){
-    listArray[i] = getListOfBucket(ht,i);
+    listArray[i] = getListOfBucket(ht,i); // every array index contains a list
   }
-  int height = ceil(log2(count));
-  Tree tree = initializeTree();
-  tree->height = height;
+  int height = ceil(log2(count)); // compute the height of the tree that is needed in order to store all the curves at the leaves
+  Tree tree = initializeTree(); // initialize an empty tree
+  tree->height = height;    // store the height of the tree
   int leafCount = 0;
-  int starting_index = numOfBuckets-1;
-  tree->root = recursiveTreeCreateFromHt(&listArray,&starting_index,height,&leafCount);
-  tree->count=leafCount;
-  free(listArray);
+  int starting_index = numOfBuckets-1;  // start from the last index of the array
+  tree->root = recursiveTreeCreateFromHt(&listArray,&starting_index,height,&leafCount);   // create all the tree nodes
+  tree->count=leafCount;    // store the count of the leaves that contain a curve
+  free(listArray);  // free the array
   return tree;
 }
 
@@ -174,23 +182,26 @@ void destroyTree(Tree tree){
 
 void computeMeanCurvesRecursive(TreeNode tn){
   if(tn==NULL) return;
-  computeMeanCurvesRecursive(getLeft(tn));
-  computeMeanCurvesRecursive(getRight(tn));
+  // DFS on the tree
+  // after the DFS the mean final curve will be stored to the root node
+  computeMeanCurvesRecursive(getLeft(tn));  // compute mean curve of the left child
+  computeMeanCurvesRecursive(getRight(tn));  // compute mean curve of the right child
 
-  if(getLeft(tn)==NULL && getRight(tn)==NULL){
-    return;
-  }else if(getLeft(tn)==NULL){
-    tn->v = copyVector(getTnVector(getRight(tn)));
-  }else if(getRight(tn)==NULL){
-    tn->v = copyVector(getTnVector(getLeft(tn)));
-  }else{
-    if(getTnVector(getRight(tn))==NULL && getTnVector(getLeft(tn))==NULL){
+  if(getLeft(tn)==NULL && getRight(tn)==NULL){  // if the current node has no childs, is a leaf node
+    return; // return as the leaf node either contains a input curve or nothing (last remaining leaves of last layer)
+  }else if(getLeft(tn)==NULL){  // if the current node only has right child
+    tn->v = copyVector(getTnVector(getRight(tn)));  // assing to the current node the curve of the right child
+  }else if(getRight(tn)==NULL){  // if the current node only has left child
+    tn->v = copyVector(getTnVector(getLeft(tn)));  // assing to the current node the curve of the left child
+  }else{  // if the current node hash both child nodes
+    if(getTnVector(getRight(tn))==NULL && getTnVector(getLeft(tn))==NULL){  // check if both child nodes contain a curve
       return;
-    }else if(getTnVector(getLeft(tn))==NULL){
-      tn->v = copyVector(getTnVector(getRight(tn)));
-    }else if (getTnVector(getRight(tn))==NULL){
-      tn->v = copyVector(getTnVector(getLeft(tn)));
-    }else{
+    }else if(getTnVector(getLeft(tn))==NULL){ // if the left node does not contain a curve
+      tn->v = copyVector(getTnVector(getRight(tn)));  // assing to the current node the curve of the right child
+    }else if (getTnVector(getRight(tn))==NULL){ // if the right node does not contain a curve
+      tn->v = copyVector(getTnVector(getLeft(tn)));  // assing to the current node the curve of the left child
+    }else{  // if both childs contain curves
+      // compute the mean curve between the two curves of the childs, and store the mean curve to the current node
       tn->v = meanCurveBetween2Curves(getTnVector(getLeft(tn)),getTnVector(getRight(tn)));
     }
   }
