@@ -36,7 +36,7 @@ static int wValueCalculation(int dim){
 
 
 void vectorTimeSeriesLSH(char* arg_inputFile,char* arg_queryFile,int arg_k_LSH,int arg_L,char* arg_outputFile,int distanceTrueOff)  {
-  // for this case every timeSerie represented as vector in R^d
+  // for this case every timeseries represented as vector in R^d
   // (not time representation needed,same implementation with the previous project)
 
   char inputFile[100];
@@ -94,8 +94,8 @@ void vectorTimeSeriesLSH(char* arg_inputFile,char* arg_queryFile,int arg_k_LSH,i
 
 
 void vectorTimeSeriesLSHFrechetDiscrete(char* arg_inputFile,char* arg_queryFile,int arg_k_LSH,int arg_L,char* arg_outputFile,double arg_delta,int distanceTrueOff){
-  // for this case every timeSerie represented as curve in R^2
-  // in this implementation (compared with the previous one) snapping and padding added (before a timeserie being inserted or searched in LSH)
+  // for this case every timeseries represented as curve in R^2
+  // in this implementation (compared with the previous one) snapping and padding added (before a timeseries being inserted or searched in LSH)
   // and the distance between 2 curves now calculated with the Discrete Frechet metric
 
   char inputFile[100];
@@ -140,6 +140,10 @@ void vectorTimeSeriesLSHFrechetDiscrete(char* arg_inputFile,char* arg_queryFile,
   printf("Found value of w = %d\n",w );
 
   begin = clock();
+
+  // the vector that will result from snapping that used each time to compute the value of the correspoding g function,
+  // it has twice the initial dimension of the timeseries
+  // so initialize the LSH with the needed dimension (2*dim)
   lsh = initializeLSH(l,2*dim);
 
   Grids grids = initializeGrids(delta,l,2); //  initialize the corresponding t for the 2 dimensions (x,y coordinates) that use at the snapping
@@ -157,10 +161,10 @@ void vectorTimeSeriesLSHFrechetDiscrete(char* arg_inputFile,char* arg_queryFile,
 
 
 void vectorTimeSeriesLSHFrechetContinuous(char* arg_inputFile,char* arg_queryFile,int arg_k_LSH,char* arg_outputFile,double arg_delta,double epsilon,int distanceTrueOff){
-  // for this case every timeSerie represented as curve in the line R.
+  // for this case every timeseries represented as curve in the line R.
   // in this implementation (compared with the previous one) added:
   // filtering, snapping, minima n' maxima, padding
-  // (before a timeserie being inserted or searched in LSH)
+  // (before a timeseries being inserted or searched in LSH)
   // and the distance between 2 curves now calculated with the Continuous Frechet metric from the corresponding library
   // (Fred-master, an interface function has been created to link this library with our code).
   // Also, LSH structure for this case has only one hash table, not L hash tables.

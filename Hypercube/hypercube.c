@@ -9,7 +9,6 @@
 #include "HashMap/hashmap.h"
 #include "../LSH/helperFunctions.h"
 
-// extern int d;
 extern int new_dimension;
 extern int m;
 extern int probes;

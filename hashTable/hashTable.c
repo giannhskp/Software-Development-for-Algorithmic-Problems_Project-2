@@ -220,19 +220,3 @@ double silhouetteofClusterLSH(HashTable *clustersHt,Vector *clusters,int current
   free(b);
   return sumOfS_i/ht->numberOfVectors;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//

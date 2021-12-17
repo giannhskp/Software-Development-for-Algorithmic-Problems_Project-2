@@ -23,40 +23,6 @@ Curve::Curve(const Points &points, const std::string &name) : Points(points), vs
     #endif
 }
 
-// Curve::Curve(const py::array_t<coordinate_t> &in, const std::string &name) : Points(in.request().shape[0], in.request().ndim > 1 ? in.request().shape[1] : 1), name{name}, vstart{0}, vend{Points::size() - 1} {
-//     const auto array_dim = in.ndim();
-//
-//     if (array_dim > 2){
-//         std::cerr << "A Curve requires a 1- or 2-dimensional numpy array of type " << typeid(coordinate_t).name() << "." << std::endl;
-//         std::cerr << "Current dimensions: " << array_dim << std::endl;
-//         std::cerr << "WARNING: constructed empty curve" << std::endl;
-//         return;
-//     }
-//
-//     if (array_dim == 2) {
-//         #if DEBUG
-//         std::cout << "constructing curve of size " << number() << " and " << dimensions() << " dimensions" << std::endl;
-//         #endif
-//
-//         #pragma omp parallel for simd collapse(2)
-//         for (curve_size_t i = 0; i < number(); ++i) {
-//             for(dimensions_t j = 0; j < dimensions(); ++j){
-//               Points::operator[](i)[j] = *in.data(i, j);
-//             }
-//         }
-//     } else {
-//         #pragma omp parallel for simd
-//         for (curve_size_t i = 0; i < number(); ++i) {
-//             Points::operator[](i)[0] = *in.data(i);
-//         }
-//     }
-//
-//     if (empty()) {
-//         std::cerr << "WARNING: constructed empty curve" << std::endl;
-//     return;
-//     }
-// }
-
 Curves Curves::simplify(const curve_size_t l, const bool approx = false) {
     Curves result(size(), l, Curves::dimensions());
     for (curve_number_t i = 0; i < size(); ++i) {

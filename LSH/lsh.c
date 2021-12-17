@@ -93,18 +93,18 @@ g_function *getGfuns(LSH lsh){
 
 Vector timeSeriesSnapping(Vector v,double gridDelta,double t_x,double t_y){
   // This snapping process used at the case of Discrete Frechet metric
-  // more especially every point of the timeSerie should be snapped at the
+  // more especially every point of the timeseries should be snapped at the
   // "closest" point of the grid based on the this formula: xi' = floor((x-t)/δ + 1/2)*δ + t.
   // Appyling this formula at every dimension separately.
   // Also consecutive duplicates points that snap at the same grid point will be removed.
-  // After all, the given time timeSerie will be converted to a vector (after applying padding process to the deleted points)
-  // which has this format : [x1,y1,x2,y2,...,x2n,y2n] with double dimension compared with the timeserie
+  // After all, the given time timeseries will be converted to a vector (after applying padding process to the deleted points)
+  // which has this format : [x1,y1,x2,y2,...,x2n,y2n] with double dimension compared with the timeseries
   // This vector will be returned from this function
 
   int dim=getDim(v);
   double *coordsVector = getCoords(v);
   double *coordsTime = getTime(v);
-  // the following 2 arrays use to remove the consecutive duplicates timeserie points
+  // the following 2 arrays use to remove the consecutive duplicates timeseries points
   double snappedTime[dim]; // array to store the snapped x coordinates of the time serie
   double snappedVector[dim]; // array to store the snapped y coordinates of the time serie
 
@@ -131,7 +131,7 @@ Vector timeSeriesSnapping(Vector v,double gridDelta,double t_x,double t_y){
     y = y * gridDelta;
     keepY = y + t_y;
 
-    // remove consecutive duplicates timeserie points
+    // remove consecutive duplicates timeseries points
     if(index>0){
       if(snappedTime[index-1]==keepX && snappedVector[index-1]==keepY){
         continue;
@@ -157,11 +157,11 @@ Vector timeSeriesSnapping(Vector v,double gridDelta,double t_x,double t_y){
 
 Vector continuousTimeSeriesSnapping(Vector v,double gridDelta,double t){
   // This snapping process used at the case of Continuous Frechet metric
-  // more especially every point of the timeSerie should be snapped at the
+  // more especially every point of the timeseries should be snapped at the
   // "closest" point of the grid based on the this formula: xi' = floor((x-t)/δ + 1/2)*δ + t.
   // Appyling this formula only at the y coordinate.
-  // After all, the given time timeSerie will be converted to a vector (after applying padding process to fill the removed points from filtering)
-  // which has this format : [y1,y2,...,yn] with same dimension with the timeserie
+  // After all, the given time timeseries will be converted to a vector (after applying padding process to fill the removed points from filtering)
+  // which has this format : [y1,y2,...,yn] with same dimension with the timeseries
   // This vector will be returned from this function.
   int dim=getDim(v);
   double *coordsVector = getCoords(v);
@@ -199,7 +199,7 @@ Vector continuousTimeSeriesSnapping(Vector v,double gridDelta,double t){
 
 Vector minima_maxima(Vector v){
   // The minima maxima process used at the case of Continuous Frechet metric
-  // after snapping is applied (timeserie has been converted in to vector ).
+  // after snapping is applied (timeseries has been converted in to vector ).
   // This function for every three consecutive points a,b,c of the vector finds
   // which point is the maximum and which is the minimum between the a and the c
   // and checks if the point b is among them 2, if it is then remove this point.
@@ -236,8 +236,8 @@ Vector minima_maxima(Vector v){
 
 Vector filtering(Vector v,double epsilon){
   // This filtering process used at the case of Continuous Frechet metric
-  // more especially use to remove some points from the timeserie.
-  // we take every time three consecutive points a,b,c from the timeserie and we have one constant epsilon
+  // more especially use to remove some points from the timeseries.
+  // we take every time three consecutive points a,b,c from the timeseries and we have one constant epsilon
   // so if |a-b|<=epsilon AND |b-c|<=epsilon then the corresponding b point will be removed.
   // Finally, function returns the vector that comes up from this process.
   int dim = getDim(v);
@@ -247,19 +247,29 @@ Vector filtering(Vector v,double epsilon){
   double previous = originalCoords[0];
   for(int i=1;i<(dim-1);i++){
     if((fabs(previous-originalCoords[i])<=epsilon) && (fabs(originalCoords[i]-originalCoords[i+1])<=epsilon)){
+      // point removed
       filteredCoords[i]=-1;
     }else{
       filteredCoords[i]=originalCoords[i];
       previous = originalCoords[i];
     }
   }
+  // shape the filtered time serie
   filteredCoords[dim-1]=originalCoords[dim-1];
   Vector tempVec = initTimeSeries(filteredCoords,getTime(v),getID(v),dim);
   free(filteredCoords);
+  // and finally return it
   return tempVec;
 }
 
 Vector filterMeanCurve(Vector v,int finalDim){
+  // This filtering process used at the case of Clustering at
+  // Lloyd's and at Reverse Assignment with LSH.
+  // more especially use to remove some points from the mean curve to reach the desired dimension (final curve).
+  // we take every time three consecutive points a,b,c from the mean curve and we have one constant epsilon,
+  // which increases each loop as it multiplies by 5 (the initial value of epsilon is 0.001).
+  // so if |a-b|<=epsilon AND |b-c|<=epsilon then the corresponding b point will be removed.
+  // Finally, function returns the mean curve that comes up from this process.
   int dim = getDim(v);
   if(dim<=finalDim){
     return copyVector(v);
@@ -269,16 +279,17 @@ Vector filterMeanCurve(Vector v,int finalDim){
   double *originalTimes = getTime(v);
   filteredCoords[0]=originalCoords[0];
   double previous = originalCoords[0];
-  double epsilon = 0.001;
+  double epsilon = 0.001; // initialize the epsilon
   int firstIter = 1;
-  int filteredDim = dim;
+  int filteredDim = dim; // the initial dimension of time serie
   int stop = 0;
   while(!stop){
     for(int i=1;i<(dim-1);i++){
       if(!firstIter && filteredCoords[i]<0){
         continue;
       }
-      if((fabs(previous-originalCoords[i])<epsilon) && (fabs(originalCoords[i]-originalCoords[i+1])<epsilon)){
+      if((fabs(previous-originalCoords[i])<=epsilon) && (fabs(originalCoords[i]-originalCoords[i+1])<=epsilon)){
+        // point removed, decrease the dimension by one
         filteredCoords[i]=-1;
         filteredDim--;
         if(filteredDim==finalDim){
@@ -290,9 +301,12 @@ Vector filterMeanCurve(Vector v,int finalDim){
         previous = originalCoords[i];
       }
     }
+    // increase epsilon by multiply this by 5
     epsilon*=5;
     firstIter=0;
   }
+
+  // shape the filtered mean curve
   filteredCoords[dim-1]=originalCoords[dim-1];
   double *reducedVector = calloc(finalDim,(sizeof(double)));
   double *reducedTimes = calloc(finalDim,(sizeof(double)));
@@ -307,6 +321,7 @@ Vector filterMeanCurve(Vector v,int finalDim){
   free(filteredCoords);
   free(reducedVector);
   free(reducedTimes);
+  // and finally return it
   return tempVec;
 }
 
@@ -412,7 +427,7 @@ LSH initializeLSH(int l,int dim){
 
 void insertToLSH(LSH lsh,Vector v){
   // insert the given vector in all LSΗ hash tables
-  // the bucket of the hash table that the vector will be inserted depends from the corresponding g function of the specific hash Table (hash function)
+  // the bucket of the hash table that the timeseries will be inserted depends from the corresponding g function of the specific hash Table (hash function)
   // at the new node tha will be inserted at the hash Tables save the id (Querying trick)
   int l = lsh->l;
   for(int i=0;i<l;i++){ // go at every hash table of lsh
@@ -424,19 +439,24 @@ void insertToLSH(LSH lsh,Vector v){
 }
 
 void insertTimeSeriesToLSH(LSH lsh,Grids grids,double delta,Vector v){
-  // insert the given vector in all LSΗ hash tables
+  // insert the given timeseries in all LSΗ hash tables
   // the bucket of the hash table that the vector will be inserted depends from the corresponding g function of the specific hash Table (hash function)
-  // at the new node tha will be inserted at the hash Tables save the id (Querying trick)
+  // at the new node tha will be inserted at the hash Tables save the id (Querying trick).
+  // in order to find each time the bucket of the hash table in which it will be stored,
+  // timeseries goes through the snapping process to be converted in to vector so that
+  // be able to calculate the value of the correspoding g function.
+
   int l = lsh->l;
   for(int i=0;i<l;i++){ // go at every hash table of lsh
     double t_x = getTofGrid(grids,i,0);
     double t_y = getTofGrid(grids,i,1);
 
+    // timeseries goes through the snapping process
     Vector snappedToGrid = timeSeriesSnapping(v,delta,t_x,t_y);
 
     unsigned int id;
-    int index = computeG(lsh->g_fun[i],snappedToGrid,&id); // compute the value of the g function for the given vector that will be inserted
-    // finally insert the vector at the corresponding bucket of the current hash table
+    int index = computeG(lsh->g_fun[i],snappedToGrid,&id); // compute the value of the g function for the given timeseries that will be inserted
+    // finally insert the timeseries at the corresponding bucket of the current hash table
 
     htInsert(lsh->hts[i],v,index,id);
 
@@ -446,20 +466,27 @@ void insertTimeSeriesToLSH(LSH lsh,Grids grids,double delta,Vector v){
 
 
 void insertContinuousTimeSeriesToLSH(LSH lsh,double delta,Vector v,double epsilon,Grids grid){
-  // insert the given vector in all LSΗ hash tables
-  // the bucket of the hash table that the vector will be inserted depends from the corresponding g function of the specific hash Table (hash function)
+  // insert the given timeseries in the LSH hashTable, only one hash table for the Continuous case,
+  // the bucket of the hash table that the timeseries will be inserted depends from the corresponding g function of the specific hash Table (hash function)
   // at the new node tha will be inserted at the hash Tables save the id (Querying trick)
+  // in order to find the bucket of the hash table in which it will be stored,
+  // timeseries goes through the following process: filtering, snapping, minima and maxima, padding
+  // to be converted in to vector so that
+  // be able to calculate the value of the correspoding g function.
 
+  // timeseries goes through the filtering process
   Vector v2 = filtering(v,epsilon);
 
   double t = getTofGrid(grid,0,0);
+  // timeseries goes through the snapping process
   Vector v3 = continuousTimeSeriesSnapping(v2,delta,t);
 
+  // timeseries goes through the minima and maxima process
   Vector v4 = minima_maxima(v3);
 
   unsigned int id;
-  int index = computeG(lsh->g_fun[0],v4,&id); // compute the value of the g function for the given vector that will be inserted
-  // finally insert the vector at the corresponding bucket of the current hash table
+  int index = computeG(lsh->g_fun[0],v4,&id); // compute the value of the g function for the given timeseries that will be inserted
+  // finally insert the timeseries at the corresponding bucket of the current hash table
   htInsert(lsh->hts[0],v,index,id);
 
   deleteVector(v2);
@@ -555,7 +582,7 @@ void nearestNeigborLSH(LSH lsh,Vector q,Vector *nNearest,double *trueDist,FILE *
 }
 
 void nearestNeigborLSH_DiscreteFrechet(LSH lsh,Vector q,Vector *nNearest,double *trueDist,FILE *fptr,Grids grids,double delta,double *aproximation_factor,int *found_neighbor,int distanceTrueOff){
-  // find the nearest neighbor of the given vector q with the help of LSH
+  // find the nearest neighbor of the given timeserie q with the help of LSH
   Vector nearest=NULL;
   double nearestDist=-1;
   int l = getL(lsh);
@@ -697,6 +724,7 @@ void radiusNeigborsLSH(LSH lsh,Vector q,double radius,FILE *fptr){
 
   htDelete(vecsInRadius,0);
 }
+
 void radiusNeigborsClustering(LSH lsh,Vector q,double radius,HashTable vecsInRadius,int centroidIndex,List* confList,int *assignCounter,int iteration){
   // based on the given centroids find the clusters that the given vectors belong with the help of LSH (this function used for the "reverseAssignmentLSH")
   // the clusters are represented by hash tables

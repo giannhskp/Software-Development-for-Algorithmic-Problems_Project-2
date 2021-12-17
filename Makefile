@@ -24,7 +24,7 @@ EXEC1 = search
 EXEC2 = cluster
 EXEC3 = unitTesting
 
-all: $(EXEC1) $(EXEC2)
+all: $(EXEC1) $(EXEC2) $(EXEC3)
 
 unit_testing: $(EXEC3)
 

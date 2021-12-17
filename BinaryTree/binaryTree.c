@@ -14,16 +14,16 @@ typedef struct tree_n{
   Vector v;
   struct tree_n *left;
   struct tree_n *right;
-}tree_node;  //list node
-typedef tree_node *TreeNode;  //double pointer to the list node (array of lists)
+}tree_node;
+typedef tree_node *TreeNode;
 
 
 typedef struct tree_head_node{
-  int height;   // the size of the hashTable
-  int count;    //how many keys/values are in the HashTable
-  TreeNode root;   //the HashTable
-}treeHeadNode;    // dummy node for hashTable
-typedef treeHeadNode *Tree;    //pointer to the dummy node
+  int height;
+  int count;
+  TreeNode root;
+}treeHeadNode;
+typedef treeHeadNode *Tree; 
 
 TreeNode getRoot(Tree tree){
   return tree->root;

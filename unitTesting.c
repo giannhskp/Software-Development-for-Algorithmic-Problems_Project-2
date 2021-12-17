@@ -65,8 +65,6 @@ void test_meanCurveBetween2Curves(void){
   Vector timeSeries2=initTimeSeries(coords2,time,"2",dim);
   Vector realMean=initTimeSeries(meanCoords,time,"real",dim);
   Vector test = meanCurveBetween2Curves(timeSeries1,timeSeries2);
-  printVector(test);
-  printTimes(test);
   CU_ASSERT(compareTimeSeries(test,realMean) == 1);
 
   deleteVector(timeSeries1);

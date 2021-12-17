@@ -14,14 +14,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #include <string>
 #include <sstream>
 
-// #include <pybind11/pybind11.h>
-// #include <pybind11/numpy.h>
-
 #include "types.hpp"
 #include "point.hpp"
 #include "interval.hpp"
 
-// namespace py = pybind11;
 
 class Curve : private Points {
 
@@ -34,7 +30,6 @@ public:
     inline Curve(const dimensions_t dim, const std::string &name = "unnamed curve") : Points(dim), vstart{0}, vend{0}, name{name} {}
     inline Curve(const curve_size_t m, const dimensions_t dimensions, const std::string &name = "unnamed curve") : Points(m, Point(dimensions)), vstart{0}, vend{m-1}, name{name} {}
     Curve(const Points &points, const std::string &name = "unnamed curve");
-    // Curve(const py::array_t<coordinate_t> &in, const std::string &name = "unnamed curve");
 
     inline Point& get(const curve_size_t i) {
         return Points::operator[](vstart + i);
@@ -120,14 +115,6 @@ public:
         return Points::centroid();
     }
 
-    // inline auto as_ndarray() const {
-    //     py::list l;
-    //     for (const Point &elem : *this) {
-    //         l.append(elem.as_ndarray());
-    //     }
-    //     return py::array_t<coordinate_t>(l);
-    // }
-
     void set_name(const std::string&);
 
     std::string get_name() const;
@@ -178,13 +165,6 @@ public:
         return dim;
     }
 
-    // inline auto as_ndarray() const {
-    //     py::list l;
-    //     for (const Curve &elem : *this) {
-    //         l.append(elem.as_ndarray());
-    //     }
-    //     return py::array_t<coordinate_t>(l);
-    // }
 
     Curves simplify(const curve_size_t, const bool);
 

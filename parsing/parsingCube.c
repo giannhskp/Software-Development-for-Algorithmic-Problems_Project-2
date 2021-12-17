@@ -16,8 +16,6 @@
 
 #define MAX_INPUT_LENGTH 10240
 
-// extern int d;
-
 // returns number of words in str
 static int countWords(char *str){
     char * token = strtok(str, "	");
@@ -182,8 +180,6 @@ void readQueryFileCube(char* queryFile,char* outputFile,HyperCube hc,List inputs
       total_true_time += time_spent_true;
       query_count++;
     }
-    // fprintf(fptr, "tCube: %f seconds\n",time_spent_cube);
-    // fprintf(fptr, "tTrue: %f seconds\n",time_spent_true);
     fprintf(fptr, "\n");
     fflush(fptr);
     deleteVector(vecTmp);

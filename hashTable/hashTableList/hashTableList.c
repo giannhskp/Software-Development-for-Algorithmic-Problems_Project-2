@@ -14,7 +14,6 @@
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
 extern char *distanceMetric;
-// extern Vector timeVector;
 
 double l2_distance(Vector v1,Vector v2){
   // calculate the Euclidean distance (or L2) between the given vectors and return it
@@ -212,7 +211,6 @@ void listFindNearestNeighbor(List list,Vector q,Vector *nearest,double *nearestD
   List temp=list;
   while(temp!=NULL){
     if(id==(temp->vector_ID)){ // (Querying trick, to avoid to compute Euclidean distance for all vectors in bucket)
-      // found=1;
       double dist = distance_metric(temp->v,q);
       if(dist<(*nearestDist) || (*nearestDist)<0){
         (*nearestDist) = dist;
@@ -221,20 +219,6 @@ void listFindNearestNeighbor(List list,Vector q,Vector *nearest,double *nearestD
     }
     temp=temp->next;
   }
-  // if(!found){
-  //   temp=list;
-  //   while(temp!=NULL){
-  //     if(1){ // (Querying trick, to avoid to compute Euclidean distance for all vectors in bucket)
-  //       found=1;
-  //       double dist = distance_metric(temp->v,q);
-  //       if(dist<(*nearestDist) || (*nearestDist)<0){
-  //         (*nearestDist) = dist;
-  //         (*nearest) = temp->v;
-  //       }
-  //     }
-  //     temp=temp->next;
-  //   }
-  // }
 }
 
 void listFindNearestNeighborCube(List list,Vector q,Vector *nearest,double *nearestDist,int dim,int *numOfSearched,int maxToSearch){

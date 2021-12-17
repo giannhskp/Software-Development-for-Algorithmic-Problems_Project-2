@@ -153,7 +153,6 @@ int main(int argc, char *argv[])  {
           vectorTimeSeriesLSHFrechetContinuous(inputFile,queryFile,k_LSH,outputFile,delta,FILTERING_E,distanceTrueOff);
         }
         else{
-          // TODO: GIVE METRIC
           printf("WRONG METRIC, %s\n",metric);
         }
       }

@@ -16,8 +16,6 @@
 
 #define MAX_INPUT_LENGTH 10240
 
-// extern int d;
-
 // returns number of words in str
 static int countWords(char *str){
     char * token = strtok(str, "	");
@@ -183,8 +181,6 @@ void readQueryFileLSH(char* queryFile,char* outputFile,LSH lsh,List inputs,int d
       total_true_time += time_spent_true;
       query_count++;
     }
-    fprintf(fptr, "tLSH: %f seconds\n",time_spent_lsh);
-    fprintf(fptr, "tTrue: %f seconds\n",time_spent_true);
     fprintf(fptr, "\n");
     fflush(fptr);
     deleteVector(vecTmp);

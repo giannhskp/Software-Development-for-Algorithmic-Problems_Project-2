@@ -13,7 +13,6 @@
 
 #define MAX_INPUT_LENGTH 10240
 
-// extern int d;
 extern int k_LSH;
 extern int new_dimension;
 

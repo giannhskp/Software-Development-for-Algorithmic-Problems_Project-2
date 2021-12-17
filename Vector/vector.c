@@ -4,7 +4,6 @@
 #include <math.h>
 #define TRUE 1
 #define FALSE 0
-// extern int d;
 
 typedef struct extra_info_node{
   int assignedCluster; // index of cluster that the vector assigned
@@ -17,7 +16,7 @@ typedef extraInfoNode *extraInfo;
 typedef struct vec_node{
   char *vec_id; // to save the corresponding id from the given file
   double* coords; // an array to save the coordinates of the vector
-  double* times;
+  double* times; // an array to save the time of the corresponding timeseries
   int dim;
   extraInfo clusterInfo; // extra info for the vector tha used at clustering (reverseAssignment with LSH and reverseAssignment with Hypercube)
 }vec;
