@@ -224,6 +224,7 @@ Vector meanCurveBetween2Curves(Vector v1,Vector v2){
 }
 
 Vector computeFrechetMeanCurve(List list,int count){
+  // used for update step of the "Lloyd's"-> in order to find the mean curve
   Tree tree = createTreeFromList(list,count);
   Vector newCenter = treeFindMeanCurve(tree);
   destroyTree(tree);
@@ -231,6 +232,7 @@ Vector computeFrechetMeanCurve(List list,int count){
 }
 
 Vector computeFrechetMeanCurveLSH(HashTable ht,int count){
+  // used for update step of the "Reverse Assignment with LSH"  > in order to find the mean curve
   Tree tree = createTreeFromHt(ht,count);
   Vector newCenter = treeFindMeanCurve(tree);
   destroyTree(tree);

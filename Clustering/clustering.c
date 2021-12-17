@@ -53,7 +53,7 @@ void lloyds(Vector* clusters,Vector *oldClusters,Vector* vectors,List* clustersL
   if(*firstTime) // skip it for the first time (original centroids from the kmeansPlusPlus)
     for(int i=0;i<numOfClusters;i++){
       Vector newCenter;
-      if(clustersList[i]!=NULL){ // check if each cluster has been formed (has vectors)
+      if(clustersList[i]!=NULL){ // check if each cluster has been formed (has vectors/timeseries)
         // ok then find the new centroid for this cluster
         if(strcmp(distanceMetric,"discreteFrechet")==0){
           Vector tempNewCenter = computeFrechetMeanCurve(clustersList[i],vectorCount[i]);
@@ -79,10 +79,9 @@ void lloyds(Vector* clusters,Vector *oldClusters,Vector* vectors,List* clustersL
       vectorCount[i] = 0;
     }
 
-  for(int i=0;i<numberOfVectors;i++){ // for every vector
+  for(int i=0;i<numberOfVectors;i++){ // for every vector/timeseries
     // find the closest centroid with the euclidean distance
     int closestCentroid = findClosestCentroid(vectors[i],clusters,numOfClusters);
-    // printf("Vector[%d] | closestCentroid= %d\n",i,closestCentroid);
     // and assign this vector to the corresponding cluster
     vectorCount[closestCentroid] += 1;
     clustersList[closestCentroid] = listInsert(clustersList[closestCentroid],vectors[i],dim);
@@ -229,13 +228,13 @@ void reverseAssignmentLSH(LSH lsh,Vector *vectors,Vector *clusters,Vector *oldCl
   int assignCounter = 0;
   int previousAssigns = -1;
   int loopCounter = 0;
-  while((double)assignCounter<(0.8*numOfVecs) && loopCounter<MAX_RECENTER_ITERATIONS){ // stop when the 80% of vectors have been assigned in to the clusters
+  while((double)assignCounter<(0.8*numOfVecs) && loopCounter<MAX_RECENTER_ITERATIONS){ // stop when the 80% of vectors/timeseries have been assigned in to the clusters
     if(assignCounter==previousAssigns && assignCounter!=0 && loopCounter>5){ // or stop when the assigns number stays some with the previous one for more than 5 iterations
       break;
     }
     previousAssigns = assignCounter;
-    List confList=initializeList(); // list that used to store the vectors that in range search assigned at more than one cluster
-    // assign each vector to the corresponding cluster with the help of range search
+    List confList=initializeList(); // list that used to store the vectors/timeseries that in range search assigned at more than one cluster
+    // assign each vector/timeseries to the corresponding cluster with the help of range search
     for(int i=0;i<numOfClusters;i++){
       if(method == METHOD_VECTOR){
         radiusNeigborsClustering(lsh,clusters[i],radius,clustersHt[i],i,&confList,&assignCounter,iteration);
@@ -243,15 +242,15 @@ void reverseAssignmentLSH(LSH lsh,Vector *vectors,Vector *clusters,Vector *oldCl
         radiusNeigborsClusteringTimeSeries(lsh,clusters[i],radius,clustersHt[i],i,&confList,&assignCounter,iteration,grids,delta,dim);
       }
     }
-    // manage the vectors that presenting conflict
+    // manage the vectors/timeseries that presenting conflict
     listSolveRangeConflicts(confList,clustersHt,clusters,numOfClusters,dim,iteration);
     listDelete(confList,0);
     radius*=2; // doubled the radius for the next range search
     loopCounter++;
   }
   int remainderCounter = 0;
-  // finally one big percentage of vectors has been assigned into clusters
-  // the remaining vectors will be assigned based on the nearest centroid at the corresponding cluster
+  // finally one big percentage of vectors/timeseries has been assigned into clusters
+  // the remaining vectors/timeseries will be assigned based on the nearest centroid at the corresponding cluster
   if(assignCounter<numOfVecs){
     for(int i=0;i<numOfVecs;i++){
       if(assignedToCluster(vectors[i]) && (getAssignedIteration(vectors[i])==iteration)){
