@@ -127,30 +127,30 @@ int main(int argc, char *argv[])  {
   int repeat=1;
   while(1){
     if(repeat){
-      if(strcmp(algorithm,"LSH")==0){
-        distanceMetric=malloc(sizeof(char)*(strlen("l2")+1));
+      if(strcmp(algorithm,"LSH")==0){ // if LSH was given as algorithm
+        distanceMetric=malloc(sizeof(char)*(strlen("l2")+1));      // set distance metric to l2
         strcpy(distanceMetric,"l2");
         fprintf(stdout,"Algorithm: LSH\n");
-        vectorTimeSeriesLSH(inputFile,queryFile,k_LSH,l,outputFile,distanceTrueOff);
+        vectorTimeSeriesLSH(inputFile,queryFile,k_LSH,l,outputFile,distanceTrueOff);  // call the correspoding function of LSH/lsh.c file
       }
-      else if(strcmp(algorithm,"Hypercube")==0){
-        distanceMetric=malloc(sizeof(char)*(strlen("l2")+1));
+      else if(strcmp(algorithm,"Hypercube")==0){ // if Hypercube was given as algorithm
+        distanceMetric=malloc(sizeof(char)*(strlen("l2")+1));     // set distance metric to l2
         strcpy(distanceMetric,"l2");
         fprintf(stdout,"Algorithm: LSH\n");
-        vectorTimeSeriesHypecube(inputFile,queryFile,new_dimension,m,probes,outputFile,distanceTrueOff);
+        vectorTimeSeriesHypecube(inputFile,queryFile,new_dimension,m,probes,outputFile,distanceTrueOff);    // call the correspoding function of LSH/lsh.c file
       }
-      else if(strcmp(algorithm,"Frechet")==0){
-        if(strcmp(metric,"discrete")==0){
-          distanceMetric=malloc(sizeof(char)*(strlen("discreteFrechet")+1));
+      else if(strcmp(algorithm,"Frechet")==0){ // if Frechet was given as algorithm
+        if(strcmp(metric,"discrete")==0){ // if Frechet was given as algorithm and Discrete as metric
+          distanceMetric=malloc(sizeof(char)*(strlen("discreteFrechet")+1));    // set distance metric to discrete frechet
           strcpy(distanceMetric,"discreteFrechet");
           fprintf(stdout,"Algorithm: Frechet Discrece\n");
-          vectorTimeSeriesLSHFrechetDiscrete(inputFile,queryFile,k_LSH,l,outputFile,delta,distanceTrueOff);
+          vectorTimeSeriesLSHFrechetDiscrete(inputFile,queryFile,k_LSH,l,outputFile,delta,distanceTrueOff);   // call the correspoding function of LSH/lsh.c file
         }
-        else if(strcmp(metric,"continuous")==0){
-          distanceMetric=malloc(sizeof(char)*(strlen("continuousFrechet")+1));
+        else if(strcmp(metric,"continuous")==0){   // if Frechet was given as algorithm and Continuous as metric
+          distanceMetric=malloc(sizeof(char)*(strlen("continuousFrechet")+1));  // set distance metric to continuous frechet
           strcpy(distanceMetric,"continuousFrechet");
           fprintf(stdout,"Algorithm: Frechet Continuous\n");
-          vectorTimeSeriesLSHFrechetContinuous(inputFile,queryFile,k_LSH,outputFile,delta,FILTERING_E,distanceTrueOff);
+          vectorTimeSeriesLSHFrechetContinuous(inputFile,queryFile,k_LSH,outputFile,delta,FILTERING_E,distanceTrueOff);   // call the correspoding function of LSH/lsh.c file
         }
         else{
           printf("WRONG METRIC, %s\n",metric);

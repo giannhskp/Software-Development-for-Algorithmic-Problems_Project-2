@@ -59,13 +59,13 @@ void vectorTimeSeriesLSH(char* arg_inputFile,char* arg_queryFile,int arg_k_LSH,i
   List list;
   clock_t begin = clock();
 
-  int dim = findDimLSH(inputFile);
+  int dim = findDimLSH(inputFile);  // find dimension of input vectors
   printf("DIMENSION = %d\n",dim);
 
   list = initializeList();
 
   int numberOfVectorsInFile = 0;
-  readFileLSH(inputFile,&list,&numberOfVectorsInFile,0,NULL,dim);
+  readFileLSH(inputFile,&list,&numberOfVectorsInFile,0,NULL,dim); // read input file and store all input vectors to a list
 
   clock_t end = clock();
 
@@ -75,18 +75,18 @@ void vectorTimeSeriesLSH(char* arg_inputFile,char* arg_queryFile,int arg_k_LSH,i
   hashTableSize=numberOfVectorsInFile/16;
 
   printf("Finding optimal value of w based on the input file\n");
-  w = wValueCalculation(dim);
+  w = wValueCalculation(dim); // find value of w depending on the input vector dimensions
   printf("Found value of w = %d\n",w );
 
   begin = clock();
-  lsh = initializeLSH(l,dim);
-  insertFromListToLSH(list,lsh);
+  lsh = initializeLSH(l,dim); // initialize LSH
+  insertFromListToLSH(list,lsh);  // insert all input vectors to LSH
   end = clock();
 
   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Created LSH in : %f seconds\n",time_spent);
 
-  readQueryFileLSH(queryFile,outputFile,lsh,list,dim,distanceTrueOff);
+  readQueryFileLSH(queryFile,outputFile,lsh,list,dim,distanceTrueOff);  // read query file and for every query find the nearest neighbor
 
   destroyLSH(lsh);
   listDelete(list,0);
@@ -118,7 +118,7 @@ void vectorTimeSeriesLSHFrechetDiscrete(char* arg_inputFile,char* arg_queryFile,
   LSH lsh;
   List list;
   clock_t begin = clock();
-  int dim = findDimLSH(inputFile);
+  int dim = findDimLSH(inputFile);    // find dimension of input curves
   double sum=0.0;
   double time[dim];
   for(int i=0;i<dim;i++){
@@ -128,7 +128,7 @@ void vectorTimeSeriesLSHFrechetDiscrete(char* arg_inputFile,char* arg_queryFile,
   printf("DIMENSION = %d\n",dim);
   list = initializeList();
   int numberOfVectorsInFile = 0;
-  readFileLSH(inputFile,&list,&numberOfVectorsInFile,1,time,dim);
+  readFileLSH(inputFile,&list,&numberOfVectorsInFile,1,time,dim); // read input file and store all input curves to a list
   clock_t end = clock();
   double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Parsed input file in : %f seconds\n",time_spent);
@@ -136,7 +136,7 @@ void vectorTimeSeriesLSHFrechetDiscrete(char* arg_inputFile,char* arg_queryFile,
   hashTableSize=numberOfVectorsInFile/16;
 
   printf("Finding optimal value of w based on the input file\n");
-  w = wValueCalculation(dim);
+  w = wValueCalculation(dim);  // find value of w depending on the input curves dimensions
   printf("Found value of w = %d\n",w );
 
   begin = clock();
@@ -148,12 +148,12 @@ void vectorTimeSeriesLSHFrechetDiscrete(char* arg_inputFile,char* arg_queryFile,
 
   Grids grids = initializeGrids(delta,l,2); //  initialize the corresponding t for the 2 dimensions (x,y coordinates) that use at the snapping
 
-  insertTimeSeriesFromListToLSH(list,lsh,grids,delta);
+  insertTimeSeriesFromListToLSH(list,lsh,grids,delta);  // insert all the input curves to LSH
   end = clock();
   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Created LSH in : %f seconds\n",time_spent);
 
-  readQueryFileLSH_DiscreteFrechet(queryFile,outputFile,lsh,list,grids,delta,time,dim,distanceTrueOff);
+  readQueryFileLSH_DiscreteFrechet(queryFile,outputFile,lsh,list,grids,delta,time,dim,distanceTrueOff);  // read query file and for every query find the nearest neighbor
   deleteGrids(grids,2);
   destroyLSH(lsh);
   listDelete(list,0);
@@ -187,7 +187,7 @@ void vectorTimeSeriesLSHFrechetContinuous(char* arg_inputFile,char* arg_queryFil
   LSH lsh;
   List list;
   clock_t begin = clock();
-  int dim = findDimLSH(inputFile);
+  int dim = findDimLSH(inputFile);      // find dimension of input curves
   double sum=0.0;
   double time[dim];
   for(int i=0;i<dim;i++){
@@ -197,7 +197,7 @@ void vectorTimeSeriesLSHFrechetContinuous(char* arg_inputFile,char* arg_queryFil
   printf("DIMENSION = %d\n",dim);
   list = initializeList();
   int numberOfVectorsInFile = 0;
-  readFileLSH(inputFile,&list,&numberOfVectorsInFile,1,time,dim);
+  readFileLSH(inputFile,&list,&numberOfVectorsInFile,1,time,dim); // read input file and store all input curves to a list
   clock_t end = clock();
   double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Parsed input file in : %f seconds\n",time_spent);
@@ -205,17 +205,17 @@ void vectorTimeSeriesLSHFrechetContinuous(char* arg_inputFile,char* arg_queryFil
   hashTableSize=numberOfVectorsInFile/16;
 
   printf("Finding optimal value of w based on the input file\n");
-  w = wValueCalculation(dim);
+  w = wValueCalculation(dim);   // find value of w depending on the input curves dimensions
   printf("Found value of w = %d\n",w );
 
   begin = clock();
   lsh = initializeLSH(l,dim);
   Grids grid = initializeGrids(delta,l,1); // (l=1) -> only one t as we only have one hash table / one grid
-  insertContinuousTimeSeriesFromListToLSH(list,lsh,delta,epsilon,grid);
+  insertContinuousTimeSeriesFromListToLSH(list,lsh,delta,epsilon,grid);   // insert all the input curves to LSH
   end = clock();
   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Created LSH in : %f seconds\n",time_spent);
-  readQueryFileLSH_ContinuousFrechet(queryFile,outputFile,lsh,list,delta,epsilon,time,dim,grid,distanceTrueOff);
+  readQueryFileLSH_ContinuousFrechet(queryFile,outputFile,lsh,list,delta,epsilon,time,dim,grid,distanceTrueOff);  // read query file and for every query find the nearest neighbor
 
   deleteGrids(grid,1);
   destroyLSH(lsh);

@@ -18,7 +18,6 @@ extern char *distanceMetric;
 double l2_distance(Vector v1,Vector v2){
   // calculate the Euclidean distance (or L2) between the given vectors and return it
   if(getDim(v1)!=getDim(v2)){
-    printf("!! DIFFERENT DIMENTIONS IN L2 METRIC\n");
     return 0.0;
   }
   int dim = getDim(v1);
@@ -33,14 +32,15 @@ double l2_distance(Vector v1,Vector v2){
 
 
 double distance_metric(Vector v1,Vector v2){
-  if(strcmp(distanceMetric,"l2")==0){
+  if(strcmp(distanceMetric,"l2")==0){ // if L2 is set as the distance metric
     return l2_distance(v1,v2);
-  }else if(strcmp(distanceMetric,"discreteFrechet")==0){
+  }else if(strcmp(distanceMetric,"discreteFrechet")==0){ // if Discrete Frechet is set as the distance metric
+    // call discreteFrechet of the file FrechetDistance/discreteFrechet.c
     return discreteFrechet(v1,v2);
-  }else if(strcmp(distanceMetric,"continuousFrechet")==0){
+  }else if(strcmp(distanceMetric,"continuousFrechet")==0){ // if Continuous Frechet is set as the distance metric
+    // call compute_continuous_distance of the file Fred-master/src/my_interface.cpp that uses gitHub implementation of continuous frechet
     return compute_continuous_distance(getCoords(v1),getTime(v1),getCoords(v2),getTime(v2),getDim(v1),getDim(v2));
   }else{
-    printf("WRONG DISTANCE METRIC\n");
     return -1.0;
   }
 }
