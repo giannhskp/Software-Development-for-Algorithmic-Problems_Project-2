@@ -14,28 +14,28 @@ double compute_continuous_distance(double *y1,double *x1, double *y2, double *x2
 
 
   // initialize an object point with 2 dimensions for the first time serie
-  Points p1 =  Points(2);
+  Points p1 =  Points(1);
   for(int i=0;i<d1;i++){
     if(y1[i]<0){
       continue;
     }
-    Point tempPoint = Point(2);
-    tempPoint.set(0,x1[i]);
-    tempPoint.set(1,y1[i]);
+    Point tempPoint = Point(1);
+    tempPoint.set(0,y1[i]);
+    // tempPoint.set(1,y1[i]);
     p1.add(tempPoint);
   }
   // form the first timeseries
   Curve c1 = Curve(p1);
 
   // initialize an object point with 2 dimensions for the second time serie
-  Points p2 =  Points(2);
+  Points p2 =  Points(1);
   for(int i=0;i<d2;i++){
     if(y2[i]<0){
       continue;
     }
-    Point tempPoint = Point(2);
-    tempPoint.set(0,x2[i]);
-    tempPoint.set(1,y2[i]);
+    Point tempPoint = Point(1);
+    // tempPoint.set(0,x2[i]);
+    tempPoint.set(0,y2[i]);
     p2.add(tempPoint);
   }
   // form the second timeseries
