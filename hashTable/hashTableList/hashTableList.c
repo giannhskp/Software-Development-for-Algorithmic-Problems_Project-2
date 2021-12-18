@@ -39,7 +39,7 @@ double distance_metric(Vector v1,Vector v2){
     return discreteFrechet(v1,v2);
   }else if(strcmp(distanceMetric,"continuousFrechet")==0){ // if Continuous Frechet is set as the distance metric
     // call compute_continuous_distance of the file Fred-master/src/my_interface.cpp that uses gitHub implementation of continuous frechet
-    return compute_continuous_distance(getCoords(v1),getTime(v1),getCoords(v2),getTime(v2),getDim(v1),getDim(v2));
+    return compute_continuous_distance(getCoords(v1),getCoords(v2),getDim(v1),getDim(v2));
   }else{
     return -1.0;
   }

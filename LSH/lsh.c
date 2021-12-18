@@ -256,7 +256,7 @@ Vector filtering(Vector v,double epsilon){
   }
   // shape the filtered time serie
   filteredCoords[dim-1]=originalCoords[dim-1];
-  Vector tempVec = initTimeSeries(filteredCoords,getTime(v),getID(v),dim);
+  Vector tempVec = initVector(filteredCoords,getID(v),dim);
   free(filteredCoords);
   // and finally return it
   return tempVec;
@@ -655,7 +655,7 @@ void nearestNeigborLSH_ContinuousFrechet(LSH lsh,Vector q,Vector *nNearest,doubl
   int q_index = computeG(lsh->g_fun[0],v4,&q_id); // compute the value of the g function for the given timeseries
 
   // and go to the corresponding bucket of the hash table to find the nearest neighbor for the given query timeserie
-  htFindNearestNeighbor(hts[0],q_index,q,&nearest,&nearestDist,getDim(v2),q_id);
+  htFindNearestNeighbor(hts[0],q_index,q,&nearest,&nearestDist,getDim(q),q_id);
 
   // check if nearest neighbor of the given timeseries q found or not
   if(nearestDist>=0 && nearest!=NULL){

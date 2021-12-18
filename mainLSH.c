@@ -188,16 +188,10 @@ void vectorTimeSeriesLSHFrechetContinuous(char* arg_inputFile,char* arg_queryFil
   List list;
   clock_t begin = clock();
   int dim = findDimLSH(inputFile);      // find dimension of input curves
-  double sum=0.0;
-  double time[dim];
-  for(int i=0;i<dim;i++){
-    time[i]=sum;
-    sum+=1.0;
-  }
   printf("DIMENSION = %d\n",dim);
   list = initializeList();
   int numberOfVectorsInFile = 0;
-  readFileLSH(inputFile,&list,&numberOfVectorsInFile,1,time,dim); // read input file and store all input curves to a list
+  readFileLSH(inputFile,&list,&numberOfVectorsInFile,0,NULL,dim); // read input file and store all input curves (projected to R^1) to a list
   clock_t end = clock();
   double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Parsed input file in : %f seconds\n",time_spent);
@@ -215,7 +209,7 @@ void vectorTimeSeriesLSHFrechetContinuous(char* arg_inputFile,char* arg_queryFil
   end = clock();
   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Created LSH in : %f seconds\n",time_spent);
-  readQueryFileLSH_ContinuousFrechet(queryFile,outputFile,lsh,list,delta,epsilon,time,dim,grid,distanceTrueOff);  // read query file and for every query find the nearest neighbor
+  readQueryFileLSH_ContinuousFrechet(queryFile,outputFile,lsh,list,delta,epsilon,dim,grid,distanceTrueOff);  // read query file and for every query find the nearest neighbor
 
   deleteGrids(grid,1);
   destroyLSH(lsh);
