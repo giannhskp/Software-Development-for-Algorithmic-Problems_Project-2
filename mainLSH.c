@@ -10,15 +10,13 @@
 #include "./parsing/parsingLSH.h"
 #include "./hashTable/hashTableList/hashTableList.h"
 
-#define W_DIVIDER 40
-
-
 int w;
 int k_LSH;
 int hashTableSize;
 
 
 static int wValueCalculation(int dim){
+    // find the value of w depending on the curve/vector dimension (on A.i and A.ii)
   if(dim>850){
     return 400;
   }else if(dim>700){
@@ -27,10 +25,21 @@ static int wValueCalculation(int dim){
     return 100;
   }else if(dim>300){
     return 50;
-  }else if(dim>150){
-    return 20;
+  }else if(dim>200){
+    return 40;
+  }else if(dim>100){
+    return 25;
   }else{
-    return 6;
+    return 10;
+  }
+}
+
+static int wValueCalculationContinuous(int dim){
+  // find the value of w depending on the curve/vector dimension (on A.iii - Continuous Frechet)
+  if(dim<150){
+    return dim/2;
+  }else{
+    return dim;
   }
 }
 
@@ -199,7 +208,7 @@ void vectorTimeSeriesLSHFrechetContinuous(char* arg_inputFile,char* arg_queryFil
   hashTableSize=numberOfVectorsInFile/16;
 
   printf("Finding optimal value of w based on the input file\n");
-  w = wValueCalculation(dim);   // find value of w depending on the input curves dimensions
+  w = wValueCalculationContinuous(dim);   // find value of w depending on the input curves dimensions
   printf("Found value of w = %d\n",w );
 
   begin = clock();
