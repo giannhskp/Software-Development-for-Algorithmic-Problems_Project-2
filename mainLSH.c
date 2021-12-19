@@ -10,15 +10,13 @@
 #include "./parsing/parsingLSH.h"
 #include "./hashTable/hashTableList/hashTableList.h"
 
-#define W_DIVIDER 40
-
-
 int w;
 int k_LSH;
 int hashTableSize;
 
 
 static int wValueCalculation(int dim){
+    // find the value of w depending on the curve/vector dimension (on A.i and A.ii)
   if(dim>850){
     return 400;
   }else if(dim>700){
@@ -27,11 +25,18 @@ static int wValueCalculation(int dim){
     return 100;
   }else if(dim>300){
     return 50;
-  }else if(dim>150){
-    return 20;
+  }else if(dim>200){
+    return 40;
+  }else if(dim>100){
+    return 25;
   }else{
-    return 6;
+    return 10;
   }
+}
+
+static int wValueCalculationContinuous(int dim){
+  // find the value of w depending on the curve/vector dimension (on A.iii - Continuous Frechet)
+  return dim;
 }
 
 
@@ -188,16 +193,10 @@ void vectorTimeSeriesLSHFrechetContinuous(char* arg_inputFile,char* arg_queryFil
   List list;
   clock_t begin = clock();
   int dim = findDimLSH(inputFile);      // find dimension of input curves
-  double sum=0.0;
-  double time[dim];
-  for(int i=0;i<dim;i++){
-    time[i]=sum;
-    sum+=1.0;
-  }
   printf("DIMENSION = %d\n",dim);
   list = initializeList();
   int numberOfVectorsInFile = 0;
-  readFileLSH(inputFile,&list,&numberOfVectorsInFile,1,time,dim); // read input file and store all input curves to a list
+  readFileLSH(inputFile,&list,&numberOfVectorsInFile,0,NULL,dim); // read input file and store all input curves (projected to R^1) to a list
   clock_t end = clock();
   double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Parsed input file in : %f seconds\n",time_spent);
@@ -205,7 +204,7 @@ void vectorTimeSeriesLSHFrechetContinuous(char* arg_inputFile,char* arg_queryFil
   hashTableSize=numberOfVectorsInFile/16;
 
   printf("Finding optimal value of w based on the input file\n");
-  w = wValueCalculation(dim);   // find value of w depending on the input curves dimensions
+  w = wValueCalculationContinuous(dim);   // find value of w depending on the input curves dimensions
   printf("Found value of w = %d\n",w );
 
   begin = clock();
@@ -215,7 +214,7 @@ void vectorTimeSeriesLSHFrechetContinuous(char* arg_inputFile,char* arg_queryFil
   end = clock();
   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("Created LSH in : %f seconds\n",time_spent);
-  readQueryFileLSH_ContinuousFrechet(queryFile,outputFile,lsh,list,delta,epsilon,time,dim,grid,distanceTrueOff);  // read query file and for every query find the nearest neighbor
+  readQueryFileLSH_ContinuousFrechet(queryFile,outputFile,lsh,list,delta,epsilon,dim,grid,distanceTrueOff);  // read query file and for every query find the nearest neighbor
 
   deleteGrids(grid,1);
   destroyLSH(lsh);

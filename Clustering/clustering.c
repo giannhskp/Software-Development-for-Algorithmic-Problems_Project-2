@@ -19,8 +19,6 @@
 #define TRUE 1
 #define FALSE 0
 #define MAX_RECENTER_ITERATIONS 5
-#define W_DIVIDER_LSH 60
-#define W_DIVIDER_CUBE 20
 #define METHOD_VECTOR 2
 #define METHOD_FRECHET 3
 
@@ -32,6 +30,7 @@ extern int w;
 char *distanceMetric;
 
 static int wValueCalculation(int dim){
+  // find the value of w depending on the curve/vector dimension
   if(dim>850){
     return 700;
   }else if(dim>700){

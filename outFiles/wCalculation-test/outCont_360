@@ -1,0 +1,80 @@
+Query aer:
+Approximate Nearest neighbor: aal
+True Nearest neighbor: was not computed
+distanceApproximate: 11.569805
+distanceTrue: was not computed
+tApproximateAverage: 1.731355 seconds
+tTrueAverage: 0.000001 seconds
+
+Query aeri:
+Approximate Nearest neighbor: aaba
+True Nearest neighbor: was not computed
+distanceApproximate: 21.240000
+distanceTrue: was not computed
+tApproximateAverage: 0.500665 seconds
+tTrueAverage: 0.000001 seconds
+
+Query aes:
+Approximate Nearest neighbor: acre
+True Nearest neighbor: was not computed
+distanceApproximate: 3.064270
+distanceTrue: was not computed
+tApproximateAverage: 1.162387 seconds
+tTrueAverage: 0.000002 seconds
+
+Query aet:
+Approximate Nearest neighbor: adi
+True Nearest neighbor: was not computed
+distanceApproximate: 84.670000
+distanceTrue: was not computed
+tApproximateAverage: 0.260598 seconds
+tTrueAverage: 0.000001 seconds
+
+Query aeti:
+Approximate Nearest neighbor: abdc
+True Nearest neighbor: was not computed
+distanceApproximate: 7.431000
+distanceTrue: was not computed
+tApproximateAverage: 0.316350 seconds
+tTrueAverage: 0.000001 seconds
+
+Query aey:
+- DID NOT FIND NEAREST NEIGHBOR
+tApproximateAverage: 0.000013 seconds
+tTrueAverage: 0.000001 seconds
+
+Query aezs:
+Approximate Nearest neighbor: abm
+True Nearest neighbor: was not computed
+distanceApproximate: 39.674375
+distanceTrue: was not computed
+tApproximateAverage: 1.468819 seconds
+tTrueAverage: 0.000001 seconds
+
+Query afam:
+Approximate Nearest neighbor: abcb
+True Nearest neighbor: was not computed
+distanceApproximate: 11.300000
+distanceTrue: was not computed
+tApproximateAverage: 1.161945 seconds
+tTrueAverage: 0.000001 seconds
+
+Query afb:
+Approximate Nearest neighbor: abev
+True Nearest neighbor: was not computed
+distanceApproximate: 7.682700
+distanceTrue: was not computed
+tApproximateAverage: 0.308885 seconds
+tTrueAverage: 0.000001 seconds
+
+Query afc:
+Approximate Nearest neighbor: aek
+True Nearest neighbor: was not computed
+distanceApproximate: 2.058000
+distanceTrue: was not computed
+tApproximateAverage: 0.461963 seconds
+tTrueAverage: 0.000002 seconds
+
+tApproximateAverage: 0.819219 seconds
+tTrueAverage: True Distances were not computed
+Min/Max Approximation Factor are not defined without distanceTrue

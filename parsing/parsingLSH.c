@@ -302,7 +302,7 @@ void readQueryFileLSH_DiscreteFrechet(char* queryFile,char* outputFile,LSH lsh,L
   fclose(file);
 }
 
-void readQueryFileLSH_ContinuousFrechet(char* queryFile,char* outputFile,LSH lsh,List inputs,double delta,double epsilon,double *time,int dim,Grids grid,int distanceTrueOff){
+void readQueryFileLSH_ContinuousFrechet(char* queryFile,char* outputFile,LSH lsh,List inputs,double delta,double epsilon,int dim,Grids grid,int distanceTrueOff){
 
    FILE *file = fopen(queryFile, "r"); // read mode
 
@@ -349,7 +349,7 @@ void readQueryFileLSH_ContinuousFrechet(char* queryFile,char* outputFile,LSH lsh
       vec[counter++]=atof(token);
       token = strtok(NULL, "	");
     }
-    Vector vecTmp=initTimeSeries(vec,time,name,dim);
+    Vector vecTmp=initVector(vec,name,dim);
 
     fprintf(fptr, "Query %s:\n",name);
 
@@ -385,8 +385,8 @@ void readQueryFileLSH_ContinuousFrechet(char* queryFile,char* outputFile,LSH lsh
       total_true_time += time_spent_true;
       query_count++;
     }
-    fprintf(fptr, "tApproximateAverage: %f seconds\n",time_spent_lsh);
-    fprintf(fptr, "tTrueAverage: %f seconds\n",time_spent_true);
+    // fprintf(fptr, "tApproximateAverage: %f seconds\n",time_spent_lsh);
+    // fprintf(fptr, "tTrueAverage: %f seconds\n",time_spent_true);
     fprintf(fptr, "\n");
     fflush(fptr);
     deleteVector(vecTmp);

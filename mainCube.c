@@ -10,9 +10,7 @@
 #include "./parsing/parsingCube.h"
 #include "./hashTable/hashTableList/hashTableList.h"
 
-#define W_DIVIDER 40
 
-// int d;
 int new_dimension;
 int m;
 int probes;

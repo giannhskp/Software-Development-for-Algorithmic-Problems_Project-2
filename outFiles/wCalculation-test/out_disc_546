@@ -1,0 +1,64 @@
+Query aer:
+Approximate Nearest neighbor: abco
+True Nearest neighbor: abt
+distanceApproximate: 13.429535
+distanceTrue: 9.999130
+
+Query aeri:
+Approximate Nearest neighbor: aaon
+True Nearest neighbor: abcb
+distanceApproximate: 30.216552
+distanceTrue: 18.100000
+
+Query aes:
+Approximate Nearest neighbor: abdc
+True Nearest neighbor: abdc
+distanceApproximate: 3.448800
+distanceTrue: 3.448800
+
+Query aet:
+Approximate Nearest neighbor: adi
+True Nearest neighbor: aapl
+distanceApproximate: 86.464689
+distanceTrue: 24.783260
+
+Query aeti:
+Approximate Nearest neighbor: acst
+True Nearest neighbor: acst
+distanceApproximate: 2.565300
+distanceTrue: 2.565300
+
+Query aey:
+Approximate Nearest neighbor: aau
+True Nearest neighbor: aau
+distanceApproximate: 1.870000
+distanceTrue: 1.870000
+
+Query aezs:
+Approximate Nearest neighbor: aa
+True Nearest neighbor: advm
+distanceApproximate: 49.580639
+distanceTrue: 36.173505
+
+Query afam:
+Approximate Nearest neighbor: adm
+True Nearest neighbor: abt
+distanceApproximate: 20.969000
+distanceTrue: 14.625236
+
+Query afb:
+Approximate Nearest neighbor: adx
+True Nearest neighbor: adx
+distanceApproximate: 3.010000
+distanceTrue: 3.010000
+
+Query afc:
+Approximate Nearest neighbor: aeh
+True Nearest neighbor: aeh
+distanceApproximate: 1.126000
+distanceTrue: 1.126000
+
+tApproximateAverage: 0.095002 seconds
+tTrueAverage: 0.475337 seconds
+Max Approximation Factor: 3.488834
+Min Approximation Factor: 1.000000
