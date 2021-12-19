@@ -36,11 +36,7 @@ static int wValueCalculation(int dim){
 
 static int wValueCalculationContinuous(int dim){
   // find the value of w depending on the curve/vector dimension (on A.iii - Continuous Frechet)
-  if(dim<150){
-    return dim/2;
-  }else{
-    return dim;
-  }
+  return dim;
 }
 
 
