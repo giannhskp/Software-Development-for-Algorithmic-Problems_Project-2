@@ -88,7 +88,6 @@ int main(int argc, char *argv[])  {
       distanceTrueOff=1;
       printf("distanceTrueOff : Enabled\n");
     }
-
   }
 
   if(!inputflag){
