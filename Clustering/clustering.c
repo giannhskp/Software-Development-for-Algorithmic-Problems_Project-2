@@ -634,6 +634,14 @@ void clustering(List vecList,FILE* fptr,char* assignment,char *update,int numOfC
 
     clusteringLSH(vecList,numOfClusters,l,fptr,dim,method,delta);
   }
+  else if(strcmp(assignment,"LSH_Frechet")==0){
+    int method;
+    fprintf(fptr,"Algorithm: Range Search LSH for Curves\n");
+    distanceMetric=malloc(sizeof(char)*(strlen("discreteFrechet")+1));
+    strcpy(distanceMetric,"discreteFrechet");
+    method = METHOD_FRECHET;
+    clusteringLSH(vecList,numOfClusters,l,fptr,dim,method,delta);
+  }
   else if(strcmp(assignment,"Hypercube")==0){
     fprintf(fptr,"Algorithm: Range Search Hypercube for vectors\n");
     distanceMetric=malloc(sizeof(char)*(strlen("l2")+1));

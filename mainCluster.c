@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
   char outputFile[200];
   int outputflag=0;
   char update[200];
-  strcpy(update,"Mean Frechet"); // default
+  strcpy(update,"Mean Vector"); // default
   char assignment[200];
   strcpy(assignment,"Classic"); // default
 

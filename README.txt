@@ -112,14 +112,30 @@ Github link: https://github.com/giannhskp/Software-Development-for-Algorithmic-P
 
 	→ Εντολές εκτέλεσης για κάθε ένα από τα δύο εκτελέσιμα:
 
-				► ./search –i <input file> –q <query file> –k <int> -L <int> -M <int> -probes <int> -ο <output file> -algorithm <LSH or Hypercube or Frechet> -metric <discrete or continuous | only for –algorithm Frechet> -delta <double> -distanceTrueOff
-				  ( π.χ. ./search -i nasd_input.csv -q nasd_query.csv -o outLSHDiscreteFrechet -algorithm Frechet -delta 3.25 -metric discrete -k 6 -L 8 -distanceTrueOff )
+		► ./search –i <input file> –q <query file> –k <int> -L <int> -M <int> -probes <int> -ο <output file> -algorithm <LSH or Hypercube or Frechet> -metric <discrete or continuous | only for –algorithm Frechet> -delta <double> -distanceTrueOff
+			π.χ.:
+				Ερώτημα Α.i/LSH: 	./search -i nasd_input.csv -q nasd_query.csv -o outLSHVector -algorithm LSH -k 6 -L 4
+				Ερώτημα Α.i/Hypercube:  ./search -i nasd_input.csv -q nasd_query.csv -o outCubeVector -algorithm Hypercube -M 50 -probes 3 -k 5
+				Ερώτημα Α.ii: 		./search -i nasd_input.csv -q nasd_query.csv -o outDiscreteFrechet -algorithm Frechet -metric discrete -delta 1 -k 4 -L 5
+				Ερώτημα Α.iii: 		./search -i nasd_input.csv -q nasd_query.csv -o outContinuousFrechet -algorithm Frechet -metric continuous -delta 1 -distanceTrueOff
 
-				► ./cluster –i <input file> –c <configuration file> -o <output file> -update <Mean Frechet or Mean Vector> –assignment <Classic or LSH or Hypercube or LSH_Frechet> -complete <optional> -silhouette <optional>
-				  ( π.χ. ./cluster -i nasd_input.csv -c cluster.conf -o outputCluster -update Mean Frechet –assignment LSH ) 
+		
+		► ./cluster –i <input file> –c <configuration file> -o <output file> -update <Mean Frechet or Mean Vector> –assignment <Classic or LSH or Hypercube or LSH_Frechet> -complete <optional> -silhouette <optional> -delta <optional>
+			π.χ.:
+				Μέθοδος 1: 	./cluster -i nasd_input.csv -c cluster.conf -o outputCluster1 –assignment Classic -update Mean Vector
+				Μέθοδος 2: 	./cluster -i nasd_input.csv -c cluster.conf -o outputCluster1 –assignment Classic -update Mean Frechet -delta 1
+				Μέθοδος 3: 	./cluster -i nasd_input.csv -c cluster.conf -o outputCluster1 –assignment LSH
+					ή  	./cluster -i nasd_input.csv -c cluster.conf -o outputCluster1 –assignment LSH -update Mean Vector
+				Μέθοδος 4: 	./cluster -i nasd_input.csv -c cluster.conf -o outputCluster1 –assignment LSH_Frechet -delta 1
+					ή  	./cluster -i nasd_input.csv -c cluster.conf -o outputCluster1 –assignment LSH -update Mean Frechet -delta 1
+				Μέθοδος 5: 	./cluster -i nasd_input.csv -c cluster.conf -o outputCluster1 –assignment Classic -update Mean Vector 
+ 	
 
 	→ Στο εκτελέσιμο του πρώτου μέρους προστέθηκε η δυνατότητα να δοθεί στη γραμμή εντολών η εξής παράμετρος: -distanceTrueOff, 
 	  ώστε να παραλείπεται η εύρεση του πλησιέστερου γείτονα κάθε χρονοσειράς με τον brute force τρόπο.
+
+	→ Στο εκτελέσιμο του δεύτερου μέρους προστέθηκε η δυνατότητα να δοθεί (προαιρετικά) στη γραμμή εντολών η εξής παράμετρος: -delta <value>, 
+	  ώστε να μπορούμε να θέσουμε την τιμή του δ που επιθυμούμε (για τις μεθόδους 2 και 4). Αν δεν δοθεί, χρησιμοποιείται η default τιμή delta=1.
 
 	→ Tα unit tests υλοποιήθηκαν με χρήση της βιβλιοθήκης CUnit στο αρχείο unitTesting.c, όπου 
 	  ουσιαστικά "επαληθεύουμε" την σωστή λειτουργία των παρακάτω συναρτήσεων: 
@@ -230,8 +246,10 @@ c(i, j) = max {min{c(i − 1, j), c(i − 1, j − 1), c(i, j − 1)}, || pi −
 
 ▪ Ερώτημα 3ο
 ———————————————
-Σε αυτό το ερώτημα, όπως και στο παραπάνω κάθε χρονοσειρά αναπαρίσταται ως πολυγωνική καμπύλη, επομένως δεσμεύουμε για κάθε χρονοσειρά
-στo αντίστοιχο struct vec_node τον πίνακα (double* times) για την αποθήκευση του χρόνου.
+Στο ερώτημα αυτό, κάθε χρονοσειρά αναπαρίσταται ως πολυγωνική καμπύλη στην ευθεία R.
+Έτσι απαλείφεται η διάσταση του χρόνου και δεν αποθηκεύεται εσωτερικά του αντίστοιχου struct (όπως στο ερώτημα A.ii).
+Δηλαδή για την αναπαράσταση στο R χρησιμοποιούνται μόνοι οι τιμές που διαβάζονται από το αρχείο εισόδου.
+Σε όλη την διαδικασία που εξηγείται στην συνέχεια (συμπεριλαμβανομένων των filtering, snapping, minima-maxima, Continuous Frechet Distance), δουλεύουμε με χρονοσειρές οι οποίες έχουν αναπαρασταθεί στην ευθεία R έχοντας απαλείψει την διάσταση του χρόνου. 
 
 Η δομή που χρησιμοποιείται για την αποθήκευση αποτελείται από ένα μοναδικό hash table το οποίο ακολουθεί την λογική του LSH,
 δηλαδή χρησιμοποιεί μια hash function G η οποία με την σειρά της χρησιμοποιεί k συναρτήσεις h. 
@@ -244,9 +262,8 @@ c(i, j) = max {min{c(i − 1, j), c(i − 1, j − 1), c(i, j − 1)}, || pi −
 a, b, c "συνεχόμενα" σημεία της χρονοσειράς, αν ισχύει |a-b| <= epsilon και |b-c| <= epsilon τότε διαγράφουμε από την χρονοσειρά το σημείο b.
 Επομένως, προκύπτει μια filtered χρονοσειρά με μειωμένα σημεία την οποία επιστρέφει η αντίστοιχη συνάρτηση.
 
-Μετά από το filtering κάθε χρονοσειρά, όπως και στο προηγούμενο ερώτημα, περνάει απο την διαδικασία του snapping, μόνο 
-που τώρα υλοποιείται μέσο της συνάρτησης continuousTimeSeriesSnapping(...) ( στο αρχέιο LSH/lsh.c ) και εφαρμόζεται σε αντίθεση με πριν 
-μόνο στην y συντεταγμένη της χρονοσειράς.
+Μετά από το filtering κάθε χρονοσειρά, όπως και στο προηγούμενο ερώτημα, περνάει από την διαδικασία του snapping, μόνο 
+που τώρα υλοποιείται μέσο της συνάρτησης continuousTimeSeriesSnapping(...) ( στο αρχέιο LSH/lsh.c ) και εφαρμόζεται σε αντίθεση με πριν μόνο στην y συντεταγμένη της χρονοσειράς, αφού οι χρονοσειρές αναπαρίστανται στην ευθεία R.
 Εφόσον έχουμε ένα μόνο hash table, έχουμε και ένα μόνο grid. Στο grid αυτό αντιστοιχεί μια μεταβλητή t, η τιμή της οποίας προκύπτει από την κανονική κατανομή (0,δ).
 Δηλαδή προβάλουμε την χρονοσειρά στην μία διάσταση με βάση την συντεταγμένη y και εφαρμόζουμε snapping σε ένα μονοδιάστατο grid.  
 Επομένως το νέο διάνυσμα που προκύπτει και επιστρέφεται από την εν λόγω συνάρτηση
@@ -255,7 +272,7 @@ a, b, c "συνεχόμενα" σημεία της χρονοσειράς, αν 
 Τέλος, σε αντίθεση με το snapping στην discrete περίπτωση, δεν αφαιρούνται διαδοχικά σημεία τα οποία γίνονται snap στο ίδιο σημείο του grid.
 
 Στην συνέχεια, στο ερώτημα αυτό, κάθε διάνυσμα πλέον ( η χρονοσειρά μέσω του snapping έχει "μετατραπεί" σε διάνυσμα) υφίσταται μια τελευταία επεξεργασία προτού
-δωθεί ως όρισμα στην συνάρτηση g για να υπολογιστεί η τιμή της, η διαδικασία αυτή λέγεται minima and maxima και υλοποιείται μέσω της συνάρτησης
+δοθεί ως όρισμα στην συνάρτηση g για να υπολογιστεί η τιμή της, η διαδικασία αυτή λέγεται minima and maxima και υλοποιείται μέσω της συνάρτησης
 minima_maxima(...) στο αρχείο LSH/lsh.c. 
 Αναλυτικότερα, η προαναφερόμενη συνάρτηση δέχεται ως όρισμα ένα διάνυσμα και ελέγχει διαδοχικές τριάδες σημείων του διανύσματος.
 Για κάθε τριάδα διαδοχικών σημείων (έστω a,b,c) αν τα σημεία αυτά ακολουθούν ανοδική πορεία ή αντίστοιχα καθοδική πορεία τότε το ενδιάμεσο σημείο b απαλείφεται.
@@ -265,10 +282,10 @@ minima_maxima(...) στο αρχείο LSH/lsh.c.
 τυχών διαγραμμένων τιμών από την παραπάνω διαδικασία.
 
 Το διάνυσμα αυτό δίνεται ως είσοδος στην συνάρτηση G του μοναδικού hash table έτσι ώστε να προκύψει το index του αντίστοιχου bucket καθώς και το ID για το Querying trick.
-Αφού βρούμε το index, αποθηκεύουμε στο hash table την αρχική καμπύλη εισόδου (δηλαδή πριν το filtering) η οποία και θα χρησιμοποιηθεί στην συνέχεια για την σύγκριση και υπολογισμό απόστασης με τα queries.
+Αφού βρούμε το index, αποθηκεύουμε στο hash table την αρχική καμπύλη εισόδου, που έχει γίνει projected στο R, (δηλαδή πριν το filtering) η οποία και θα χρησιμοποιηθεί στην συνέχεια για την σύγκριση και υπολογισμό απόστασης με τα queries.
 
 Συνοπτικά η διαδικασία εισαγωγής ενός input curve στην δομή είναι η εξής:
-	input curve -> filtering -> snapping -> minima-maxima -> G-function of LSH -> αποθήκευση του input curve στο hash table
+	input curve projected to R -> filtering -> snapping -> minima-maxima -> G-function of LSH -> αποθήκευση του input curve στο hash table
 Η διαδικασία που ακολουθεί ένα query curve είναι η ίδια με την διαφορά ότι αντί να αποθηκευτεί στο hash table υπολογίζει την απόσταση του με όλα τα curves που είναι αποθηκευμένα στο αντίστοιχο bucket του hash table και έχουν ίδιο ID (Querying trick). 
 Τελικά κρατά αυτό με την μικρότερη απόσταση ως κοντινότερο γείτονα.
 
@@ -276,12 +293,12 @@ minima_maxima(...) στο αρχείο LSH/lsh.c.
 υλοποιημένη μέσω μιας βιβλιοθήκης C++ από το GitHub, τα αρχεία της βρίσκονται στον φάκελο Fred-master/src. Συνεπώς, για να μπορέσουμε να συνδέσουμε
 την βιβλιοθήκη C++ με τα αρχεία μας ( που είναι "γραμμένα" σε C) φτιάξαμε την αντίστοιχη διεπαφή-συνάρτηση, η οποία υλοποιείται στο αρχείο 
 my_interface.cpp ( βρίσκεται στον φακελο Fred-master/src) και μας επιστρέφει την αντίστοιχη απόσταση μεταξύ 2 χρονοσειρών υπολογιζόμενη με χρήση της μετρικής Continuous Frechet.
-Ουσιαστικά, έχουμε φτιάξει μια συνάρτηση (εν ονόματι compute_continuous_distance(...) ) η οποία δέχεται σαν ορίσματα 4 πίνακες
-και 2 ακεραίους, οι πίνακες έχουν τις τιμές των χρονοσειρών και των αντίστοιχων χρόνων, ενώ οι ακέραιοι τις διαστάσεις για τις αντίστοιχες χρονοσειρές που
+Ουσιαστικά, έχουμε φτιάξει μια συνάρτηση (εν ονόματι compute_continuous_distance(...) ) η οποία δέχεται σαν ορίσματα 2 πίνακες
+και 2 ακεραίους, οι πίνακες έχουν τις τιμές των χρονοσειρών (που αντιστοιχούν στην προβολή στο R), ενώ οι ακέραιοι τις διαστάσεις για τις αντίστοιχες χρονοσειρές που
 πρόκειται να δημιουργηθούν. Έτσι, με βάσει των παραπάνω παραμέτρων που περνάμε στην συνάρτηση, δημιουργούμε τελικά δύο αντικείμενα της κλάσης Curve τα c1,c2 , τα οποία προκύπτουν
 μέσο των αντικειμένων p1 και p2 της κλάσης Points αξιοποιώντας σε αυτά τις παραμέτρους αντίστοιχα για κάθε χρονοσειρά. Με τα αντικείμενα c1,c2 που δημιουργήσαμε 
 (τα οποία αναπαριστούν τις αντίστοιχες χρονοσειρές), μας δίνετε πλέον η δυνατότητα να καλέσουμε την συνάρτηση distance(...) της βιβλιοθήκης (αφού η συγκεκριμένη συνάρτηση
-παίρνει ως ορίσματα 2 αντικέιμενα Curve), ώστε να υπολογιστεί τελικά η ζητούμενη απόσταση μεταξύ των 2 αυτών χρονοσειρών με βάσει της μετρικής Continuous Frechet, αφού υπολογιστεί αυτή η απόσταση, επιστρέφεται απο τη συνάρτηση
+παίρνει ως ορίσματα 2 αντικείμενα Curve), ώστε να υπολογιστεί τελικά η ζητούμενη απόσταση μεταξύ των 2 αυτών χρονοσειρών με βάσει της μετρικής Continuous Frechet, αφού υπολογιστεί αυτή η απόσταση, επιστρέφεται από τη συνάρτηση
 που αποτελεί την "διεπαφή" μας μεταξύ του αρχείου στο οποίο καλείται η συνάρτηση και της βιβλιοθήκης που μας δίνετε. 
 Αξίζει να σημειωθεί πως για να δουλέψει "σωστά" η διεπαφή, δηλαδή να μπορεί να κληθεί από τo αρχείο hashTable/hashTableList/hashTableList.c 
 (πέρα του ότι έγινε το απαραίτητο include: #include "../../Fred-master/src/my_interface.hpp") στο αρχείο κεφαλίδας my_interface.hpp 
@@ -304,7 +321,7 @@ extern "C" {
 
 Επιγραμματικά, οι αλλαγές που έγιναν στην υλοποίηση (σε σχέση με την υλοποίηση του LSH της προηγούμενης εργασίας) για το συγκεκριμένο ερώτημα αναλύθηκαν παραπάνω και είναι:
 	
-	1) Στην δομή struct vec_node προστέθηκε ένας πίνακας για την αποθήκευση του χρόνου της κάθε χρονοσειράς.
+	1) Για την αποθήκευση των σημείων της χρονοσειράς εξακολουθείται να χρησιμοποιείται ένας μόνο πίνακας, καθώς λόγω της αναπαράστασης της χρονοσειράς στο R, η διάσταση του χρόνου απαλείφεται.
 	2) Για να εισαχθεί στην δομή LSΗ ή για να γίνει αναζήτηση του πλησιέστερου γείτονα μέσο της δομής LSΗ, κάθε χρονοσειρά υφίσταται πρώτα filtering, έπειτα περνάει από την διαδικασία του snapping ώστε να μετατραπεί σε διάνυσμα και τέλος περνάει από την διαδικασία του minima and maxima.
 	3) Η απόσταση μεταξύ των χρονοσειρών υπολογίζεται βάσει την μετρικής Continuous Frechet, η υλοποίηση της οποίας δίνεται έτοιμη μέσω μιας βιβλιοθήκης C++.
 	4) Παρατηρήσεις σχετικά με την παράμετρο delta αναφέρονται στην συνέχεια.
