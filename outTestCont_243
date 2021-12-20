@@ -1,0 +1,60 @@
+Query aer:
+Approximate Nearest neighbor: ae
+True Nearest neighbor: was not computed
+distanceApproximate: 18.234562
+distanceTrue: was not computed
+
+Query aeri:
+Approximate Nearest neighbor: aegn
+True Nearest neighbor: was not computed
+distanceApproximate: 38.480000
+distanceTrue: was not computed
+
+Query aes:
+Approximate Nearest neighbor: acco
+True Nearest neighbor: was not computed
+distanceApproximate: 3.657023
+distanceTrue: was not computed
+
+Query aet:
+- DID NOT FIND NEAREST NEIGHBOR
+
+Query aeti:
+Approximate Nearest neighbor: adhd
+True Nearest neighbor: was not computed
+distanceApproximate: 2.980000
+distanceTrue: was not computed
+
+Query aey:
+Approximate Nearest neighbor: acst
+True Nearest neighbor: was not computed
+distanceApproximate: 3.100000
+distanceTrue: was not computed
+
+Query aezs:
+Approximate Nearest neighbor: adxs
+True Nearest neighbor: was not computed
+distanceApproximate: 55.550000
+distanceTrue: was not computed
+
+Query afam:
+Approximate Nearest neighbor: a
+True Nearest neighbor: was not computed
+distanceApproximate: 17.050000
+distanceTrue: was not computed
+
+Query afb:
+Approximate Nearest neighbor: aegn
+True Nearest neighbor: was not computed
+distanceApproximate: 12.931875
+distanceTrue: was not computed
+
+Query afc:
+Approximate Nearest neighbor: adx
+True Nearest neighbor: was not computed
+distanceApproximate: 10.304000
+distanceTrue: was not computed
+
+tApproximateAverage: 0.868636 seconds
+tTrueAverage: True Distances were not computed
+Min/Max Approximation Factor are not defined without distanceTrue

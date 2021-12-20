@@ -113,22 +113,26 @@ Github link: https://github.com/giannhskp/Software-Development-for-Algorithmic-P
 	→ Εντολές εκτέλεσης για κάθε ένα από τα δύο εκτελέσιμα:
 
 		► ./search -i <input file> -q <query file> -k <int> -L <int> -M <int> -probes <int> -ο <output file> -algorithm <LSH or Hypercube or Frechet> -metric <discrete or continuous | only for -algorithm Frechet> -delta <double> -distanceTrueOff
+			
 			π.χ.:
-				Ερώτημα Α.i/LSH: 	./search -i nasd_input.csv -q nasd_query.csv -o outLSHVector -algorithm LSH -k 6 -L 4
-				Ερώτημα Α.i/Hypercube:  ./search -i nasd_input.csv -q nasd_query.csv -o outCubeVector -algorithm Hypercube -M 50 -probes 3 -k 5
-				Ερώτημα Α.ii: 		./search -i nasd_input.csv -q nasd_query.csv -o outDiscreteFrechet -algorithm Frechet -metric discrete -delta 1 -k 4 -L 5
-				Ερώτημα Α.iii: 		./search -i nasd_input.csv -q nasd_query.csv -o outContinuousFrechet -algorithm Frechet -metric continuous -delta 1 -distanceTrueOff
+
+			Ερώτημα Α.i/LSH: 	      ./search -i nasd_input.csv -q nasd_query.csv -o outLSHVector -algorithm LSH -k 6 -L 4
+			Ερώτημα Α.i/Hypercube:  ./search -i nasd_input.csv -q nasd_query.csv -o outCubeVector -algorithm Hypercube -M 50 -probes 3 -k 5
+			Ερώτημα Α.ii: 	      ./search -i nasd_input.csv -q nasd_query.csv -o outDiscreteFrechet -algorithm Frechet -metric discrete -delta 1 -k 4 -L 5
+			Ερώτημα Α.iii: 	      ./search -i nasd_input.csv -q nasd_query.csv -o outContinuousFrechet -algorithm Frechet -metric continuous -delta 1 -distanceTrueOff
 
 		
 		► ./cluster -i <input file> -c <configuration file> -o <output file> -update <Mean Frechet or Mean Vector> -assignment <Classic or LSH or Hypercube or LSH_Frechet> -complete <optional> -silhouette <optional> -delta <optional>
+			
 			π.χ.:
-				Μέθοδος 1: 	./cluster -i nasd_input.csv -c cluster.conf -o outputCluster1 -assignment Classic -update Mean Vector
-				Μέθοδος 2: 	./cluster -i nasd_input.csv -c cluster.conf -o outputCluster1 -assignment Classic -update Mean Frechet -delta 1
-				Μέθοδος 3: 	./cluster -i nasd_input.csv -c cluster.conf -o outputCluster1 -assignment LSH
-					ή  	./cluster -i nasd_input.csv -c cluster.conf -o outputCluster1 -assignment LSH -update Mean Vector
-				Μέθοδος 4: 	./cluster -i nasd_input.csv -c cluster.conf -o outputCluster1 -assignment LSH_Frechet -delta 1
-					ή  	./cluster -i nasd_input.csv -c cluster.conf -o outputCluster1 -assignment LSH -update Mean Frechet -delta 1
-				Μέθοδος 5: 	./cluster -i nasd_input.csv -c cluster.conf -o outputCluster1 -assignment Hypercube
+
+			Μέθοδος 1: 	./cluster -i nasd_input.csv -c cluster.conf -o outputCluster1 -assignment Classic -update Mean Vector
+			Μέθοδος 2: 	./cluster -i nasd_input.csv -c cluster.conf -o outputCluster1 -assignment Classic -update Mean Frechet -delta 1
+			Μέθοδος 3: 	./cluster -i nasd_input.csv -c cluster.conf -o outputCluster1 -assignment LSH
+					./cluster -i nasd_input.csv -c cluster.conf -o outputCluster1 -assignment LSH -update Mean Vector
+			Μέθοδος 4: 	./cluster -i nasd_input.csv -c cluster.conf -o outputCluster1 -assignment LSH_Frechet -delta 1
+					./cluster -i nasd_input.csv -c cluster.conf -o outputCluster1 -assignment LSH -update Mean Frechet -delta 1
+			Μέθοδος 5: 	./cluster -i nasd_input.csv -c cluster.conf -o outputCluster1 -assignment Hypercube
  	
 
 	→ Στο εκτελέσιμο του πρώτου μέρους προστέθηκε η δυνατότητα να δοθεί στη γραμμή εντολών η εξής παράμετρος: -distanceTrueOff, 
