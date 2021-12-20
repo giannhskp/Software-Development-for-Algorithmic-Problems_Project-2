@@ -653,5 +653,6 @@ void clustering(List vecList,FILE* fptr,char* assignment,char *update,int numOfC
     printf("INVALID assignment NAME!\n");
     exit(EXIT_FAILURE);
   }
+  free(distanceMetric);
 
 }
