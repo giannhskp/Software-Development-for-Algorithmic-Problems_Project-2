@@ -6,6 +6,10 @@ Vectors comparison is performed using L2 (Euclidean distance) metric.
 
 Time series comparison is performed using Discrete Frechet or Continuous Frechet metric.
 
+**Project Description** : [Project2_2021.pdf](https://github.com/giannhskp/Software-Development-for-Algorithmic-Problems_Project-2/blob/master/Project2_2021.pdf)
+
+**Project Implementation Documentation** : [README.txt](https://github.com/giannhskp/Software-Development-for-Algorithmic-Problems_Project-2/blob/master/README.txt)
+
 # Part 1 - Neighbor Search
 In the first part of the project we implemented 3 different approaches:
   - Time series are represented as vectors in the Euclidean space. The distance between two vectors is computed using L2 (Euclidean distance) metric. The methods used for the Nearest Neighbor Search are: LSH for vectors and Projection to Hypercube (same as Project 1).
